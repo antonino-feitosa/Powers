@@ -22,3 +22,8 @@ end
 function map:on_opening_transition_finished()
 
 end
+
+
+function switch_save:on_activated()
+  game:save()
+end

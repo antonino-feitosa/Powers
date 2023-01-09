@@ -96,6 +96,7 @@ function item_icon_builder:new(game, config)
 
     -- Item assigned.
     local item = game:get_item_assigned(item_icon.slot)
+
     if item_icon.item_displayed ~= item then
       need_rebuild = true
       item_icon.item_displayed = item

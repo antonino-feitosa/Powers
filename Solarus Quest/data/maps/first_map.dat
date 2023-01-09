@@ -97,22 +97,24 @@ destination{
   direction = 1,
 }
 
-block{
+chest{
   layer = 0,
-  x = 88,
-  y = 93,
-  sprite = "entities/block",
-  pushable = true,
-  pullable = true,
+  x = 144,
+  y = 77,
+  treasure_name = "flame",
+  treasure_savegame_variable = "treasure",
+  sprite = "entities/chest",
 }
 
-destructible{
+switch{
+  name = "switch_save",
   layer = 0,
-  x = 216,
-  y = 85,
-  sprite = "destructibles/cabbagge_red",
-  can_be_cut = true,
-  can_explode = true,
-  can_regenerate = true,
+  x = 224,
+  y = 72,
+  subtype = "walkable",
+  sprite = "switches/switch_1",
+  sound = "arrow_hit",
+  needs_block = false,
+  inactivate_when_leaving = false,
 }
 

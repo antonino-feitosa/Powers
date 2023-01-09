@@ -119,6 +119,8 @@ sprite{ id = "hud/icon_action", description = "Action icon" }
 sprite{ id = "hud/icon_attack", description = "Attack icon" }
 sprite{ id = "hud/icon_item_1", description = "Item 1 icon" }
 sprite{ id = "hud/icon_item_2", description = "Item 2 icon" }
+sprite{ id = "hud/icon_item_3", description = "Item 3 icon" }
+sprite{ id = "hud/icon_item_4", description = "Item 4 icon" }
 sprite{ id = "hud/icon_pause", description = "Pause icon" }
 sprite{ id = "hud/magic_bar", description = "Magic bar" }
 sprite{ id = "menus/arrow", description = "Arrow" }
@@ -283,6 +285,7 @@ sound{ id = "wrong", description = "wrong" }
 sound{ id = "wrong2", description = "wrong2" }
 sound{ id = "wrong3", description = "wrong3" }
 
+item{ id = "flame" }
 item{ id = "gem", description = "Gem (x1 / x5 / x20 / x50 / x300)" }
 item{ id = "heart", description = "Heart" }
 item{ id = "money_bag", description = "Money bag (small / large / huge)" }
@@ -335,6 +338,7 @@ file{ path = "enemies/slime_yellow.lua", author = "Diarandor", license = "GPL v3
 file{ path = "enemies/slimy_green.lua", author = "Diarandor", license = "GPL v3" }
 file{ path = "fonts/8_bit.png", author = "usr_share, Christopho", license = "Public domain" }
 file{ path = "fonts/enter_command.ttf", author = "Jeti", license = "CC BY 4.0" }
+file{ path = "items/flame.lua", author = "Antonino", }
 file{ path = "items/gem.lua", author = "Christopho", license = "GPL v3" }
 file{ path = "items/heart.lua", author = "Christopho", license = "GPL v3" }
 file{ path = "items/money_bag.lua", author = "Christopho", license = "GPL v3" }
@@ -768,8 +772,12 @@ file{ path = "sprites/hud/icon_item_1.dat", author = "Olivier Cléro", license =
 file{ path = "sprites/hud/icon_item_1.png", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
 file{ path = "sprites/hud/icon_item_2.dat", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
 file{ path = "sprites/hud/icon_item_2.png", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
+file{ path = "sprites/hud/icon_item_3.dat", author = "Antonino Feitosa", license = "UNLICENSED" }
+file{ path = "sprites/hud/icon_item_4.dat", author = "Antonino Feitosa", license = "UNLICENSED" }
 file{ path = "sprites/hud/icon_pause.dat", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
 file{ path = "sprites/hud/icon_pause.png", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
+file{ path = "sprites/hud/icon_power_1.png", author = "Antonino Feitosa", license = "UNLICENSED" }
+file{ path = "sprites/hud/icon_power_2.png", author = "Antonino Feitosa", license = "UNLICENSED" }
 file{ path = "sprites/hud/magic_bar.dat", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
 file{ path = "sprites/hud/magic_bar.png", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
 file{ path = "sprites/hud/rupee_icon.png", author = "Olivier Cléro", license = "CC BY-SA 4.0" }

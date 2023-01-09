@@ -10,5 +10,6 @@ require("scripts/menus/dialog_box")
 
 require("scripts/meta/hero")
 require("scripts/meta/map")
+require("scripts/meta/game")
 
 return true

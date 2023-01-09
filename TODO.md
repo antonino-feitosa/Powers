@@ -3,12 +3,12 @@
 
 - [ ] Create Player
     - [ ] Basic Actions with Animations
-        - [ ] Walk
         - [ ] Hurt
         - [ ] Attack
         - [ ] Run
-- [ ] Controls
-    - [ ] Actions B and N
+- [x] Controls
+    - [x] Actions B and N
+    - [x] Hud to Actions
 - [ ] Simple Enemy
 
 - [ ] Create powers of the basic attributes;
