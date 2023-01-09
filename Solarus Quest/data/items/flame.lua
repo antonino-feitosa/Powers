@@ -24,16 +24,15 @@ end
 function item:on_obtaining()
   local game = item:get_game()
   game:set_item_assigned(3, item)
-  print(">>>>>>>>>>>>>")
 end
 
 -- Event called when the hero starts using this item.
 function item:on_using()
-
   -- Define here what happens when using this item
   -- and call item:set_finished() to release the hero when you have finished.
   item:set_finished()
 end
+
 
 -- Event called when a pickable treasure representing this item
 -- is created on the map.

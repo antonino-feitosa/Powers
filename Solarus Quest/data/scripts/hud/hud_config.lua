@@ -38,41 +38,41 @@ local hud_config = {
     menu_script = "scripts/hud/item_icon",
     x = 8,
     y = 26,
-    slot = 1,  -- Item slot (1 or 2).
+    slot = 1,
   },
 
   -- Item icon for slot 2.
   {
     menu_script = "scripts/hud/item_icon",
-    x = 68,
+    x = 38,
     y = 26,
-    slot = 2,  -- Item slot (1 or 2).
+    slot = 2,
   },
 
   -- Item icon for slot 3
   {
     menu_script = "scripts/hud/item_icon",
-    x = 98,
+    x = 68,
     y = 26,
     slot = 3,
   },
 
-  -- Item icon for slot 4.
+  -- Item icon for slot 4
   {
     menu_script = "scripts/hud/item_icon",
-    x = 128,
+    x = 98,
     y = 26,
     slot = 4,
   },
 
-  -- Attack icon.
+  -- Item icon for slot 5
   {
-    menu_script = "scripts/hud/attack_icon",
-    x = 38,
+    menu_script = "scripts/hud/item_icon",
+    x = 128,
     y = 26,
-    dialog_x = 15,
-    dialog_y = 20,
+    slot = 5,
   },
+
 
   -- Action icon.
   {

@@ -1,4 +1,5 @@
 map{ id = "first_map", description = "First map" }
+map{ id = "test" }
 
 tileset{ id = "castle", description = "Castle" }
 tileset{ id = "house", description = "House" }
@@ -121,6 +122,7 @@ sprite{ id = "hud/icon_item_1", description = "Item 1 icon" }
 sprite{ id = "hud/icon_item_2", description = "Item 2 icon" }
 sprite{ id = "hud/icon_item_3", description = "Item 3 icon" }
 sprite{ id = "hud/icon_item_4", description = "Item 4 icon" }
+sprite{ id = "hud/icon_item_5", description = "Item 5 icon" }
 sprite{ id = "hud/icon_pause", description = "Pause icon" }
 sprite{ id = "hud/magic_bar", description = "Magic bar" }
 sprite{ id = "menus/arrow", description = "Arrow" }
@@ -346,6 +348,8 @@ file{ path = "items/sword.lua", author = "Christopho", license = "GPL v3" }
 file{ path = "items/tunic.lua", author = "Christopho", license = "GPL v3" }
 file{ path = "languages/en/text/strings.dat", author = "Christopho", license = "CC BY-SA 4.0" }
 file{ path = "main.lua", author = "Christopho", license = "GPL v3" }
+file{ path = "maps/test.dat", author = "Antonino Feitosa", license = "UNLINCESED" }
+file{ path = "maps/test.lua", author = "Antonino Feitosa", license = "UNLINCESED" }
 file{ path = "musics/eduardo", author = "Eduardo Dueñas", license = "CC BY-SA 4.0" }
 file{ path = "musics/eduardo/boss.ogg", author = "Eduardo Dueñas", license = "CC BY-SA 4.0" }
 file{ path = "musics/eduardo/cave.ogg", author = "Eduardo Dueñas", license = "CC BY-SA 4.0" }
@@ -768,16 +772,18 @@ file{ path = "sprites/hud/icon_action.dat", author = "Olivier Cléro", license =
 file{ path = "sprites/hud/icon_action.png", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
 file{ path = "sprites/hud/icon_attack.dat", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
 file{ path = "sprites/hud/icon_attack.png", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
-file{ path = "sprites/hud/icon_item_1.dat", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
-file{ path = "sprites/hud/icon_item_1.png", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
-file{ path = "sprites/hud/icon_item_2.dat", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
-file{ path = "sprites/hud/icon_item_2.png", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
+file{ path = "sprites/hud/icon_item_1.dat", author = "Antonino Feitosa", license = "UNLICENSED" }
+file{ path = "sprites/hud/icon_item_1.png", author = "Antonino Feitosa", license = "UNLICENSED" }
+file{ path = "sprites/hud/icon_item_2.dat", author = "Antonino Feitosa", license = "UNLICENSED" }
+file{ path = "sprites/hud/icon_item_2.png", author = "Antonino Feitosa", license = "UNLICENSED" }
 file{ path = "sprites/hud/icon_item_3.dat", author = "Antonino Feitosa", license = "UNLICENSED" }
-file{ path = "sprites/hud/icon_item_4.dat", author = "Antonino Feitosa", license = "UNLICENSED" }
+file{ path = "sprites/hud/icon_item_3.png", author = "Antonino Feitosa", license = "UNLICENSED" }
+file{ path = "sprites/hud/icon_item_4.dat", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
+file{ path = "sprites/hud/icon_item_4.png", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
+file{ path = "sprites/hud/icon_item_5.dat", author = "Antonino Feitosa", license = "UNLICENSED" }
+file{ path = "sprites/hud/icon_item_5.png", author = "Antonino Feitosa", license = "UNLICENSED" }
 file{ path = "sprites/hud/icon_pause.dat", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
 file{ path = "sprites/hud/icon_pause.png", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
-file{ path = "sprites/hud/icon_power_1.png", author = "Antonino Feitosa", license = "UNLICENSED" }
-file{ path = "sprites/hud/icon_power_2.png", author = "Antonino Feitosa", license = "UNLICENSED" }
 file{ path = "sprites/hud/magic_bar.dat", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
 file{ path = "sprites/hud/magic_bar.png", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
 file{ path = "sprites/hud/rupee_icon.png", author = "Olivier Cléro", license = "CC BY-SA 4.0" }
