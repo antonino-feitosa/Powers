@@ -9,7 +9,8 @@ Simple ARPG with rogue like game elements:
 - [ ] Puzzles (like Zelda[^3], Pokemon[^4], video games[^5] and RPG[^6]);
 - [ ] Races, Classes and Weapons;
 - [ ] Dialog and Conversation Strategies;
-- [ ] Environment Interaction;
+- [ ] Environment Interaction (like Brogue[^14] and Pokemon[^13]);
+- [ ] Weapons Strategy (like Brogue[^12]);
 - [ ] Strange and Hostil Environment (like Roadside Picnic[^7] and Annihilation[^8] with elements of Debris[^9] and Doctor Who[^10]).
 
 ## History
@@ -36,3 +37,6 @@ This is the first version implemented using Solarus[^11] engine.
 [^9]: [https://en.wikipedia.org/wiki/Debris_(TV_series)]
 [^10]: [https://pt.wikipedia.org/wiki/Doctor_Who]
 [^11]: [https://www.solarus-games.org/]
+[^12]: [https://brogue.fandom.com/wiki/Category:Weapon]
+[^13]: [https://bulbapedia.bulbagarden.net/wiki/Field_move]
+[^14]: [https://brogue.fandom.com/wiki/Terrain_Features]

@@ -1,6 +1,20 @@
 
 ## Development Plan
 
+- [ ] Environment
+    - [ ] Ground
+    - [ ] Mountain
+    - [ ] Forest
+    - [ ] Fire
+    - [ ] Water
+    - [ ] Ice
+    - [ ] Poison
+    - [ ] Electric
+    - [ ] Dark
+    - [ ] Sand
+    - [ ] Ocean
+    - [ ] Lake
+    - [ ] River
 - [ ] Create Player
     - [ ] Basic Actions with Animations
         - [ ] Hurt

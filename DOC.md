@@ -9,6 +9,20 @@
 
 ## Weapons
 
+#### Sword
+
+- [ ] Cut
+- [ ] Swing
+- [ ] Piercer
+- [ ] Parry
+
+#### Axe
+
+- [ ] Pull
+- [ ] Disarm Shield
+- [ ] Cut
+- [ ] Swing
+
 ## Puzzles
 
 ## Attack Types
