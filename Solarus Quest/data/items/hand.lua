@@ -17,19 +17,39 @@ function item:on_started()
   -- Initialize the properties of your item here,
   -- like whether it can be saved, whether it has an amount
   -- and whether it can be assigned.
-  item:set_savegame_variable("flame_item")
+  item:set_savegame_variable("possession_hand")
   item:set_assignable(true)
 end
 
 function item:on_obtaining()
   local game = item:get_game()
-  game:set_item_assigned(3, item)
+  game:set_item_assigned(1, item)
+end
+
+function item:on_charging(hero)
+  local x, y, layer = hero:get_position()
+  local map = item:get_map()
+  item.touch = map:create_custom_entity({
+    x = x,
+    y = y,
+    layer = layer,
+    direction = 0,
+    width = 16,
+    height = 16,
+    model = 'hand_touch'
+  })
 end
 
 -- Event called when the hero starts using this item.
 function item:on_using()
   -- Define here what happens when using this item
   -- and call item:set_finished() to release the hero when you have finished.
+  
+  if item.touch then
+    item.touch:remove()
+    item.touch = nil
+  end
+
   item:set_finished()
 end
 

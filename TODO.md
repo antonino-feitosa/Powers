@@ -4,7 +4,7 @@
 - [ ] Create Player
     - [ ] Basic Actions with Animations
         - [ ] Hurt
-        - [ ] Attack
+        - [x] Attack (hand)
         - [ ] Run
 - [x] Controls
     - [x] Actions B and N

@@ -16,6 +16,7 @@ sprite{ id = "animals/butterfly_yellow", description = "Butterfly yellow" }
 sprite{ id = "animals/meow_orange", description = "Meow orange" }
 sprite{ id = "animals/mouse", description = "Mouse" }
 sprite{ id = "animals/worf_brown", description = "Worf Brown" }
+sprite{ id = "attack/hand", description = "Touch Attack" }
 sprite{ id = "blocks/block_blue", description = "Block (blue)" }
 sprite{ id = "blocks/block_brown", description = "Block (brown)" }
 sprite{ id = "blocks/block_green", description = "Block (green)" }
@@ -287,8 +288,8 @@ sound{ id = "wrong", description = "wrong" }
 sound{ id = "wrong2", description = "wrong2" }
 sound{ id = "wrong3", description = "wrong3" }
 
-item{ id = "flame" }
 item{ id = "gem", description = "Gem (x1 / x5 / x20 / x50 / x300)" }
+item{ id = "hand" }
 item{ id = "heart", description = "Heart" }
 item{ id = "money_bag", description = "Money bag (small / large / huge)" }
 item{ id = "sword", description = "Sword" }
@@ -312,6 +313,7 @@ enemy{ id = "slime_red", description = "Slime (red)" }
 enemy{ id = "slime_yellow", description = "Slime (yellow)" }
 enemy{ id = "slimy_green", description = "Slimy Green" }
 
+entity{ id = "hand_touch", description = "Touch Hand" }
 
 language{ id = "en", description = "English" }
 
@@ -338,10 +340,11 @@ file{ path = "enemies/slime_purple.lua", author = "Diarandor", license = "GPL v3
 file{ path = "enemies/slime_red.lua", author = "Diarandor", license = "GPL v3" }
 file{ path = "enemies/slime_yellow.lua", author = "Diarandor", license = "GPL v3" }
 file{ path = "enemies/slimy_green.lua", author = "Diarandor", license = "GPL v3" }
+file{ path = "entities/hand_touch.lua", author = "Antonino Feitosa", license = "UNLICENSED" }
 file{ path = "fonts/8_bit.png", author = "usr_share, Christopho", license = "Public domain" }
 file{ path = "fonts/enter_command.ttf", author = "Jeti", license = "CC BY 4.0" }
-file{ path = "items/flame.lua", author = "Antonino", }
 file{ path = "items/gem.lua", author = "Christopho", license = "GPL v3" }
+file{ path = "items/hand.lua", author = "Antonino", }
 file{ path = "items/heart.lua", author = "Christopho", license = "GPL v3" }
 file{ path = "items/money_bag.lua", author = "Christopho", license = "GPL v3" }
 file{ path = "items/sword.lua", author = "Christopho", license = "GPL v3" }
@@ -524,6 +527,7 @@ file{ path = "sprites/animals/mouse.dat", author = "Diarandor", license = "CC BY
 file{ path = "sprites/animals/mouse.png", author = "Diarandor", license = "CC BY-SA 4.0" }
 file{ path = "sprites/animals/worf_brown.dat", author = "Diarandor", license = "CC BY-SA 4.0" }
 file{ path = "sprites/animals/worf_brown.png", author = "Diarandor", license = "CC BY-SA 4.0" }
+file{ path = "sprites/attack/hand.dat", author = "Antonino Feitosa", license = "UNLICENSED" }
 file{ path = "sprites/blocks", license = "CC BY-SA 4.0" }
 file{ path = "sprites/blocks/block.png", author = "Diarandor", license = "CC BY-SA 4.0" }
 file{ path = "sprites/blocks/block_blue.dat", author = "Diarandor", license = "CC BY-SA 4.0" }

@@ -13,7 +13,7 @@ function game_meta:start_process_power(power)
     local hero = map:get_hero()
     hero:on_power_pressed(power)
     local item = game:get_item_assigned(power)
-    if item then hero:start_item(item) end
+    if item and item.on_charging then item:on_charging(hero) end
   end
 end
 
@@ -24,8 +24,8 @@ function game_meta:end_process_power(power)
     local hero = map:get_hero()
     hero:on_power_released(power)
     local item = game:get_item_assigned(power)
-    if item and item.on_apply then
-      item:on_apply()
+    if item then
+      hero:start_item(item)
     end
   end
 end
