@@ -9,8 +9,8 @@ You are an entity in a world of war and research, training to become a warrior. 
   quest_version = "1.0.0",
   release_date = "",
   website = "",
-  normal_quest_size = "320x240",
-  min_quest_size = "320x240",
-  max_quest_size = "320x240",
+  normal_quest_size = "640x480",
+  min_quest_size = "640x480",
+  max_quest_size = "640x480",
 }
 

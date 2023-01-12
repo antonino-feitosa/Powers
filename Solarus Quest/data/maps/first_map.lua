@@ -12,7 +12,7 @@ local game = map:get_game()
 
 -- Event called at initialization time, as soon as this map is loaded.
 function map:on_started()
-
+	invisible:set_visible(false)
   -- You can initialize the movement and sprites of various
   -- map entities here.
 end
@@ -23,7 +23,11 @@ function map:on_opening_transition_finished()
 
 end
 
-
-function switch_save:on_activated()
-  game:save()
+function first_map_sensor1:on_activated()
+	local hero = map:get_hero()
+	if hero:get_layer() == 1 then
+		hero:set_layer(0)
+	else
+		hero:set_layer(1)
+	end
 end

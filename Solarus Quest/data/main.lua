@@ -11,6 +11,8 @@ local initial_menus = {}
 -- This function is called when Solarus starts.
 function sol.main:on_started()
 
+	sol.video.set_window_size(640, 480)
+
   sol.main.load_settings()
   math.randomseed(os.time())
 

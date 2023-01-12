@@ -1,15 +1,16 @@
 # Game Powers
 
 Simple ARPG with rogue like game elements:
+- [ ] Turn Based (Active Time Battle);
 - [ ] Procedural Map Generation;
 - [ ] Permanent Death;
 - [ ] High difficulty;
 - [ ] Powers Customization (like Daemon Supers[^1]);
 - [ ] Rare and Champion Monsters (like Diablo 3[^2]);
-- [ ] Puzzles (like Zelda[^3], Pokemon[^4], video games[^5] and RPG[^6]);
+- [ ] Puzzles (like Zelda[^3], Pokemon[^4], video games[^5], Goof a Troop[^16] and RPG[^6]);
 - [ ] Races, Classes and Weapons;
 - [ ] Dialog and Conversation Strategies;
-- [ ] Environment Interaction (like Brogue[^14] and Pokemon[^13]);
+- [ ] Environment Interaction (like Brogue[^14], Pokemon[^13] and Metroid[^15]);
 - [ ] Weapons Strategy (like Brogue[^12]);
 - [ ] Strange and Hostil Environment (like Roadside Picnic[^7] and Annihilation[^8] with elements of Debris[^9] and Doctor Who[^10]).
 
@@ -40,3 +41,5 @@ This is the first version implemented using Solarus[^11] engine.
 [^12]: [https://brogue.fandom.com/wiki/Category:Weapon]
 [^13]: [https://bulbapedia.bulbagarden.net/wiki/Field_move]
 [^14]: [https://brogue.fandom.com/wiki/Terrain_Features]
+[^15]: [https://metroid.fandom.com/wiki/Super_Metroid#Power-ups_and_suit_upgrades]
+[^16]: [http://playingwithsuperpower.com/goof-troop-review/]

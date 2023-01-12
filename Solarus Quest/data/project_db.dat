@@ -1,11 +1,16 @@
-map{ id = "first_map", description = "First map" }
+map{ id = "Hex" }
+map{ id = "first_map" }
+map{ id = "intro/tutorial", description = "Tutorial" }
+map{ id = "simple_procedural" }
 map{ id = "test" }
 
+tileset{ id = "HexGrid" }
 tileset{ id = "castle", description = "Castle" }
 tileset{ id = "house", description = "House" }
 tileset{ id = "oceanset_inside", description = "Oceanset-Inside" }
 tileset{ id = "oceanset_outside", description = "Oceanset-Outside" }
 tileset{ id = "outside", description = "Light Overworld" }
+tileset{ id = "powers", description = "Powers Tileset" }
 
 sprite{ id = "animals/bird_red", description = "Red Bird" }
 sprite{ id = "animals/butterfly_blue", description = "Butterfly blue" }
@@ -170,6 +175,7 @@ music{ id = "eduardo/sword_fanfare", description = "Sword fanfare" }
 music{ id = "eduardo/title_screen", description = "Title screen" }
 music{ id = "eduardo/village", description = "Village" }
 music{ id = "eduardo/witch_hut", description = "Witch" }
+music{ id = "leap-motiv-113893", description = "Soft Music" }
 
 sound{ id = "arrow_hit", description = "arrow_hit" }
 sound{ id = "bird_chirp", description = "bird_chirp" }
@@ -351,6 +357,10 @@ file{ path = "items/sword.lua", author = "Christopho", license = "GPL v3" }
 file{ path = "items/tunic.lua", author = "Christopho", license = "GPL v3" }
 file{ path = "languages/en/text/strings.dat", author = "Christopho", license = "CC BY-SA 4.0" }
 file{ path = "main.lua", author = "Christopho", license = "GPL v3" }
+file{ path = "maps/intro/tutorial.dat", author = "Antonino Feitosa", license = "UNLICENSED" }
+file{ path = "maps/intro/tutorial.lua", author = "Antonino Feitosa", license = "UNLICENSED" }
+file{ path = "maps/simple_procedural.dat", author = "Antonino", }
+file{ path = "maps/simple_procedural.lua", author = "Antonino", }
 file{ path = "maps/test.dat", author = "Antonino Feitosa", license = "UNLINCESED" }
 file{ path = "maps/test.lua", author = "Antonino Feitosa", license = "UNLINCESED" }
 file{ path = "musics/eduardo", author = "Eduardo Dueñas", license = "CC BY-SA 4.0" }
@@ -370,6 +380,7 @@ file{ path = "musics/eduardo/sword_fanfare.ogg", author = "Eduardo Dueñas", lic
 file{ path = "musics/eduardo/title_screen.ogg", author = "Eduardo Dueñas", license = "CC BY-SA 4.0" }
 file{ path = "musics/eduardo/village.ogg", author = "Eduardo Dueñas", license = "CC BY-SA 4.0" }
 file{ path = "musics/eduardo/witch_hut.ogg", author = "Eduardo Dueñas", license = "CC BY-SA 4.0" }
+file{ path = "musics/leap-motiv-113893.ogg", author = "Samuel Francis Johnson", license = "Pixabay License" }
 file{ path = "scripts/features.lua", author = "Christopho", license = "GPL v3" }
 file{ path = "scripts/game_manager.lua", author = "Christopho", license = "GPL v3" }
 file{ path = "scripts/hud", license = "GPL v3" }
@@ -858,3 +869,5 @@ file{ path = "tilesets/oceanset_outside.dat", author = "Max Mraz", license = "CC
 file{ path = "tilesets/oceanset_outside.tiles.png", author = "Max Mraz", license = "CC BY-SA 4.0" }
 file{ path = "tilesets/outside.dat", author = "Diarandor, Max Mraz", license = "CC-BY-SA 4.0" }
 file{ path = "tilesets/outside.tiles.png", author = "Diarandor, Max Mraz", license = "CC-BY-SA 4.0" }
+file{ path = "tilesets/powers.dat", author = "Antonino Feitosa", license = "UNLICENSED" }
+file{ path = "tilesets/powers.tiles.png", author = "Antonino Feitosa", license = "UNLICENSED" }
