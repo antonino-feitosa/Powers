@@ -41,6 +41,28 @@ export class Random {
         return this.nextDouble() >= 0.5;
     }
 
+    pick<T>(arr: T[]): T {
+        if (arr.length <= 0)
+            throw new Error('The must have at least one element!');
+        let index = this.nextInt(arr.length);
+        return arr[index];
+    }
+
+    shuffle<T>(vet: T[]): void {
+        for (let i = vet.length - 1; i > 0; i--) {
+            let index = this.nextInt(i);
+            [vet[i], vet[index]] = [vet[index], vet[i]];
+        }
+    }
+
+    sample<T>(vet: T[], size: number): T[] {
+        if (!vet || !vet.length || vet.length < size)
+            throw new Error(`The array must have at least ${size} elements!`);
+        let arr = [...vet];
+        this.shuffle(arr);
+        return arr.slice(0, size);
+    }
+
     /** Hash function to extract no zero 128 seed from a string.*/
     static _cyrb128(str: string) {
         let h1 = 1779033703, h2 = 3144134277, h3 = 1013904242, h4 = 2773480762;
