@@ -2,7 +2,7 @@
 
 
 
-
+function testSeq(){
 
 function seq(min: number, max: number, step = 1): number[] {
     return Array(max - min).fill(1).map((_,index) => min + step * index);
@@ -10,6 +10,7 @@ function seq(min: number, max: number, step = 1): number[] {
 
 let x = seq(0, 10, 1);
 console.log(x);
+}
 
 
 
@@ -17,12 +18,11 @@ console.log(x);
 
 
 
-
-function textColor() {
+//function textColor() {
 
     let rgb: number[] = [255, 255, 255];
 
-    let fg: string = '\x1b[38;2;255;255;255m';
+    let fg: string = '\x1b[38;2;255;255;0m';
 
     let bg: string = '\x1b[48;2;0;0;0m';
 
@@ -33,5 +33,5 @@ function textColor() {
     console.log('\x1b[38;2;255;255;255mString');
 
     console.log('\x1b[0m');
-}
+//}
 
