@@ -1,0 +1,24 @@
+{
+    "ts-node": {
+        "files": true
+    },
+    "files": [
+        "Main.ts"
+    ],
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": false,
+        "lib": [
+            "ES2021", "DOM"
+        ],
+        "module": "ES2022",
+        "moduleResolution": "node",
+        "target": "ES2021",
+        "noImplicitAny": true,
+        "outDir": "./dist",
+        "sourceMap": true,
+        "alwaysStrict": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noFallthroughCasesInSwitch": true
+    }
+}

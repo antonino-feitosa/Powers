@@ -31,21 +31,21 @@ The first version should be implemented using Solarus[^11] engine (lua).
 The final version should be implemenete using Unity.
 
 
-[^1]: [https://wiki.daemon.com.br/index.php?title=Supers_RPG]
-[^2]: [https://www.reddit.com/r/Diablo/comments/tuhcc/whats_the_difference_between_champion_rare_and/]
-[^3]: [https://gamerant.com/zelda-hardest-puzzles-how-to-solve/]
-[^4]: [https://www.thegamer.com/pokemon-hardest-puzzles-across-all-games-ranked/]
-[^5]: [https://www.denofgeek.com/games/hardest-video-game-puzzles/]
-[^6]: [https://www.reddit.com/r/rpg/comments/1l72cw/10000_greatest_traps_puzzles/]
-[^7]: [https://en.wikipedia.org/wiki/Roadside_Picnic]
-[^8]: [https://en.wikipedia.org/wiki/Annihilation_(VanderMeer_novel)]
-[^9]: [https://en.wikipedia.org/wiki/Debris_(TV_series)]
-[^10]: [https://pt.wikipedia.org/wiki/Doctor_Who]
-[^11]: [https://www.solarus-games.org/]
-[^12]: [https://brogue.fandom.com/wiki/Category:Weapon]
-[^13]: [https://bulbapedia.bulbagarden.net/wiki/Field_move]
-[^14]: [https://brogue.fandom.com/wiki/Terrain_Features]
-[^15]: [https://metroid.fandom.com/wiki/Super_Metroid#Power-ups_and_suit_upgrades]
-[^16]: [http://playingwithsuperpower.com/goof-troop-review/]
-[^17]: [https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797]
-[^18]: [https://bfnightly.bracketproductions.com/chapter_0.html]
+[^1]: [Daemon Powers](https://wiki.daemon.com.br/index.php?title=Supers_RPG)
+[^2]: [Diablo 3 - Monters](https://www.reddit.com/r/Diablo/comments/tuhcc/)whats_the_difference_between_champion_rare_and/]
+[^3]: [Zelda - Puzzles](https://gamerant.com/zelda-hardest-puzzles-how-to-solve/)
+[^4]: [Pokemon - Puzzles](https://www.thegamer.com/pokemon-hardest-puzzles-across-all-games-ranked/)
+[^5]: [Video Game - Puzzles](https://www.denofgeek.com/games/hardest-video-game-puzzles/)
+[^6]: [RPG - Puzzles](https://www.reddit.com/r/rpg/comments/1l72cw/10000_greatest_traps_puzzles/)
+[^7]: [Roadside Picnic](https://en.wikipedia.org/wiki/Roadside_Picnic)
+[^8]: [Annihilation](https://en.wikipedia.org/wiki/Annihilation_(VanderMeer_novel))
+[^9]: [Debris](https://en.wikipedia.org/wiki/Debris_(TV_series))
+[^10]: [Doctor Who](https://pt.wikipedia.org/wiki/Doctor_Who)
+[^11]: [Solarus](https://www.solarus-games.org/)
+[^12]: [Brogue - Weapons](https://brogue.fandom.com/wiki/Category:Weapon)
+[^13]: [Pokemon Moves](https://bulbapedia.bulbagarden.net/wiki/Field_move)
+[^14]: [Brogue - Terrain](https://brogue.fandom.com/wiki/Terrain_Features)
+[^15]: [Metroid Powers](https://metroid.fandom.com/wiki/Super_Metroid#Power-ups_and_suit_upgrades)
+[^16]: [Goof Troop - Pluzzes](http://playingwithsuperpower.com/goof-troop-review/)
+[^17]: [ANSI Escape Codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797)
+[^18]: [Rogue Like with Rust](https://bfnightly.bracketproductions.com/chapter_0.html)

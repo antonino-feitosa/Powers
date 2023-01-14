@@ -1,4 +1,4 @@
-/** Class represeting a uniform pseudorandom number generator.
+/** Class representing a uniform pseudorandom number generator.
     Implementation of xoshiro128** general-purpose 64-bit number generator with cyrb128 hash initialization.
     The javascript switch to 32-bit integer mode during bitwise operation (justifies the 128 version over 256).
     Implementation based on the stackoverflow discussion:
