@@ -1,18 +1,14 @@
 
-
 import { Random } from './Random';
+import { range } from './Utils';
 
 export enum Tile {
     Wall,
-    Floor
+    Floor,
+    Corridor
 }
 
 export type mapCallback = (value: number, position: Point) => void;
-
-function range(min: number, max: number, step = 1): number[] {
-    let arr = Array(max - min).fill(1);
-    return arr.map((_, index) => min + step * index);
-}
 
 export class Point {
     x: number;
@@ -30,6 +26,10 @@ export class Point {
     copy(point: Point) {
         this.x = point.x;
         this.y = point.y;
+    }
+
+    static sum(a: Point, b: Point): Point {
+        return new Point(a.x + b.x, a.y + b.y);
     }
 }
 
@@ -63,13 +63,13 @@ interface RoomGenerator {
     make: () => Layer;
 }
 
-class MapGenerator {
+export class MapGenerator {
 
     width: number;
     height: number;
     rand: Random;
 
-    constructor(width:number, height:number, rand:Random) {
+    constructor(width: number, height: number, rand: Random) {
         this.width = width;
         this.height = height;
         this.rand = rand;
@@ -83,9 +83,20 @@ class MapGenerator {
         return layer;
     }
 
+    createRoomToMap(map: Layer, rect: Rectangle): void {
+        map.iterateMap(rect.start, rect.end, (_, p) => map.setTile(p, Tile.Floor));
+    }
 
-    applyRoomToMap(map: Layer, rect: Rectangle, room: Layer): void {
-        //this.iterateMap(rect.start, rect.end, );
+    copyRoomToMap(map: Layer, point: Point, room: Layer): void {
+        room.iterate((_, inc) => map.setTile(Point.sum(inc, point), room.getTile(inc)));
+    }
+
+    makeTunnelHor(map: Layer, start: number, end: number, y: number) {
+        map.iterateHor(start, end, y, (_, p) => map.setTile(p, Tile.Floor));
+    }
+
+    makeTunnelVer(map: Layer, start: number, end: number, x: number) {
+        map.iterateVer(start, end, x, (_, p) => map.setTile(p, Tile.Floor));
     }
 
     samplePosition(map: Layer, tile: Tile, size = 1) {
@@ -126,6 +137,7 @@ export class MapManager {
 
     setMapGenerator(mapGen: MapGenerator) {
         this.mapGen = mapGen;
+        this.currentLayer = mapGen.make();
     }
 
     getCurrentLayer(): Layer {
@@ -141,18 +153,22 @@ export class Layer {
     start: Point;
     end: Point;
 
-    constructor(width = 80, height = 50, start = new Point(0, 0), end = new Point(0, 0)) {
+    constructor(width = 80, height = 50, tile:Tile = Tile.Floor) {
         this.width = width;
         this.height = height;
-        this.start = start;
-        this.end = end;
-        this.map = Array.from({ length: this.height * this.width }, () => Tile.Floor);
+        this.start = new Point();
+        this.end = new Point();
+        this.map = Array.from({ length: this.height * this.width }, () => tile);
     }
 
     on_start(): void {
     }
 
     _iterateDim(start: number, end: number, common: number, horizontal = true, call: mapCallback): void {
+        if(start > end){
+            console.warn(`Wrong limits! Swaping start ${start} and end ${end}`);
+            [start, end] = [end, start];
+        }
         range(start, end).forEach(i => {
             let point: Point = new Point();
             [point.x, point.y] = horizontal ? [i, common] : [common, i];

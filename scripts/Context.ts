@@ -35,8 +35,9 @@ export class Context {
 
     drawLayer(world: Layer) {
         let map = new Map([
-            [Tile.Floor, new Renderable(' ', 'white', 'black')],
+            [Tile.Floor, new Renderable('.', 'white', 'black')],
             [Tile.Wall, new Renderable('#', 'white', 'black')],
+            [Tile.Corridor, new Renderable('c', 'white', 'black')],
         ]);
         world.iterateMap(new Point(), new Point(this.width, this.height), (val, point) => {
             let render = map.get(val);

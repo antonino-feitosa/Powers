@@ -1,8 +1,8 @@
 
-import { Random } from './Random';
-import { MapManager, Layer } from './MapManager';
-import { Context, KeyEvent } from './Context';
 import { Component } from './Component';
+import { Context, KeyEvent } from './Context';
+import { Layer, MapGenerator, MapManager } from './MapManager';
+import { Random } from './Random';
 
 
 enum CommandState { On, Active, Deactivating, Off };
@@ -20,8 +20,8 @@ export class Game {
     running = false;
     drawing = true;
 
-    constructor(width = 20, height = 15, seed = 0) {
-        this.rand = new Random(seed);
+    constructor(width = 20, height = 15, rand = new Random(0)) {
+        this.rand = rand;
         this.context = new Context(width, height);
         this.context.setTitle('Powers - Rogue Like\n');
         this.world = new MapManager(width, height, this.rand);
@@ -45,6 +45,10 @@ export class Game {
 
     getCurrentLayer(): Layer {
         return this.world.getCurrentLayer();
+    }
+
+    setMapGenerator(mapGen: MapGenerator): void {
+        this.world.setMapGenerator(mapGen);
     }
 
     start() {
