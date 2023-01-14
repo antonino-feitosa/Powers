@@ -1,4 +1,5 @@
 
+import { Renderable } from './Component';
 import { Random } from './Random';
 import { range } from './Utils';
 
@@ -8,7 +9,7 @@ export enum Tile {
     Corridor
 }
 
-export type mapCallback = (value: number, position: Point) => void;
+export type mapCallback = (value: Cell, position: Point) => void;
 
 export class Point {
     x: number;
@@ -101,13 +102,13 @@ export class MapGenerator {
 
     samplePosition(map: Layer, tile: Tile, size = 1) {
         let floor: Point[] = [];
-        map.iterate((val, pos) => val === tile && (floor.push(pos)));
+        map.iterate((val, pos) => val.getTile() === tile && (floor.push(pos)));
         this.rand.shuffle(floor);
         return this.rand.sample(floor, size);
     }
 
     makeBoundariesWalls(map: Layer): void {
-        let makeWall = (_: Tile, pos: Point) => map.setTile(pos, Tile.Wall);
+        let makeWall = (_: Cell, pos: Point) => map.setTile(pos, Tile.Wall);
         map.iterateHor(0, map.width, 0, makeWall);
         map.iterateHor(0, map.width, map.height - 1, makeWall);
         map.iterateVer(0, map.height, 0, makeWall);
@@ -145,27 +146,71 @@ export class MapManager {
     }
 }
 
+export class Cell {
+
+    _point: Point;
+    _tile: Tile;
+    render: Renderable;
+
+    constructor(point: Point, tile: Tile = Tile.Floor) {
+        this._point = point;
+        this._tile = tile;
+        this.render = Cell.createRender(tile);
+    }
+
+    static createRender(tile: Tile): Renderable {
+        let map: Map<Tile, Renderable> = new Map([
+            [Tile.Floor, new Renderable('.', 'white', 'black')],
+            [Tile.Wall, new Renderable('#', 'white', 'black')],
+            [Tile.Corridor, new Renderable('c', 'white', 'black')],
+        ]);
+        let render = map.get(tile);
+        if (render) {
+            return render.clone();
+        } else {
+            throw new Error('Can not render the tile ' + tile);
+        }
+    }
+
+    setTile(tile: Tile): void {
+        this.render = Cell.createRender(tile);
+        this._tile = tile;
+    }
+
+    getTile(): Tile {
+        return this._tile;
+    }
+}
+
 export class Layer {
 
     width: number;
     height: number;
-    map: Tile[];
+    map: Cell[];
     start: Point;
     end: Point;
+    visibles: Cell[];
+    revealed: Cell[];
 
-    constructor(width = 80, height = 50, tile:Tile = Tile.Floor) {
+    constructor(width = 80, height = 50, tile: Tile = Tile.Floor) {
         this.width = width;
         this.height = height;
         this.start = new Point();
         this.end = new Point();
-        this.map = Array.from({ length: this.height * this.width }, () => tile);
+        this.visibles = [];
+        this.revealed = [];
+        this.map = Array.from({ length: this.height * this.width }, (_, index) => {
+            let y = Math.floor(index / width);
+            let x = Math.floor(index % width);
+            return new Cell(new Point(x, y), tile);
+        });
     }
 
     on_start(): void {
     }
 
     _iterateDim(start: number, end: number, common: number, horizontal = true, call: mapCallback): void {
-        if(start > end){
+        if (start > end) {
             console.warn(`Wrong limits! Swaping start ${start} and end ${end}`);
             [start, end] = [end, start];
         }
@@ -200,11 +245,11 @@ export class Layer {
     }
 
     setTile(point: Point, tile: Tile): void {
-        this.map[this._xyIndex(point)] = tile;
+        this.map[this._xyIndex(point)].setTile(tile);
     }
 
     getTile(point: Point): Tile {
-        return this.map[this._xyIndex(point)];
+        return this.map[this._xyIndex(point)].getTile();
     }
 
     _xyIndex(point: Point): number {

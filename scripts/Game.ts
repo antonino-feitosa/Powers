@@ -1,7 +1,7 @@
 
-import { Component } from './Component';
+import { Component, Player } from './Component';
 import { Context, KeyEvent } from './Context';
-import { Layer, MapGenerator, MapManager } from './MapManager';
+import { Layer, MapGenerator, MapManager, Point } from './MapManager';
 import { Random } from './Random';
 
 
@@ -15,6 +15,7 @@ export class Game {
     world: MapManager;
     rand: Random;
     components: Component[];
+    players: Component[];
     commands: Map<string, Command>;
     count_turns = 0;
     running = false;
@@ -26,6 +27,7 @@ export class Game {
         this.context.setTitle('Powers - Rogue Like\n');
         this.world = new MapManager(width, height, this.rand);
         this.components = [];
+        this.players = [];
         this.commands = new Map([
             ['w', { name: 'up', state: CommandState.Off, processed: false }],
             ['a', { name: 'left', state: CommandState.Off, processed: false }],
@@ -57,7 +59,7 @@ export class Game {
     }
 
     update() {
-        for (let comp of this.components) {
+        for (let comp of this.players) {
             this.commands.forEach(c => {
                 if (!c.processed) {
                     if (c.state === CommandState.Off) {
@@ -71,6 +73,7 @@ export class Game {
             });
             comp.update(this.count_turns);
         }
+        this.components.forEach(comp => comp.update(this.count_turns));
         this.count_turns++;
     }
 
@@ -79,12 +82,35 @@ export class Game {
         for (let comp of this.components) {
             this.context.drawRenderable(comp.position, comp.render);
         }
-        this.context.build(false);
+        for (let comp of this.players) {
+            this.context.drawRenderable(comp.position, comp.render);
+        }
+        this.context.build();
         this.context.clear();
+    }
+
+    updateViewRange():void{
+        let layer = this.world.getCurrentLayer();
+        layer.visibles = [];
+
+        this.players.forEach( c => {
+            let player:Player = c as Player;
+            let range = player.viewRange;
+            let left = Math.max(c.position.x - range, 0);
+            let right = Math.min(c.position.x + range, this.world.getCurrentLayer().width);
+            let up = Math.max(c.position.y - range, 0);
+            let down = Math.min(c.position.y + range, this.world.getCurrentLayer().height);
+
+            layer.iterateMap(new Point(left, up), new Point(right, down), (c, pos) => {
+                layer.revealed[layer._xyIndex(pos)] = c;
+                layer.visibles.push(c);
+            });
+        });
     }
 
     main_loop() {
         this.suspendInput();
+        this.updateViewRange();
         this.drawing && this.show();
         this.running && this.update();
         this.commands.forEach(command => {
@@ -142,6 +168,7 @@ export class Game {
     }
 
     run() {
+        this.context.start();
         this.start();
         let timer = setInterval(this.main_loop.bind(this), 100);
         this.context.listenInput(this.keyPressed.bind(this), timer);

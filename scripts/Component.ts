@@ -12,6 +12,11 @@ export class Renderable {
         this.fg = fg;
         this.bg = bg;
     }
+
+    clone() {
+        let render = new Renderable(this.glyph, this.fg, this.bg);
+        return render;
+    }
 }
 
 export class Component {
@@ -34,15 +39,16 @@ export class Component {
 }
 
 
-enum State {Idle, Moving};
+enum State { Idle, Moving };
 export class Player extends Component {
 
-    state:State = State.Idle;
+    state: State = State.Idle;
+    viewRange:number = 6;
 
     update(turn: number): boolean {
-        if(this.state == State.Idle){
+        if (this.state == State.Idle) {
             this.game.freeze();
-        } else if(this.state == State.Moving){
+        } else if (this.state == State.Moving) {
             this.game.unfreeze();
             this.state = State.Idle;
             return true;
