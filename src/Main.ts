@@ -157,11 +157,11 @@ class Context {
         this.width = width;
         this.height = height;
 
-        process.stdout.write('\x1b[2J'); // clear and reset
+        process.stdout.write('\u001b[?1049h'); // enable alternative buffer
         process.stdout.write('\u001b[?25l'); // hide cursor
 
         let back = Context._applyColor(' ', this.foreground, this.background);
-        
+
         this.matrix = [];
         this.matrix.populate(height, _ => {
             let row: string[] = [];
@@ -170,7 +170,7 @@ class Context {
         });
     }
 
-    static _applyColor(text:string, fg:string = 'white', bg:string = 'black'){
+    static _applyColor(text: string, fg: string = 'white', bg: string = 'black') {
         let fgColor = Context.color.get(fg);
         let bgColor = Context.color.get(bg);
         return `\x1b[38;2;${fgColor}m\x1b[48;2;${bgColor}m` + text;
@@ -222,42 +222,57 @@ interface Grid { width: number, height: number, tiles: Tile[], rooms: Rect[] };
 interface Render { glyph: string, fg: string, bg: string };
 interface KeyEvent { key: string, shift: boolean, ctrl: boolean, alt: boolean };
 
-enum Tile {
-    Floor = 0,
-    Wall = 1,
-}
+function createRect(x: number, y: number, width: number, height: number) {
+    return {
+        start: { x: x, y: y },
+        end: { x: x + width, y: y + height },
+        includes(point: Point): boolean {
+            return point.x >= this.start.x && point.x < this.end.x && point.y >= this.start.y && point.y < this.end.y;
+        }
+    }
+};
 
-let grid: Grid = {
-    width: 30,
-    height: 20,
-    tiles: [],
-    rooms: []
-}
+enum Tile { Floor = 0, Wall = 1, };
+
+let grid: Grid = { width: 30, height: 20, tiles: [], rooms: [] };
 
 let player = {
-    point: {
-        x: Math.floor(grid.width / 2), y: Math.floor(grid.height / 2),
-    },
+    point: { x: Math.floor(grid.width / 2), y: Math.floor(grid.height / 2) },
     render: { glyph: '@', fg: 'yellow', bg: 'black' }
-}
+};
 
 let rand = new Random(0);
 
 const context = new Context(grid.width, grid.height);
 
-function loop(){
+function loop() {
     context.clear();
-    context.render({x:0,y:0}, '#', 'white', 'black');
-    context.render({x:grid.width -1,y:0}, '#', 'white', 'black');
+    context.render({ x: 0, y: 0 }, '#', 'white', 'black');
+    context.render({ x: grid.width - 1, y: 0 }, '#', 'white', 'black');
     context.render(player.point, player.render.glyph, player.render.fg, player.render.bg);
     context.build();
 }
 
+function tryMove(x: number, y: number) {
+    let dest = { x: player.point.x + x, y: player.point.y + y };
+    let bounds = createRect(0, 0, grid.width, grid.height);
+    bounds.includes(dest) && (player.point = dest);
+}
+
 context.listenInput(evt => {
-    switch(evt.key){
-        case 'd': player.point.x += 1; break;
+    switch (evt.key) {
+        case 'd':
+        case 'right': tryMove(+1, 0); break;
+        case 'a':
+        case 'left': tryMove(-1, 0); break;
+        case 'w':
+        case 'up': tryMove(0, -1); break;
+        case 's':
+        case 'down': tryMove(0, +1); break;
         default: return;
     }
+    player.point.x >= grid.width && (player.point.x = grid.width - 1);
+    player.point.x < 0 && (player.point.x = 0);
     loop();
 });
 
