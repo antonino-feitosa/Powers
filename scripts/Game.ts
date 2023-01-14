@@ -24,7 +24,7 @@ export class Game {
     constructor(width = 20, height = 15, rand = new Random(0)) {
         this.rand = rand;
         this.context = new Context(width, height);
-        this.context.setTitle('Powers - Rogue Like\n');
+        this.context.setTitle('Powers - Rogue Like');
         this.world = new MapManager(width, height, this.rand);
         this.components = [];
         this.players = [];

@@ -24,7 +24,11 @@ Initially, the user can choose a race, class, weapons, and powers among the init
 
 ## Implementation
 
-This is the first version implemented using Solarus[^11] engine.
+The prototype is textual[^17] (Typescript) based on the software architecture described in [^18].
+
+The first version should be implemented using Solarus[^11] engine (lua).
+
+The final version should be implemenete using Unity.
 
 
 [^1]: [https://wiki.daemon.com.br/index.php?title=Supers_RPG]
@@ -43,3 +47,5 @@ This is the first version implemented using Solarus[^11] engine.
 [^14]: [https://brogue.fandom.com/wiki/Terrain_Features]
 [^15]: [https://metroid.fandom.com/wiki/Super_Metroid#Power-ups_and_suit_upgrades]
 [^16]: [http://playingwithsuperpower.com/goof-troop-review/]
+[^17]: [https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797]
+[^18]: [https://bfnightly.bracketproductions.com/chapter_0.html]

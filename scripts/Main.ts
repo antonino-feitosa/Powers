@@ -4,7 +4,7 @@ import { Game } from './Game';
 import { SimpleRandomGenerator } from './Generator';
 import { Random } from './Random';
 
-const WIDTH = 100;
+const WIDTH = 130;
 const HEIGHT = 27;
 
 let rand = new Random(0);

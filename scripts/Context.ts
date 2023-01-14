@@ -75,10 +75,10 @@ export class Context {
         if(this.clearBuffer){
             //process.stdout.write(`\x1b[${this.height+2}A`);
             //process.stdout.write(`\x1b[2J`);
-            console.log(`\x1b[${this.height+3}A`);
+            process.stdout.write(`\x1b[${this.height+5}A`);
         }
-        //let titleRender = this.renderString(this.title);
-        //console.log(titleRender);
+        let titleRender = this.renderString(this.title);
+        console.log(titleRender);
         this.matrix.forEach(row => console.log(row.join('')));
         this.clear();
     }
@@ -102,6 +102,8 @@ export class Context {
             if (key && key.ctrl && key.name == 'c') {
                 process.stdin.pause();
                 clearInterval(timer);
+                // restore cursor (ANSI escape sequence)
+                console.log('\u001b[?25h');
             } else {
                 call({ key: key ? key.name : ch, shift: false, crtl: false, alt: false });
             }
