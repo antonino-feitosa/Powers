@@ -218,7 +218,11 @@ class Context {
 
 interface Point { x: number, y: number };
 interface Rect { start: Point, end: Point };
-interface Grid { width: number, height: number, tiles: Tile[], rooms: Rect[] };
+interface Grid {
+    width: number, height: number, tiles: Tile[], rooms: Rect[],
+    indexToPoint: (index: number) => Point,
+    pointToIndex: (point: Point) => number;
+};
 interface Render { glyph: string, fg: string, bg: string };
 interface KeyEvent { key: string, shift: boolean, ctrl: boolean, alt: boolean };
 
@@ -232,31 +236,62 @@ function createRect(x: number, y: number, width: number, height: number) {
     }
 };
 
-enum Tile { Floor = 0, Wall = 1, };
+function createMapBernoulli(width: number, height: number, prob: number = 0.5) {
+    let indexToPoint = (index: number) => ({ x: index % width, y: Math.floor(index / width) });
+    let pointToIndex = (point: Point) => point.y * width + point.x;
+    let tiles: Tile[] = [];
+    let rooms: Rect[] = [];
+    tiles.populate(width * height, index => {
+        switch (true) {
+            case index < width:
+            case index >= (width - 1) * height:
+            case index % width - 1 === 0:
+            case index % width === 0:
+            case rand.nextDouble() < prob:
+                return Tile.Wall;
+            default:
+                let point = indexToPoint(index);
+                rooms.push({ start: point, end: { x: point.x + 1, y: point.y + 1 } });
+                return Tile.Floor;
+        }
+    });
+    return { width: width, height: height, tiles: tiles, rooms: rooms, indexToPoint: indexToPoint, pointToIndex: pointToIndex };
+}
 
-let grid: Grid = { width: 30, height: 20, tiles: [], rooms: [] };
+enum Tile { Floor = 0, Wall = 1, };
+let rand = new Random(0);
+
+let grid: Grid = createMapBernoulli(30, 20);
 
 let player = {
-    point: { x: Math.floor(grid.width / 2), y: Math.floor(grid.height / 2) },
+    point: grid.rooms.length > 0 ? grid.rooms.pick<Rect>(rand).start : { x: Math.floor(grid.width / 2), y: Math.floor(grid.height / 2) },
     render: { glyph: '@', fg: 'yellow', bg: 'black' }
 };
-
-let rand = new Random(0);
 
 const context = new Context(grid.width, grid.height);
 
 function loop() {
     context.clear();
-    context.render({ x: 0, y: 0 }, '#', 'white', 'black');
-    context.render({ x: grid.width - 1, y: 0 }, '#', 'white', 'black');
+    drawGrid(grid, context);
     context.render(player.point, player.render.glyph, player.render.fg, player.render.bg);
     context.build();
+}
+
+function drawGrid(grid: Grid, context: Context) {
+    grid.tiles.forEach((tile, index) => {
+        let glyph = '';
+        switch (tile) {
+            case Tile.Wall: glyph = '#'; break;
+            case Tile.Floor: glyph = '.'; break;
+        }
+        context.render(grid.indexToPoint(index), glyph, 'white', 'black');
+    });
 }
 
 function tryMove(x: number, y: number) {
     let dest = { x: player.point.x + x, y: player.point.y + y };
     let bounds = createRect(0, 0, grid.width, grid.height);
-    bounds.includes(dest) && (player.point = dest);
+    bounds.includes(dest) && grid.tiles[grid.pointToIndex(dest)] === Tile.Floor && (player.point = dest);
 }
 
 context.listenInput(evt => {
