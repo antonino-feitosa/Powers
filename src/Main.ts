@@ -1,18 +1,12 @@
 
-interface Point { x: number, y: number };
-interface Rect { start: Point, end: Point };
-interface Grid {
-    width: number, height: number, tiles: Tile[], rooms: Rect[],
-    indexToPoint: (index: number) => Point,
-    pointToIndex: (point: Point) => number;
-};
-interface Render { glyph: string, fg: string, bg: string };
-interface KeyEvent { key: string, shift: boolean, ctrl: boolean, alt: boolean };
+import {Random} from './Random';
+import {Context} from './Context';
+import {Rect, Grid, Tile} from './Maps';
 
-enum Tile { Floor = 0, Wall = 1, };
+
 let rand = new Random(0);
 
-let grid: Grid = createMapBernoulli(30, 20);
+let grid = Grid.fromBernoulli(30, 20, rand);
 
 let player = {
     point: grid.rooms.length > 0 ? rand.pick(grid.rooms).start : { x: Math.floor(grid.width / 2), y: Math.floor(grid.height / 2) },
@@ -29,24 +23,27 @@ function loop() {
 }
 
 function drawGrid(grid: Grid, context: Context) {
+    console.log(grid.width * grid.height, grid.tiles.length);
     grid.tiles.forEach((tile, index) => {
         let glyph = '';
         switch (tile) {
             case Tile.Wall: glyph = '#'; break;
             case Tile.Floor: glyph = '.'; break;
         }
-        context.render(grid.indexToPoint(index), glyph, 'white', 'black');
+        let point = grid.indexToPoint(index);
+        context.render(point, glyph, 'white', 'black');
     });
 }
 
 function tryMove(x: number, y: number) {
     let dest = { x: player.point.x + x, y: player.point.y + y };
-    let bounds = createRect(0, 0, grid.width, grid.height);
+    let bounds = new Rect(0, 0, grid.width, grid.height);
     bounds.includes(dest) && grid.tiles[grid.pointToIndex(dest)] === Tile.Floor && (player.point = dest);
 }
 
-context.listenInput(evt => {
-    switch (evt.key) {
+context.listenInput((unicode:string,name?:string) => {
+    let key = name ? name : unicode;
+    switch (key) {
         case 'd':
         case 'right': tryMove(+1, 0); break;
         case 'a':

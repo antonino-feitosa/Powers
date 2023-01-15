@@ -1,4 +1,5 @@
-class Random {
+
+export class Random {
 
     /** Class representing a uniform pseudorandom number generator.
     Implementation of xoshiro128** general-purpose 64-bit number generator with cyrb128 hash initialization.

@@ -8,10 +8,16 @@
             "name": "Current TS File",
             "type": "node",
             "request": "launch",
-            "args": ["${relativeFile}"],
-            "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+            "runtimeArgs": [
+                "--nolazy",
+                "-r",
+                "ts-node/register",
+                "--trace-deprecation",
+                "--abort-on-uncaught-exception"
+            ],
             "sourceMaps": true,
-            "cwd": "${workspaceRoot}"
+            "cwd": "${workspaceRoot}",
+            "program": "${workspaceRoot}/src/Main.ts",
         }
     ]
 }
