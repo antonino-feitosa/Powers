@@ -3,7 +3,7 @@
         "files": true
     },
     "files": [
-        "Main.ts"
+        "./Main.ts", "./Random.ts", "./Context.ts", "./Utils.ts", "./Maps.ts"
     ],
     "compilerOptions": {
         "allowSyntheticDefaultImports": false,

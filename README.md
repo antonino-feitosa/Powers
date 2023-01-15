@@ -49,3 +49,5 @@ The final version should be implemenete using Unity.
 [^16]: [Goof Troop - Pluzzes](http://playingwithsuperpower.com/goof-troop-review/)
 [^17]: [ANSI Escape Codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797)
 [^18]: [Rogue Like with Rust](https://bfnightly.bracketproductions.com/chapter_0.html)
+
+[^19]: [Configure Key GIT](https://roelofjanelsinga.com/articles/how-to-setup-gpg-signing-keys-in-github/#:~:text=How%20to%20get%20the%20verified%20flag%20on%20your,use%20your%20GPG%20key%20to%20sign%20commits%20)
