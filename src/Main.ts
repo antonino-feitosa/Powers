@@ -6,14 +6,17 @@ import {Rect, Grid, Tile} from './Maps';
 
 let rand = new Random(0);
 
-let grid = Grid.fromBernoulli(30, 20, rand);
+//let grid = Grid.fromBernoulli(30, 20, rand);
+let grid = Grid.fromRandom(125, 27, rand, 100);
 
 let player = {
-    point: grid.rooms.length > 0 ? rand.pick(grid.rooms).start : { x: Math.floor(grid.width / 2), y: Math.floor(grid.height / 2) },
+    point: rand.pick(grid.rooms).center(),
     render: { glyph: '@', fg: 'yellow', bg: 'black' }
 };
 
 const context = new Context(grid.width, grid.height);
+context.clearBuffer = true;
+context.start();
 
 function loop() {
     context.clear();
@@ -23,12 +26,12 @@ function loop() {
 }
 
 function drawGrid(grid: Grid, context: Context) {
-    console.log(grid.width * grid.height, grid.tiles.length);
     grid.tiles.forEach((tile, index) => {
         let glyph = '';
         switch (tile) {
             case Tile.Wall: glyph = '#'; break;
             case Tile.Floor: glyph = '.'; break;
+            case Tile.Tunnel: glyph = 'C'; break;
         }
         let point = grid.indexToPoint(index);
         context.render(point, glyph, 'white', 'black');

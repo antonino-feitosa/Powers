@@ -15,12 +15,12 @@
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "noUnusedParameters": true,
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "strictNullChecks": true,
         "forceConsistentCasingInFileNames": true,
+        "noUnusedParameters": false,
     },
     "exclude": [
         "node_modules"

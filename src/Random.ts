@@ -44,7 +44,7 @@ export class Random {
 
     pick<T>(arr: T[]): T {
         if (arr.length <= 0)
-            throw new Error('The must have at least one element!');
+            throw new Error('The array must have at least one element!');
         let index = this.nextInt(arr.length);
         return arr[index];
     }
