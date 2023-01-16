@@ -54,3 +54,4 @@ The final version should be implemenete using Unity.
 [^20]: [triangle rasterization](http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html)
 [^21]: [line rasterization](https://www.javatpoint.com/computer-graphics-bresenhams-line-algorithm)
 [^22]: [Field of View](https://www.researchgate.net/publication/347719548_New_Algorithms_for_Computing_Field_of_Vision_over_2D_Grids)
+[^23]: [Field of View - Rogue](http://www.roguebasin.com/index.php/Comparative_study_of_field_of_view_algorithms_for_2D_grid_based_worlds)
