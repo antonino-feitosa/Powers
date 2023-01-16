@@ -4,12 +4,13 @@ import {Context} from './Context';
 import {Rect, Grid, Tile} from './Maps';
 
 
-let rand = new Random(0);
+let rand = new Random(1);
 
 //let grid = Grid.fromBernoulli(30, 20, rand);
-let grid = Grid.fromRandom(125, 27, rand, 100);
+let grid = Grid.fromRandom(125, 30, rand, 100);
 
 let player = {
+    viewRange: 8,
     point: rand.pick(grid.rooms).center(),
     render: { glyph: '@', fg: 'yellow', bg: 'black' }
 };

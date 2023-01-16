@@ -31,6 +31,7 @@ export class Grid {
     height: number = 0;
     rooms: Rect[] = [];
     tiles: Tile[] = [];
+    revealed: number[] = [];
     constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
