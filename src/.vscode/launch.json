@@ -17,7 +17,7 @@
             ],
             "sourceMaps": true,
             "cwd": "${workspaceRoot}",
-            "program": "${workspaceRoot}/Main.ts",
+            "program": "${workspaceRoot}/_Test.ts",
         }
     ]
 }

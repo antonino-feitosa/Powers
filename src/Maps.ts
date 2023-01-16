@@ -3,28 +3,14 @@
 
 import { pushInRange } from './Utils';
 import { Random } from './Random';
+import {Point, Rect} from './Algorithms2D';
 
 export enum Tile { Floor = 0, Wall = 1, Tunnel = 2 };
-export interface Point { x: number, y: number };
 
 const range = (start: number, length: number, call: (i: number) => void) => {
     console.assert(length >= 0, `lenght ${length} must be no negative.`);
     for (let i = start; i < start + length; i++) call(i)
 };
-
-export class Rect {
-    start: Point;
-    end: Point;
-    constructor(x: number, y: number, width: number, height: number) {
-        this.start = { x: x, y: y };
-        this.end = { x: x + width, y: y + height };
-    }
-    get width() { return this.end.x - this.start.x };
-    get height() { return this.end.y - this.start.y };
-    includes = (point: Point) => point.x >= this.start.x && point.x < this.end.x && point.y >= this.start.y && point.y < this.end.y;
-    overlaps = (other: Rect) => !(this.start.x > other.end.x || this.end.x < other.start.x || this.start.y > other.end.y || this.end.y < other.start.y);
-    center = () => ({ x: Math.floor((this.start.x + this.end.x) / 2), y: Math.floor((this.start.y + this.end.y) / 2) });
-}
 
 export class Grid {
     width: number = 0;
