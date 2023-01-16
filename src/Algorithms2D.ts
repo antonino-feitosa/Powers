@@ -81,32 +81,55 @@ export function linePixels(start: Point, end: Point, call: (p: Point) => void): 
 
 
 
-export function tringlePixels(p1: Point, p2: Point, p3: Point, call: (p: Point) => void) {
+export function trianglePixels(p1: Point, p2: Point, p3: Point, call: (p: Point) => void) {
     //Bresenham Algorithm
 
-    function fillTriangle(p1: Point, p2: Point, p3: Point) {
-        linePixels(p1, p2, v1 => {
-            call(v1);
-            linePixels(p1, p3, v2 => {
-                call(v2);
-                if (v1.y !== v2.y) {
-                    console.log({ x: v1.x, y: v1.y }, { x: v2.x, y: v1.y });
-                    linePixels({ x: v1.x, y: v1.y }, { x: v2.x, y: v1.y }, call);
-                }
-            });
-        });
-    };
+    function mergePoints(line1: Point[], line2: Point[]){
+        let height = line1[0].y;
+        while (line1.length > 0) {
+            let sx = line1[0].x;
+            while (line1.length > 0 && line1[0].y === height) {
+                sx = Math.min(sx, line1[0].x);
+                line1.shift();
+            }
+            let ex = line2[0].x;
+            while (line2.length > 0 && line2[0].y === height) {
+                ex = Math.max(ex, line2[0].x);
+                line2.shift();
+            }
+            linePixels({ x: sx, y: height }, { x: ex, y: height }, call);
+            height++;
+        }
+    }
 
+    function fillBottomFlatTriangle(v1: Point, v2: Point, v3: Point) {
+        [v2, v3] = v2.x > v3.x ? [v3, v2] : [v2, v3];
+        let line1: Point[] = [];
+        let line2: Point[] = [];
+        linePixels(v1, v2, p => line1.push(p));
+        linePixels(v1, v3, p => line2.push(p));
+        mergePoints(line1, line2);
+    }
+
+    function fillTopFlatTriangle(v1: Point, v2: Point, v3: Point) {
+        [v2, v3] = v2.x > v3.x ? [v3, v2] : [v2, v3];
+        let line1: Point[] = [];
+        let line2: Point[] = [];
+        linePixels(v1, v3, p => line1.push(p));
+        linePixels(v2, v3, p => line2.push(p));
+        mergePoints(line1, line2);
+    }
 
     let [v1, v2, v3] = [p1, p2, p3].sort((a, b) => a.y - b.y);
     if (v2.y === v3.y) {
-        fillTriangle(v1, v2, v3);
+        fillBottomFlatTriangle(v1, v2, v3);
     } else if (v1.y === v2.y) {
-        fillTriangle(v3, v2, v1);
+        fillTopFlatTriangle(v1, v2, v3);
     } else {
-        let v4 = { x: Math.floor((p1.x + ((p2.y - p1.y) / (p3.y - p1.y)) * (p3.x - p1.x))), y: Math.floor(p2.y) };
-        fillTriangle(v1, v2, v4);
-        fillTriangle(v3, v2, v4);
+        let v4 = { x: (v1.x + ((v2.y - v1.y) / (v3.y - v1.y)) * (v3.x - v1.x)), y: v2.y };
+        v4.x = Math.floor(v4.x);
+        fillBottomFlatTriangle(v1, v2, v3);
+        fillTopFlatTriangle(v2, v3, v4);
     }
 }
 

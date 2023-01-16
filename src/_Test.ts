@@ -1,5 +1,5 @@
 
-import { tringlePixels, Point } from './Algorithms2D';
+import { trianglePixels, Point } from './Algorithms2D';
 
 let mat = new Array();
 for (let i = 0; i < 20; i++) {
@@ -8,9 +8,10 @@ for (let i = 0; i < 20; i++) {
     mat.push(row);
 }
 
-tringlePixels({x:5, y:0}, {x:0, y:10}, {x: 15, y:0} , (p:Point) => {
+let i = 0;
+trianglePixels({x:5, y:0}, {x:0, y:5}, {x:10, y:12} , (p:Point) => {
     console.log(p);
-    mat[p.y][p.x] = '#  ';
+    mat[p.y][p.x] = i < 10 ? i++ + '  ' :  i++ + ' ';
 });
 
 /*tringlePixels({ x: 5, y: 5 }, {x: 2, y:10}, {x:12, y: 10}, (p:Point) => {
