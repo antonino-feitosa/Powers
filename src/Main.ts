@@ -1,21 +1,23 @@
 
-import {Random} from './Random';
-import {Context} from './Context';
-import {Grid, Tile} from './Grid';
-import {Rect, Point} from './Algorithms2D';
-import { calculateFOV } from './View';
+import { Random } from './Random';
+import { Context } from './Context';
+import { Grid, Tile } from './Grid';
+import { Rect, Point } from './Algorithms2D';
+import { Viewer } from './View';
 
 
 let rand = new Random(1);
 
 //let grid = Grid.fromBernoulli(30, 20, rand);
-let grid = Grid.fromRandom(125, 30, rand, 100);
+//let grid = Grid.fromRandom(125, 30, rand, 100);
+let grid = Grid.fromEmpty(50, 20);
 
-let player = {
-    viewRange: 8,
-    point: rand.pick(grid.rooms).center(),
-    render: { glyph: '@', fg: 'yellow', bg: 'black' }
+class Player {
+    point = rand.pick(grid.rooms).center();
+    viewer = new Viewer(this.point, 8, (p: Point) => grid.getTile(p) === Tile.Wall);
+    render = { glyph: '@', fg: 'yellow', bg: 'black' };
 };
+let player = new Player();
 
 const context = new Context(grid.width, grid.height);
 context.clearBuffer = true;
@@ -32,11 +34,10 @@ function loop() {
 }
 
 function drawGrid(grid: Grid, context: Context) {
-    const isOpaque = (p:Point) => grid.getTile(p) === Tile.Wall;
-
     grid.clearLight();
-    calculateFOV(isOpaque, player.point, player.viewRange, (pos:Point, light:number) => {
-        if(light > 0) {
+
+    player.viewer.calculate((pos: Point, light: number) => {
+        if (light > 0) {
             grid.setVisible(pos);
             grid.setRevealed(pos);
         }
@@ -58,20 +59,26 @@ function drawGrid(grid: Grid, context: Context) {
 function tryMove(x: number, y: number) {
     let dest = { x: player.point.x + x, y: player.point.y + y };
     let bounds = new Rect(0, 0, grid.width, grid.height);
-    bounds.includes(dest) && grid.tiles[grid.pointToIndex(dest)] === Tile.Floor && (player.point = dest);
+    if (bounds.includes(dest) && grid.tiles[grid.pointToIndex(dest)] === Tile.Floor) {
+        player.point = dest;
+        player.viewer.center = player.point;
+        player.viewer.isDirty = true;
+    } else {
+        player.viewer.isDirty = false;
+    }
 }
 
-context.listenInput((unicode:string,name?:string) => {
+context.listenInput((unicode: string, name?: string) => {
     let key = name ? name : unicode;
     switch (key) {
-        case 'd':
-        case 'right': tryMove(+1, 0); break;
-        case 'a':
-        case 'left': tryMove(-1, 0); break;
-        case 'w':
-        case 'up': tryMove(0, -1); break;
-        case 's':
-        case 'down': tryMove(0, +1); break;
+        case 'h': tryMove(-1, 0); break;
+        case 'j': tryMove(0, -1); break;
+        case 'k': tryMove(0, +1); break;
+        case 'l': tryMove(+1, 0); break;
+        case 'y': tryMove(-1, -1); break;
+        case 'u': tryMove(1, -1); break;
+        case 'b': tryMove(-1, 1); break;
+        case 'n': tryMove(1, 1); break;
         default: return;
     }
     player.point.x >= grid.width && (player.point.x = grid.width - 1);

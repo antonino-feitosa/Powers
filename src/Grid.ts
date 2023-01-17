@@ -1,9 +1,9 @@
 
 //import assert from 'assert';
 
-import { pushInRange } from './Utils';
-import { Random } from './Random';
 import { Point, Rect } from './Algorithms2D';
+import { Random } from './Random';
+import { pushInRange } from './Utils';
 
 export enum Tile { Floor = '.', Wall = '#', Tunnel = 'C' };
 
@@ -62,6 +62,23 @@ export class Grid {
     iterate(rect: Rect, call: (pos: Point, val: Tile) => void): void {
         range(rect.start.y, rect.height, row =>
             this.iterateHor({ x: rect.start.x, y: row }, rect.width, call));
+    }
+
+    static fromEmpty(width: number, height: number, border: boolean = true): Grid {
+        let grid = new Grid(width, height);
+        grid.rooms.push(grid.bounds);
+        pushInRange(grid.tiles, 0, width * height, index => {
+            switch (true) {
+                case index < width:
+                case index >= width * (height - 1):
+                case (index + 1) % width === 0:
+                case index % width === 0:
+                    return border ? Tile.Wall : Tile.Floor;
+                default:
+                    return Tile.Floor;
+            }
+        });
+        return grid;
     }
 
     static fromBernoulli(width: number, height: number, rand: Random, prob: number = 0.2): Grid {

@@ -15,15 +15,38 @@ export class Direction {
     static Diagonals: Point[] = [Direction.UpRight, Direction.UpLeft, Direction.DownRight, Direction.DownLeft];
 }
 
-export function calculateFOV(opaque: (p: Point) => boolean, start: Point, radius: number, call: (p: Point, light: number) => void): void {
+export enum RadiusType { Circle, Square, Diamond };
+
+export function radiusFunctionCircle(x: number, y: number) { return Math.sqrt(x ** 2 + y ** 2); }
+export function radiusFunctionSquare(x: number, y: number) { return Math.max(Math.abs(x), Math.abs(y)); }
+export function radiusFunctionDiamond(x: number, y: number) { return Math.abs(x) + Math.abs(y); }
+
+export class Viewer {
+    radius: number;
+    center: Point;
+    opaque: (p: Point) => boolean;
+    isDirty: boolean = true;
+    radiusFunction: (x: number, y: number) => number = radiusFunctionCircle;
+
+    constructor(center: Point, radius: number, opaque: (p: Point) => boolean) {
+        this.center = center;
+        this.radius = radius;
+        this.opaque = opaque;
+    }
+
+    calculate(call: (p: Point, light: number) => void) {
+        calculateFOV(this.opaque, this.center, this.radius, this.radiusFunction, call);
+    }
+}
+
+function calculateFOV(opaque: (p: Point) => boolean, start: Point, radius: number,
+    calcRadius: (x: number, y: number) => number, call: (p: Point, light: number) => void): void
+    {
     //http://www.roguebasin.com/index.php/Improved_Shadowcasting_in_Java
     let width = start.x + radius;
     let height = start.y + radius;
     let lightMap: Map<Point, number> = new Map();
 
-    function calcRadius(x: number, y: number): number { // to (0,0)
-        return Math.sqrt(x ** 2 + y ** 2);
-    }
     function castLight(row: number, st: number, end: number, xx: number, xy: number, yx: number, yy: number) {
         let newStart = 0;
         if (st < end) {
