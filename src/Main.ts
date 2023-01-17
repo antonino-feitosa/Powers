@@ -1,7 +1,9 @@
 
 import {Random} from './Random';
 import {Context} from './Context';
-import {Rect, Grid, Tile} from './Maps';
+import {Grid, Tile} from './Grid';
+import {Rect, Point} from './Algorithms2D';
+import { calculateFOV } from './View';
 
 
 let rand = new Random(1);
@@ -18,6 +20,9 @@ let player = {
 const context = new Context(grid.width, grid.height);
 context.clearBuffer = true;
 context.start();
+Context.Color.set('silver', 'ADADC9');
+Context.Color.set('ash', '5654C4D');
+Context.Color.set('shadow', '373737');
 
 function loop() {
     context.clear();
@@ -27,14 +32,25 @@ function loop() {
 }
 
 function drawGrid(grid: Grid, context: Context) {
-    grid.tiles.forEach((tile, index) => {
-        let glyph = '';
-        switch (tile) {
-            case Tile.Wall: glyph = '#'; break;
-            case Tile.Floor: glyph = '.'; break;
-            case Tile.Tunnel: glyph = 'C'; break;
+    const isOpaque = (p:Point) => grid.getTile(p) === Tile.Wall;
+
+    grid.clearLight();
+    calculateFOV(isOpaque, player.point, player.viewRange, (pos:Point, light:number) => {
+        if(light > 0) {
+            grid.setVisible(pos);
+            grid.setRevealed(pos);
         }
+    });
+
+    grid.revealed.forEach((index) => {
         let point = grid.indexToPoint(index);
+        let glyph = grid.getTile(point);
+        context.render(point, glyph, 'grey', 'black');
+    });
+
+    grid.visible.forEach((index) => {
+        let point = grid.indexToPoint(index);
+        let glyph = grid.getTile(point);
         context.render(point, glyph, 'white', 'black');
     });
 }

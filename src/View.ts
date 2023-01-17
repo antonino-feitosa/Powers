@@ -21,7 +21,7 @@ export function calculateFOV(opaque: (p: Point) => boolean, start: Point, radius
     let height = start.y + radius;
     let lightMap: Map<Point, number> = new Map();
 
-    function calcRadius(x: number, y: number): number {
+    function calcRadius(x: number, y: number): number { // to (0,0)
         return Math.sqrt(x ** 2 + y ** 2);
     }
     function castLight(row: number, st: number, end: number, xx: number, xy: number, yx: number, yy: number) {
@@ -37,7 +37,6 @@ export function calculateFOV(opaque: (p: Point) => boolean, start: Point, radius
                 let currentY = start.y + deltaX * yx + deltaY * yy;
                 let leftSlope = (deltaX - 0.5) / (deltaY + 0.5);
                 let rightSlope = (deltaX + 0.5) / (deltaY - 0.5);
-                console.log(currentX, currentY);
 
                 if (!(currentX >= 0 && currentY >= 0 && currentX < width && currentY < height) || st < rightSlope) {
                     continue;
@@ -46,7 +45,6 @@ export function calculateFOV(opaque: (p: Point) => boolean, start: Point, radius
                 }
 
                 //check if it's within the lightable area and light if needed
-                console.log('Radius:',calcRadius(deltaX, deltaY), radius);
                 if (calcRadius(deltaX, deltaY) <= radius) {
                     let bright = (1 - (calcRadius(deltaX, deltaY) / radius));
                     lightMap.set({ x: currentX, y: currentY }, bright);

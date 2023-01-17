@@ -3,12 +3,12 @@
 
 import { pushInRange } from './Utils';
 import { Random } from './Random';
-import {Point, Rect} from './Algorithms2D';
+import { Point, Rect } from './Algorithms2D';
 
-export enum Tile { Floor = 0, Wall = 1, Tunnel = 2 };
+export enum Tile { Floor = '.', Wall = '#', Tunnel = 'C' };
 
 const range = (start: number, length: number, call: (i: number) => void) => {
-    console.assert(length >= 0, `lenght ${length} must be no negative.`);
+    console.assert(length >= 0, `length ${length} must be no negative.`);
     for (let i = start; i < start + length; i++) call(i)
 };
 
@@ -18,6 +18,7 @@ export class Grid {
     rooms: Rect[] = [];
     tiles: Tile[] = [];
     revealed: number[] = [];
+    visible: number[] = [];
     constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
@@ -30,6 +31,11 @@ export class Grid {
         this.tiles[index] = tile;
     };
     getTile = (pos: Point) => this.tiles[this.pointToIndex(pos)];
+    setRevealed = (pos: Point) => this.revealed[this.pointToIndex(pos)] = this.pointToIndex(pos);
+    isRevealed = (pos: Point) => this.revealed[this.pointToIndex(pos)];
+    clearLight = () => this.visible = [];
+    setVisible = (pos: Point) => this.visible[this.pointToIndex(pos)] = this.pointToIndex(pos);
+    isVisible = (pos: Point) => this.visible[this.pointToIndex(pos)];
 
     static _inc = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
     iterateNeighbor(pos: Point, call: (position: Point, value: Tile) => 0) {

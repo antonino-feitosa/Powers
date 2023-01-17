@@ -4,6 +4,7 @@
 - [ ] Monsters
 - [ ] Combat
 - [ ] User Interface
+- [ ] Map Keys
 
 
 ## Development Plan

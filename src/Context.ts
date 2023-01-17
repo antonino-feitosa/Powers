@@ -15,12 +15,13 @@ export class Context {
     fog: boolean = false;
     clearBuffer: boolean = true;
 
-    static color = new Map([
-        ['black', '0;0;0'],
-        ['white', '255;255;255'],
-        ['yellow', '255;255;0'],
-        ['green', '0;255;0'],
-        ['blue', '0;0;255'],
+    static Color = new Map([
+        ['black', '000000'],
+        ['white', 'FFFFFF'],
+        ['yellow', 'FFFF00'],
+        ['green', '00FF00'],
+        ['blue', '0000FF'],
+        ['grey', '808080']
     ]);
 
     constructor(width = 80, height = 50) {
@@ -37,8 +38,16 @@ export class Context {
     }
 
     static _applyColor(text: string, fg: string = 'white', bg: string = 'black') {
-        let fgColor = Context.color.get(fg);
-        let bgColor = Context.color.get(bg);
+        let fgColor = Context.Color.get(fg);
+        let bgColor = Context.Color.get(bg);
+        let convert = (c:string) => {
+            let r = parseInt(c.substring(0,2), 16);
+            let g = parseInt(c.substring(2,4), 16);
+            let b = parseInt(c.substring(4,6), 16);
+            return r + ';' + g + ';' + b;
+        }
+        fgColor = convert(fgColor ? fgColor : '000000');
+        bgColor = convert(bgColor ? bgColor : '000000');
         return `\x1b[38;2;${fgColor}m\x1b[48;2;${bgColor}m` + text;
     }
 
