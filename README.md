@@ -32,7 +32,7 @@ The final version should be implemenete using Unity.
 
 
 [^1]: [Daemon Powers](https://wiki.daemon.com.br/index.php?title=Supers_RPG)
-[^2]: [Diablo 3 - Monters](https://www.reddit.com/r/Diablo/comments/tuhcc/whats_the_difference_between_champion_rare_and/]
+[^2]: [Diablo 3 - Monters](https://www.reddit.com/r/Diablo/comments/tuhcc/whats_the_difference_between_champion_rare_and/)
 [^3]: [Zelda - Puzzles](https://gamerant.com/zelda-hardest-puzzles-how-to-solve/)
 [^4]: [Pokemon - Puzzles](https://www.thegamer.com/pokemon-hardest-puzzles-across-all-games-ranked/)
 [^5]: [Video Game - Puzzles](https://www.denofgeek.com/games/hardest-video-game-puzzles/)
@@ -55,3 +55,5 @@ The final version should be implemenete using Unity.
 [^21]: [line rasterization](https://www.javatpoint.com/computer-graphics-bresenhams-line-algorithm)
 [^22]: [Field of View](https://www.researchgate.net/publication/347719548_New_Algorithms_for_Computing_Field_of_Vision_over_2D_Grids)
 [^23]: [Field of View - Rogue](http://www.roguebasin.com/index.php/Comparative_study_of_field_of_view_algorithms_for_2D_grid_based_worlds)
+[^24]: [Game Algorithms](https://www.phstudios.com/game-algorithm-series/)
+[^25]: [Brogue](https://sites.google.com/site/broguegame/)

@@ -1,59 +1,80 @@
 
-import { range } from './Utils';
-import { Point, angleBetween, trianglePixels, elipsePixels } from './Algorithms2D';
-import { posix } from 'path';
+export interface Point { x: number, y: number };
 
+export class Direction {
+    static Up: Point = { x: 0, y: -1 };
+    static Down: Point = { x: 0, y: +1 };
+    static Left: Point = { x: -1, y: 0 };
+    static Right: Point = { x: +1, y: 0 };
+    static UpRight: Point = { x: 1, y: -1 };
+    static UpLeft: Point = { x: -1, y: -1 };
+    static DownRight: Point = { x: 1, y: 1 };
+    static DownLeft: Point = { x: -1, y: 1 };
 
-enum Direction { RIGHT, UP, LEFT, DOWN };
-
-
-function fieldOfViewExlipse(opaque: (pos: Point) => boolean, center: Point, radius: Point, call: (vis: Point) => void) {
-
-    function pointToIndex(point: Point) {
-        return point.y * radius.x * 2 + point.x;
-    }
-    function indexToPoint(index: number) {
-        return index / (radius.x * 2) + index % (radius.x * 2);
-    }
-    function centerPos(pos: Point) {
-        return { x: pos.x + 0.5, y: pos.y + 0.5 };
-    }
-
-
-    let visible: Point[] = [];
-    let obstacle: Point[] = [];
-    elipsePixels(center, radius, (pos, end) =>
-        range(pos.x, end + 1, 1, index => {
-            let point = { x: index, y: pos.y };
-            opaque(point) ? obstacle[pointToIndex(point)] = point : 0;
-        }));
-
-    let cdxy = (p: Point, dx1: number, dy1: number, dx2: number, dy2: number) =>
-        [{ x: p.x + 0.5 + dx1, y: p.x + 0.5 + dy1 }, { x: p.x + 0.5 + dx2, y: p.x + 0.5 + dy2 }];
-
-    let vcenter = centerPos(center);
-    obstacle.forEach(obs => {
-        let cmp1: Point, cmp2: Point;
-        switch (true) {
-            case obs.x == vcenter.x: [cmp1, cmp2] = cdxy(obs, 0, 0.5, 0, 0.5); break;
-            case obs.y == vcenter.y: [cmp1, cmp2] = cdxy(obs, 0.5, 0, 0.5, 0); break;
-            case obs.x > center.x && obs.y > center.y: [cmp1, cmp2] = cdxy(obs, 0.5, -0.5, -0.5, 0.5); break;
-            case obs.x > center.x && obs.y < center.y: [cmp1, cmp2] = cdxy(obs, -0.5, -0.5, 0.5, 0.5); break;
-            case obs.x < center.x && obs.y > center.y: [cmp1, cmp2] = cdxy(obs, 0.5, -0.5, -0.5, 0.5); break;
-            case obs.x < center.x && obs.y < center.y: [cmp1, cmp2] = cdxy(obs, -0.5, -0.5, 0.5, 0.5); break;
-        }
-        //trianglePixels(vcenter, cmp1, cmp2, p => );
-    });
+    static All: Point[] = [Direction.Up, Direction.Left, Direction.Down, Direction.Right, Direction.UpLeft, Direction.DownRight, Direction.DownLeft];
+    static Diagonals: Point[] = [Direction.UpRight, Direction.UpLeft, Direction.DownRight, Direction.DownLeft];
 }
 
-function cone(center: Point, angleDir: number, angle: number, radius: number, call: (vis: Point) => void) {
-    let left: Point = { x: 0, y: 0 };
-    left.x = center.x + Math.cos(angleDir + angle) * radius;
-    left.y = center.y + Math.sin(angleDir + angle) * radius;
+export function calculateFOV(opaque: (p: Point) => boolean, start: Point, radius: number, call: (p: Point, light: number) => void): void {
+    //http://www.roguebasin.com/index.php/Improved_Shadowcasting_in_Java
+    let width = start.x + radius;
+    let height = start.y + radius;
+    let lightMap: Map<Point, number> = new Map();
 
-    let right: Point = { x: 0, y: 0 };
-    left.x = center.x + Math.cos(angleDir - angle) * radius;
-    left.y = center.y + Math.sin(angleDir - angle) * radius;
+    function calcRadius(x: number, y: number): number {
+        return Math.sqrt(x ** 2 + y ** 2);
+    }
+    function castLight(row: number, st: number, end: number, xx: number, xy: number, yx: number, yy: number) {
+        let newStart = 0;
+        if (st < end) {
+            return;
+        }
+        let blocked = false;
+        for (let distance = row; distance <= radius && !blocked; distance++) {
+            let deltaY = -distance;
+            for (let deltaX = -distance; deltaX <= 0; deltaX++) {
+                let currentX = start.x + deltaX * xx + deltaY * xy;
+                let currentY = start.y + deltaX * yx + deltaY * yy;
+                let leftSlope = (deltaX - 0.5) / (deltaY + 0.5);
+                let rightSlope = (deltaX + 0.5) / (deltaY - 0.5);
+                console.log(currentX, currentY);
 
-    trianglePixels(center, left, right, call);
+                if (!(currentX >= 0 && currentY >= 0 && currentX < width && currentY < height) || st < rightSlope) {
+                    continue;
+                } else if (end > leftSlope) {
+                    break;
+                }
+
+                //check if it's within the lightable area and light if needed
+                console.log('Radius:',calcRadius(deltaX, deltaY), radius);
+                if (calcRadius(deltaX, deltaY) <= radius) {
+                    let bright = (1 - (calcRadius(deltaX, deltaY) / radius));
+                    lightMap.set({ x: currentX, y: currentY }, bright);
+                }
+
+                if (blocked) { //previous cell was a blocking one
+                    if (opaque({ x: currentX, y: currentY })) {//hit a wall
+                        newStart = rightSlope;
+                        continue;
+                    } else {
+                        blocked = false;
+                        st = newStart;
+                    }
+                } else {
+                    if (opaque({ x: currentX, y: currentY }) && distance < radius) {//hit a wall within sight line
+                        blocked = true;
+                        castLight(distance + 1, st, leftSlope, xx, xy, yx, yy);
+                        newStart = rightSlope;
+                    }
+                }
+            }
+        }
+    }
+
+    lightMap.set(start, 1);//light the starting cell
+    Direction.Diagonals.forEach(d => {
+        castLight(1, 1, 0, 0, d.x, d.y, 0);
+        castLight(1, 1, 0, d.x, 0, 0, d.y);
+    });
+    lightMap.forEach((light, pos) => call(pos, light));
 }
