@@ -9,6 +9,7 @@ export class Context {
     width: number;
     height: number;
     matrix: string[][];
+    message: string = '';
 
     background: string = 'black';
     foreground: string = 'white';
@@ -21,6 +22,7 @@ export class Context {
         ['yellow', 'FFFF00'],
         ['green', '00FF00'],
         ['blue', '0000FF'],
+        ['red', 'FF0000'],
         ['grey', '808080']
     ]);
 
@@ -60,9 +62,14 @@ export class Context {
         this.matrix[pos.y][pos.x] = Context._applyColor(glyph, fg, bg);
     }
 
+    renderMessage(message:string){
+        this.message = message;
+    }
+
     build(): void {
         this.clearBuffer && process.stdout.write(`\x1b[${this.height + 1}A`); // move to start
         this.matrix.forEach(row => console.log(row.join('')));
+        process.stdout.write('\u001b\r[2K' + this.message);
         this.clear();
     }
 

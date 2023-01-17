@@ -27,6 +27,7 @@ export class Viewer {
     opaque: (p: Point) => boolean;
     isDirty: boolean = true;
     radiusFunction: (x: number, y: number) => number = radiusFunctionCircle;
+    lightMap: Map<Point, number> = new Map();
 
     constructor(center: Point, radius: number, opaque: (p: Point) => boolean) {
         this.center = center;
@@ -35,13 +36,20 @@ export class Viewer {
     }
 
     calculate(call: (p: Point, light: number) => void) {
-        calculateFOV(this.opaque, this.center, this.radius, this.radiusFunction, call);
+        if (this.isDirty) {
+            this.lightMap = calculateFOV(this.opaque, this.center, this.radius, this.radiusFunction);
+        }
+        this.lightMap.forEach((light, pos) => call(pos, light));
+    }
+
+    contains(p: Point) {
+        let e = this.lightMap.get(p);
+        return e && e > 0;
     }
 }
 
 function calculateFOV(opaque: (p: Point) => boolean, start: Point, radius: number,
-    calcRadius: (x: number, y: number) => number, call: (p: Point, light: number) => void): void
-    {
+    calcRadius: (x: number, y: number) => number): Map<Point, number> {
     //http://www.roguebasin.com/index.php/Improved_Shadowcasting_in_Java
     let width = start.x + radius;
     let height = start.y + radius;
@@ -97,5 +105,5 @@ function calculateFOV(opaque: (p: Point) => boolean, start: Point, radius: numbe
         castLight(1, 1, 0, 0, d.x, d.y, 0);
         castLight(1, 1, 0, d.x, 0, 0, d.y);
     });
-    lightMap.forEach((light, pos) => call(pos, light));
+    return lightMap;
 }

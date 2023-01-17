@@ -19,6 +19,7 @@ export class Grid {
     tiles: Tile[] = [];
     revealed: number[] = [];
     visible: number[] = [];
+    blocked: boolean[] = [];
     constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
@@ -36,6 +37,8 @@ export class Grid {
     clearLight = () => this.visible = [];
     setVisible = (pos: Point) => this.visible[this.pointToIndex(pos)] = this.pointToIndex(pos);
     isVisible = (pos: Point) => this.visible[this.pointToIndex(pos)];
+    setBlocked = (pos: Point, block:boolean = true) => this.blocked[this.pointToIndex(pos)] = block;
+    isBlocked = (pos: Point) => this.blocked[this.pointToIndex(pos)];
 
     static _inc = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
     iterateNeighbor(pos: Point, call: (position: Point, value: Tile) => 0) {
