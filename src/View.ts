@@ -28,22 +28,27 @@ export class Viewer {
     isDirty: boolean = true;
     radiusFunction: (x: number, y: number) => number = radiusFunctionCircle;
     lightMap: Map<Point, number> = new Map();
+    pointToIndex: (p:Point) => number = () => 0;
+    indexes: number[] = [];
 
-    constructor(center: Point, radius: number, opaque: (p: Point) => boolean) {
+    constructor(center: Point, radius: number, opaque: (p: Point) => boolean, pointToIndex: (p:Point) => number) {
         this.center = center;
         this.radius = radius;
         this.opaque = opaque;
+        this.pointToIndex = pointToIndex;
     }
 
-    calculate(call: (p: Point, light: number) => void) {
+    calculate(call: (p: Point, light: number) => void = () => 0) {
         if (this.isDirty) {
+            this.indexes = [];
             this.lightMap = calculateFOV(this.opaque, this.center, this.radius, this.radiusFunction);
+            this.lightMap.forEach((light, pos) => this.indexes[this.pointToIndex(pos)] = light);
         }
         this.lightMap.forEach((light, pos) => call(pos, light));
     }
 
-    contains(p: Point) {
-        let e = this.lightMap.get(p);
+    contains(pos: Point) {
+        let e = this.indexes[this.pointToIndex(pos)];
         return e && e > 0;
     }
 }

@@ -10,7 +10,7 @@ import { Entity, Monster } from './Entity';
 let rand = new Random(1);
 
 //let grid = Grid.fromBernoulli(30, 20, rand);
-let grid = Grid.fromRandom(100, 30, rand, 100);
+let grid = Grid.fromRandom(100, 20, rand, 100);
 //let grid = Grid.fromEmpty(50, 20);
 let monsters: Monster[] = [];
 
@@ -19,7 +19,7 @@ let startPosition = startRoom.center();
 grid.setBlocked(startPosition);
 let player: Entity = {
     point: startPosition,
-    viewer: new Viewer(startPosition, 8, (p: Point) => grid.getTile(p) === Tile.Wall),
+    viewer: new Viewer(startPosition, 8, (p: Point) => grid.getTile(p) === Tile.Wall, grid.pointToIndex),
     render: { glyph: '@', fg: 'yellow', bg: 'black' }
 };
 addMonsters();
@@ -33,15 +33,28 @@ Context.Color.set('shadow', '373737');
 
 loop();
 
+function loop() {
+    context.clear();
+    monsters.forEach(m => m.update());
+    drawGrid(grid, context);
+    drawMonster(grid, context);
+    context.render(player.point, player.render.glyph, player.render.fg, player.render.bg);
+    context.build();
+}
+
 function addMonsters() {
     grid.rooms.filter(r => r !== startRoom).forEach(room => {
         let pos = room.center();
         grid.setBlocked(pos);
         let monster: Monster = {
             point: pos,
-            viewer: new Viewer(pos, 6, (p: Point) => grid.getTile(p) === Tile.Wall),
+            viewer: new Viewer(pos, 6, (p: Point) => grid.getTile(p) === Tile.Wall, grid.pointToIndex),
             render: { glyph: 'M', fg: 'red', bg: 'black' },
             update: function () {
+                if (this.viewer.isDirty) {
+                    this.viewer.calculate();
+                    this.viewer.isDirty = false;
+                }
                 if (this.viewer.contains(player.point)) {
                     context.renderMessage('Monster shouts insults!');
                 }
@@ -49,14 +62,6 @@ function addMonsters() {
         }
         monsters.push(monster);
     });
-}
-
-function loop() {
-    context.clear();
-    drawGrid(grid, context);
-    drawMonster(grid, context);
-    context.render(player.point, player.render.glyph, player.render.fg, player.render.bg);
-    context.build();
 }
 
 function drawGrid(grid: Grid, context: Context) {
