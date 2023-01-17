@@ -10,6 +10,7 @@ export class Context {
     height: number;
     matrix: string[][];
     message: string = '';
+    // TODO num of messages
 
     background: string = 'black';
     foreground: string = 'white';
@@ -67,9 +68,10 @@ export class Context {
     }
 
     build(): void {
-        this.clearBuffer && process.stdout.write(`\x1b[${this.height + 1}A`); // move to start
+        this.clearBuffer && process.stdout.write(`\x1b[${this.height + 2}A`); // move to start
         this.matrix.forEach(row => console.log(row.join('')));
-        process.stdout.write('\u001b\r[2K' + this.message);
+        console.log('\u001b\r[2K' + this.message);
+        this.message = '';
         this.clear();
     }
 
