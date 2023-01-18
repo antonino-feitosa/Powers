@@ -22,6 +22,7 @@ const Viewer = {
 
     calculate(call = () => 0) {
         if (this.isDirty) {
+            this.lightMap = new Map();
             this.lightMap.set(this.center, 1);//light the starting cell
             Diagonals.forEach(([x,y]) => {
                 this._castLight(1, 1, 0, 0, x, y, 0);

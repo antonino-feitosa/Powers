@@ -1,6 +1,7 @@
 
 "use strict";
 
+const {range} = require('./Utils');
 const { Context } = require('./Context');
 const { DijkstraMap } = require('./DijkstraMap');
 const { Entity, Render, Monster } = require('./Entity');
@@ -36,7 +37,7 @@ player.heatMap.neighborhood = function (u) {
 addMonsters();
 
 const context = Object.create(Context).with(grid.width, grid.height);
-context.clearBuffer = true;
+context.clearBuffer = false;
 context.start();
 Context.Color.set('silver', 'ADADC9');
 Context.Color.set('ash', '5654C4D');
@@ -101,13 +102,13 @@ function drawGrid(grid, context) {
     grid.revealed.forEach((index) => {
         let [x, y] = grid.Point.to2D(index);
         let glyph = grid.tiles[index];
-        context.render(x, y, glyph, 'grey', 'black');
+        context.render(x, y, glyph, 'red', 'black');
     });
 
     grid.visible.forEach((index) => {
         let [x, y] = grid.Point.to2D(index);
         let glyph = grid.tiles[index];
-        context.render(x, y, glyph, 'green', 'black');
+        context.render(x, y, glyph, 'white', 'black');
     });
 }
 
@@ -121,8 +122,9 @@ function drawMonster(grid, context) {
 }
 
 function tryMove(entity, x, y) {
-    let dest = grid.Point.from(x, y);
-    if (grid.Point.isValid(dest) && !grid.isBlocked(dest) && grid.tiles[dest] === Tile.Floor) {
+    let [ox, oy] = grid.Point.to2D(entity.point);
+    let dest = grid.Point.from(x + ox, y + oy);
+    if (grid.Point.isValid(dest) && !grid.blocked[dest] && grid.tiles[dest] === Tile.Floor) {
         grid.blocked[entity.point] = false;
         grid.blocked[dest] = true;
         entity.point = dest;

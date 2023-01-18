@@ -27,9 +27,9 @@ const DijkstraMap = {
             queue.length--;
 
             this.neighborhood(u).forEach(v => {
-                let alt = this.dist.get(u) + cost(u, v);
+                let alt = this.dist.get(u) + this.cost(u, v);
                 if (alt < this.dist.get(v)) {
-                    dist.set(v, alt);
+                    this.dist.set(v, alt);
                 }
             });
         }

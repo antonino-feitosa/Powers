@@ -15,7 +15,7 @@ const Point = {
     to2D(p) { return [p % this.width, Math.floor(p / this.width)] },
 
     isValid(p) {
-        let [x, y] = Point.to2D(p);
+        let [x, y] = this.to2D(p);
         return x < this.width && y < this.height && x >= 0 && y >= 0;
     },
 
@@ -97,6 +97,7 @@ Grid.fromEmpty = function (width, height, fillBorder = true) {
             case (index + 1) % width === 0:
             case index % width === 0:
                 grid.tiles.push(fillBorder ? Tile.Wall : Tile.Floor);
+                break;
             default:
                 grid.tiles.push(Tile.Floor);
         }
@@ -114,6 +115,7 @@ Grid.fromBernoulli = function (width, height, rand, prob = 0.2) {
             case index % width === 0:
             case rand.nextDouble() < prob:
                 grid.tiles.push(Tile.Wall);
+                break;
             default:
                 let [x, y] = grid.Point.to2D(index);
                 grid.rooms.push(new Rect(x, y, 1, 1));
