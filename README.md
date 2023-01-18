@@ -57,3 +57,8 @@ The final version should be implemenete using Unity.
 [^23]: [Field of View - Rogue](http://www.roguebasin.com/index.php/Comparative_study_of_field_of_view_algorithms_for_2D_grid_based_worlds)
 [^24]: [Game Algorithms](https://www.phstudios.com/game-algorithm-series/)
 [^25]: [Brogue](https://sites.google.com/site/broguegame/)
+[^26]: [Multiple Body](https://www.gridsagegames.com/blog/2020/04/developing-multitile-creatures-roguelikes/)
+[^27]: [IA] (http://www.roguebasin.com/index.php/Roguelike_Intelligence_-_Stateless_AIs)
+[^28]: [IA - path](https://news.ycombinator.com/item?id=22848888)
+[^29]: [Dijkstra map](http://www.roguebasin.com/index.php?title=The_Incredible_Power_of_Dijkstra_Maps)
+[^30]: [Dijkstra map - Rogue Basin](http://www.roguebasin.com/index.php/Dijkstra_Maps_Visualized)

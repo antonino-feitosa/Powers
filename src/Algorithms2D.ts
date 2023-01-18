@@ -1,6 +1,8 @@
 
 export interface Point { x: number, y: number };
 
+
+
 export class Rect {
     start: Point;
     end: Point;

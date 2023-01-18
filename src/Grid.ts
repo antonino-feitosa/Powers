@@ -37,8 +37,9 @@ export class Grid {
     clearLight = () => this.visible = [];
     setVisible = (pos: Point) => this.visible[this.pointToIndex(pos)] = this.pointToIndex(pos);
     isVisible = (pos: Point) => this.visible[this.pointToIndex(pos)];
-    setBlocked = (pos: Point, block:boolean = true) => this.blocked[this.pointToIndex(pos)] = block;
+    setBlocked = (pos: Point, block: boolean = true) => this.blocked[this.pointToIndex(pos)] = block;
     isBlocked = (pos: Point) => this.blocked[this.pointToIndex(pos)];
+    isAtBounds = (pos: Point) => pos.x >= 0 && pos.x < this.width && pos.y >= 0 && pos.y <= this.height;
 
     static _inc = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
     iterateNeighbor(pos: Point, call: (position: Point, value: Tile) => 0) {
