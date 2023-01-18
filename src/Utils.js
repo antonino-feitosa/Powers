@@ -4,7 +4,7 @@
 function minimumIndex(array, cmp){
     let min = null;
     for(let i=0;i<array.length;i++){
-        if(!min || cmp(array[i], array[min])){
+        if(min === null || cmp(array[i], array[min]) < 0){
             min = i;
         }
     }

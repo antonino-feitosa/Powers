@@ -14,23 +14,15 @@ const Point = {
     from(x, y) { return y * this.width + x },
     to2D(p) { return [p % this.width, Math.floor(p / this.width)] },
 
-    isValid(p) {
-        let [x, y] = this.to2D(p);
+    is2DValid(x, y) {
         return x < this.width && y < this.height && x >= 0 && y >= 0;
     },
 
-    up(p) { return p - this.width },
-    down(p) { return p + this.width },
-    left(p) { return p - 1 },
-    right(p) { return p + 1 },
-    upLeft(p) { return p - this.width - 1 },
-    upRight(p) { return p - this.width + 1 },
-    downLeft(p) { return p + this.width - 1 },
-    downRight(p) { return p + this.width + 1 },
-
-    axis(p) { return [this.up(p), this.down(p), this.left(p), this.right(p)] },
-    diagonals(p) { return [this.upLeft(p), this.upRight(p), this.downLeft(p), this.downRight(p)] },
-    neighborhood(p) { return [...this.axis(p), ...this.diagonals(0)] },
+    neighborhood(p) {
+        let [x, y] = this.to2D(p);
+        let inc = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+        return inc.map(([dx, dy]) => [x + dx, y + dy]).filter(([x, y]) => this.is2DValid(x, y)).map(([x, y]) => this.from(x, y));
+    },
 
     toString(p) { return this.to2D(p).toString() }
 }
@@ -44,8 +36,6 @@ const Rect = {
         this.y2 = y + height;
         return this;
     },
-    get width() { return this.x2 - this.x1 },
-    get height() { return this.y2 - this.y1 },
     overlaps(other) { return !(this.x1 > other.x2 || this.x2 < other.x1 || this.y1 > other.y2 || this.y2 < other.y1); },
     center() { return [Math.floor((this.x1 + this.x2) / 2), Math.floor((this.y1 + this.y2) / 2)]; },
     includes(x, y) { return x >= this.x1 && x < this.x2 && y >= this.y1 && y < this.y2; }
@@ -71,19 +61,28 @@ const Grid = {
         return Object.create(Rect).with(0, 0, this.width, this.height);
     },
 
-    iterateDim(start, length, isX, call) {
-        let [x, y] = this.Point.to2D(start);
+    area(x, y, call, radius = 10){
+        let rect = Object.create(Rect).with(
+            Math.max(0, x - radius),
+            Math.max(0, y - radius),
+            Math.min(this.width, 2 * radius),
+            Math.min(this.height, 2 * radius)
+        );
+        this.iterate(rect, call);
+    },
+
+    iterateDim(x, y, length, isX, call) {
         range(isX ? x : y, length, i => {
             let point = isX ? this.Point.from(i, y) : this.Point.from(x, i);
             call(point, this.tiles[point]);
         });
     },
 
-    iterateVer(pos, length, call) { this.iterateDim(pos, length, false, call) },
-    iterateHor(pos, length, call) { this.iterateDim(pos, length, true, call) },
+    iterateVer(x, y, length, call) { this.iterateDim(x, y, length, false, call) },
+    iterateHor(x, y, length, call) { this.iterateDim(x, y, length, true, call) },
     iterate(rect, call) {
-        range(rect.y1, rect.height, row =>
-            this.iterateHor(this.Point.from(rect.x1, row), rect.width, call));
+        range(rect.y1, rect.y2 - rect.y1, row =>
+            this.iterateHor(rect.x1, row, rect.x2 - rect.x1, call));
     }
 }
 
@@ -107,7 +106,7 @@ Grid.fromEmpty = function (width, height, fillBorder = true) {
 
 Grid.fromBernoulli = function (width, height, rand, prob = 0.2) {
     let grid = Object.create(Grid).with(width, height);
-    range(grid.tiles, 0, width * height, index => {
+    range(0, width * height, index => {
         switch (true) {
             case index < width:
             case index >= width * (height - 1):
@@ -116,9 +115,11 @@ Grid.fromBernoulli = function (width, height, rand, prob = 0.2) {
             case rand.nextDouble() < prob:
                 grid.tiles.push(Tile.Wall);
                 break;
-            default:
+            case rand.nextDouble() < 0.1:
                 let [x, y] = grid.Point.to2D(index);
-                grid.rooms.push(new Rect(x, y, 1, 1));
+                grid.rooms.push(Object.create(Rect).with(x, y, 1, 1));
+            // no break
+            default:
                 grid.tiles.push(Tile.Floor);
         }
     });
@@ -131,23 +132,23 @@ Grid.fromRandom = function (width, height, rand, maxRooms = 30, minSize = 6, max
 
     let applyToRoom = (rect) => grid.iterate(rect, (pos) => grid.tiles[pos] = Tile.Floor);
     let apply_horizontal_tunnel = (x, ex, y) =>
-        grid.iterateHor(Grid.Point.from(x, y), ex - x, (pos) => grid.tiles[pos] = Tile.Floor);
+        grid.iterateHor(x, y, ex - x, (pos) => grid.tiles[pos] = Tile.Floor);
     let apply_vertical_tunnel = (y, ey, x) =>
-        grid.iterateVer(Grid.Point.from(x, y), ey - y, (pos) => grid.tiles[pos] = Tile.Floor);
+        grid.iterateVer(x, y, ey - y, (pos) => grid.tiles[pos] = Tile.Floor);
 
     let connectRoom = (rect) => {
         let source = rect.center();
         let dest = grid.rooms[grid.rooms.length - 1].center();
         if (rand.nextBoolean()) {
-            let [sx, ex] = source.x > dest.x ? [dest.x, source.x] : [source.x, dest.x];
-            source.x !== dest.x && apply_horizontal_tunnel(sx, ex + 1, dest.y);
-            let [sy, ey] = source.y > dest.y ? [dest.y, source.y] : [source.y, dest.y];
-            source.y !== dest.y && apply_vertical_tunnel(sy, ey, source.x);
+            let [sx, ex] = source[0] > dest[0] ? [dest[0], source[0]] : [source[0], dest[0]];
+            source[0] !== dest[0] && apply_horizontal_tunnel(sx, ex + 1, dest[1]);
+            let [sy, ey] = source[1] > dest[1] ? [dest[1], source[1]] : [source[1], dest[1]];
+            source[1] !== dest[1] && apply_vertical_tunnel(sy, ey, source[0]);
         } else {
-            let [sy, ey] = source.y > dest.y ? [dest.y, source.y] : [source.y, dest.y];
-            source.y !== dest.y && apply_vertical_tunnel(sy, ey, dest.x);
-            let [sx, ex] = source.x > dest.x ? [dest.x, source.x] : [source.x, dest.x];
-            source.x !== dest.x && apply_horizontal_tunnel(sx, ex + 1, source.y);
+            let [sy, ey] = source[1] > dest[1] ? [dest[1], source[1]] : [source[1], dest[1]];
+            source[1] !== dest[1] && apply_vertical_tunnel(sy, ey, dest[0]);
+            let [sx, ex] = source[0] > dest[0] ? [dest[0], source[0]] : [source[0], dest[0]];
+            source[0] !== dest[0] && apply_horizontal_tunnel(sx, ex + 1, source[1]);
         }
     }
 

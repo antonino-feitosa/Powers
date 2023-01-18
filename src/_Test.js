@@ -1,91 +1,56 @@
 
-const {Point} = require('./Grid');
-const {Viewer} = require('./View');
+const { range } = require('./Utils');
+const { Point } = require('./Grid');
+const { DijkstraMap } = require('./DijkstraMap');
 
-Point.with(20,20);
+Point.with(20, 20);
 let map = [];
-for(let i=0;i<Point.height;i++){
-    let row = new Array(Point.width);
-    row.fill(0);
-    map.push(row);
+let obstacle = [];
+for (let i = 0; i < Point.height; i++) {
+    obstacle[i] = new Array(Point.width).fill(0);
+    map[i] = new Array(Point.width).fill('    .');
 }
 
-map.forEach(row => console.log(row.join(' ')));
-
-Viewer.with(5, Point.from(10, 10), Point, (pos) => {
-    return false;
-});
-
-Viewer.calculate((pos, lit) => {
-    if(lit > 0){
-        let [x,y] = Point.to2D(pos);
-        map[y][x] = 1;
+for (let i = 10; i < Point.height; i++) {
+    for (let j = 0; j < 10; j++) {
+        obstacle[i][j] = 1;
     }
-});
-map.forEach(row => console.log(row.join(' ')));
-
-//console.log(Point.from(-1,0));
-//console.log(Point.to2D(-1));
-
-
-
-/*
-function calculateFOV(opaque, start, radius, calcRadius) {
-    //http://www.roguebasin.com/index.php/Improved_Shadowcasting_in_Java
-    let width = start.x + radius;
-    let height = start.y + radius;
-    let lightMap = new Map();
-
-    function castLight(row, st, end, xx, xy, yx, yy) {
-        let newStart = 0;
-        if (st < end) {
-            return;
-        }
-        let blocked = false;
-        for (let distance = row; distance <= radius && !blocked; distance++) {
-            let deltaY = -distance;
-            for (let deltaX = -distance; deltaX <= 0; deltaX++) {
-                let currentX = start.x + deltaX * xx + deltaY * xy;
-                let currentY = start.y + deltaX * yx + deltaY * yy;
-                let leftSlope = (deltaX - 0.5) / (deltaY + 0.5);
-                let rightSlope = (deltaX + 0.5) / (deltaY - 0.5);
-
-                if (!(currentX >= 0 && currentY >= 0 && currentX < width && currentY < height) || st < rightSlope) {
-                    continue;
-                } else if (end > leftSlope) {
-                    break;
-                }
-
-                //check if it's within the lightable area and light if needed
-                if (calcRadius(deltaX, deltaY) <= radius) {
-                    let bright = (1 - (calcRadius(deltaX, deltaY) / radius));
-                    lightMap.set({ x: currentX, y: currentY }, bright);
-                }
-
-                if (blocked) { //previous cell was a blocking one
-                    if (opaque({ x: currentX, y: currentY })) {//hit a wall
-                        newStart = rightSlope;
-                        continue;
-                    } else {
-                        blocked = false;
-                        st = newStart;
-                    }
-                } else {
-                    if (opaque({ x: currentX, y: currentY }) && distance < radius) {//hit a wall within sight line
-                        blocked = true;
-                        castLight(distance + 1, st, leftSlope, xx, xy, yx, yy);
-                        newStart = rightSlope;
-                    }
-                }
-            }
-        }
-    }
-
-    lightMap.set(start, 1);//light the starting cell
-    Point.diagonals(Point.from(start)).forEach(d => {
-        castLight(1, 1, 0, 0, d.x, d.y, 0);
-        castLight(1, 1, 0, d.x, 0, 0, d.y);
-    });
-    return lightMap;
 }
-*/
+
+//map.forEach(row => console.log(row.join(' ')));
+
+function canMove(p){
+    let [x, y] = Point.to2D(p);
+    return obstacle[y][x] === 0;
+}
+
+let indexes = [];
+range(0, Point.width * Point.height, index => indexes.push(index));
+indexes = indexes.filter(p => canMove(p));
+
+DijkstraMap.with(new Map([[Point.from(3, 3), 0]]));
+DijkstraMap.neighborhood = function (p) { return Point.neighborhood(p).filter(p => canMove(p));};
+DijkstraMap.cost = function (u, v) {
+    let [x1, y1] = Point.to2D(u);
+    let [x2, y2] = Point.to2D(v);
+    return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+}
+DijkstraMap.calculate(indexes);
+
+DijkstraMap.makeFleeMap(-1.2);
+DijkstraMap.fleeMap.dist.forEach((val, key) => {
+    let [x, y] = Point.to2D(key);
+    //let v = '      ' + (neigh.includes(key) ?  (val).toFixed(1) :' ' );
+    let v = '      ' + (val).toFixed(1);
+    map[y][x] = v.substring(v.length - 5);
+});
+
+let start = Point.from(0, 3);
+for (let i = 0; i < 20; i++) {
+    start = DijkstraMap.flee(start);
+    let [x, y] = Point.to2D(start);
+    map[y][x] = '    P';
+}
+map[3][3] = '   @ ';
+
+map.forEach(row => console.log(row.join(' ')));
