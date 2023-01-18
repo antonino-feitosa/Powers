@@ -5,19 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Main.ts",
             "type": "node",
             "request": "launch",
-            "runtimeArgs": [
-                "--nolazy",
-                "-r",
-                "ts-node/register",
-                "--trace-deprecation",
-                "--abort-on-uncaught-exception"
+            "name": "Launch Program",
+            "skipFiles": [
+                "<node_internals>/**"
             ],
-            "sourceMaps": true,
-            "cwd": "${workspaceRoot}",
-            "program": "${workspaceRoot}/_Test.ts",
+            "program": "${workspaceFolder}\\Main.js"
         }
     ]
 }
