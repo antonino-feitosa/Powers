@@ -19,15 +19,40 @@ class Entity {
         this.damage = [];
         this.messages = [];
         this.collision = [];
+        this.isDead = false;
+        this.game = game;
+
+        const grid = game.grid;
+        grid.blocked[pos] ? grid.blocked[pos].push(this) : (grid.blocked[pos] = [this]);
     }
     update(game) { };
 
-    draw(game) {
+    draw() {
+        const game = this.game;
         const grid = game.grid;
         const context = game.context;
         const render = this.render;
+        
         let [x, y] = grid.Point.to2D(this.point);
         context.render(x, y, render.glyph, render.fg, render.bg);
+    }
+
+    tryMove(x, y) {
+        const entity = this;
+        const game = this.game;
+        const grid = game.grid;
+
+        let [ox, oy] = grid.Point.to2D(entity.point);
+        let dest = grid.Point.from(x + ox, y + oy);
+        if (grid.Point.is2DValid(x + ox, y + oy) && !game.isOpaque(dest) && !grid.blocked[dest]) {
+            grid.blocked[entity.point] = false;
+            grid.blocked[dest] = true;
+            entity.point = dest;
+            entity.viewer.center = dest;
+            entity.viewer.isDirty = true;
+        } else {
+            entity.viewer.isDirty = false;
+        }
     }
 }
 
@@ -52,33 +77,39 @@ class Monster extends Entity {
         this.heatMap = new DijkstraMap(new Map(), game.neighborhood.bind(game), game.moveCost.bind(game));
     }
 
-    update(game) {
+    update() {
+        const game = this.game;
         const grid = game.grid;
         const player = game.player;
-        if (this.viewer.isDirty) {
-            this.viewer.calculate(pos => this.revealed[pos] = pos);
-            this.viewer.isDirty = false;
-        }
-        if (this.viewer.lightMap.get(player.point) > 0) {
-            this.heatMap.sources = new Map([[player.point, 0]]);
-            this.heatMap.calculate(this.revealed);
-            this.heatMap.makeRangeMap(-1.2, this.viewer.radius);
-            this.heatMap.makeFleeMap(-1.2);
+        const viewer = this.viewer;
+        const heatMap = this.heatMap;
 
-            let moveIndex = this.heatMap.rangeMap.chase(this.point);
+        if (viewer.isDirty) {
+            viewer.calculate(pos => this.revealed[pos] = pos);
+            viewer.isDirty = false;
+        }
+        if (viewer.lightMap.get(player.point) > 0) {
+            heatMap.sources = new Map([[player.point, 0]]);
+            heatMap.calculate(this.revealed);
+            heatMap.makeRangeMap(-1.2, viewer.radius);
+            heatMap.makeFleeMap(-1.2);
+
+            let moveIndex = heatMap.rangeMap.chase(this.point);
             if (game.grid.Point.neighborhood(player.point).includes(this.point)) {
                 game.message = 'The Monster Attacks!!!';
             } else {
                 let [dx, dy] = grid.Point.to2D(moveIndex);
                 let [x, y] = grid.Point.to2D(this.point);
-                game.tryMove(this, dx - x, dy - y);
+                this.tryMove(dx - x, dy - y);
                 game.message = 'Monster shouts a insult!';
             }
         }
     }
 
-    draw(game) {
+    draw() {
+        const game = this.game;
         const grid = game.grid;
+
         if (grid.visible[this.point] || !game.hasFog) {
             super.draw(game);
 
@@ -108,9 +139,11 @@ class Player extends Entity {
         this.heatMap = new DijkstraMap(new Map(), game.neighborhood.bind(game), game.moveCost.bind(game));
     }
 
-    update(game) {
+    update() {
+        const game = this.game;
         const player = this;
         const grid = game.grid;
+
         if (player.viewer.isDirty) {
             game.hasFog && (grid.visible = []);
             player.viewer.calculate((pos, light) => {

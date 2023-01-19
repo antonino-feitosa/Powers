@@ -41,11 +41,8 @@ class Game {
         let startRoom = this.rand.pick(this.grid.rooms);
         let startPosition = startRoom.center();
         let startIndex = this.grid.Point.from(startPosition[0], startPosition[1]);
-        this.grid.blocked[startIndex] = startIndex;
 
         const player = this.player = new Player(this, startIndex, 8);
-        //, this.grid.Point, this.isOpaque.bind(this), this.neighborhood.bind(this), this.moveCost.bind(this));
-
         this.addMonsters(startRoom);
 
         this.context = new Context(this.width, this.height + 1);
@@ -54,14 +51,14 @@ class Game {
         this.context.listenInput((unicode, name) => {
             let key = name ? name : unicode;
             switch (key) {
-                case 'h': this.tryMove(player, -1, 0); break;
-                case 'k': this.tryMove(player, 0, -1); break;
-                case 'j': this.tryMove(player, 0, +1); break;
-                case 'l': this.tryMove(player, +1, 0); break;
-                case 'y': this.tryMove(player, -1, -1); break;
-                case 'u': this.tryMove(player, 1, -1); break;
-                case 'b': this.tryMove(player, -1, 1); break;
-                case 'n': this.tryMove(player, 1, 1); break;
+                case 'h': player.tryMove(-1, +0); break;
+                case 'k': player.tryMove(+0, -1); break;
+                case 'j': player.tryMove(+0, +1); break;
+                case 'l': player.tryMove(+1, +0); break;
+                case 'y': player.tryMove(-1, -1); break;
+                case 'u': player.tryMove(+1, -1); break;
+                case 'b': player.tryMove(-1, +1); break;
+                case 'n': player.tryMove(+1, +1); break;
                 default: return;
             }
             this.loop();
@@ -73,15 +70,15 @@ class Game {
         grid.rooms.filter(r => r !== startRoom).forEach(room => {
             let [rx, ry] = room.center();
             let pos = this.grid.Point.from(rx, ry);
-            grid.blocked[pos] = pos;
             let monster = new Monster(this, pos, 5);
+
             this.monsters.push(monster);
         });
     }
 
     loop() {
-        this.player.update(this);
-        this.monsters.forEach(m => m.update(this));
+        this.player.update();
+        this.monsters.forEach(m => m.update());
         this.draw();
     }
 
@@ -94,9 +91,9 @@ class Game {
         context.render(0, grid.height, this.message, 'white', 'black');
         this.message = '';
 
-        this.drawGrid(grid, context);
-        this.monsters.forEach(m => m.draw(this));
-        player.draw(this);
+        this.drawGrid();
+        this.monsters.forEach(m => m.draw());
+        player.draw();
 
         /*this.player.heatMap.fleeMap.dist.forEach((val, p) => {
             val = -val;
@@ -126,21 +123,6 @@ class Game {
                 let glyph = this.grid.tiles[index];
                 this.context.render(x, y, glyph, 'white', 'black');
             });
-        }
-    }
-
-    tryMove(entity, x, y) {
-        const grid = this.grid;
-        let [ox, oy] = grid.Point.to2D(entity.point);
-        let dest = grid.Point.from(x + ox, y + oy);
-        if (grid.Point.is2DValid(x + ox, y + oy) && !this.isOpaque(dest) && !grid.blocked[dest]) {
-            grid.blocked[entity.point] = false;
-            grid.blocked[dest] = true;
-            entity.point = dest;
-            entity.viewer.center = dest;
-            entity.viewer.isDirty = true;
-        } else {
-            entity.viewer.isDirty = false;
         }
     }
 }
