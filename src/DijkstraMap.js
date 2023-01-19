@@ -55,15 +55,21 @@ class DijkstraMap {
         return neighbor[index];
     }
 
-    flee(point) {
-        let p = this.fleeMap.chase(point);
-        return p;
-    }
-
-    makeFleeMap(force = -1.2, range = 6) {
+    makeRangeMap(force = -1.2, range = 6) {
         let map = new DijkstraMap(this.sources, this.neighborhood, this.cost);
         this.dist.forEach((val, key) => {
-            let value = val > range ? force * val : DijkstraMap.INF;
+            let value = val < DijkstraMap.INF && val >= range && val < range + 2 ? force * val : DijkstraMap.INF;
+            map.dist.set(key, value)
+        });
+        map.apply_dijkstra();
+        this.rangeMap = map;
+        return map;
+    }
+
+    makeFleeMap(force = -1.2) {
+        let map = new DijkstraMap(this.sources, this.neighborhood, this.cost);
+        this.dist.forEach((val, key) => {
+            let value = val < DijkstraMap.INF && val >= this.max ? force * val : DijkstraMap.INF;
             map.dist.set(key, value)
         });
         map.apply_dijkstra();
