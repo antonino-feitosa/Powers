@@ -3,7 +3,7 @@
 
 const { Context } = require('./Context');
 const { DijkstraMap } = require('./DijkstraMap');
-const { Entity, Render, Monster } = require('./Entity');
+const { Entity, Render, Monster, Player } = require('./Entity');
 const { Grid, Tile } = require('./Grid');
 const { Random } = require('./Random');
 const { Viewer } = require('./View');
@@ -45,13 +45,8 @@ class Game {
         let startIndex = this.grid.Point.from(startPosition[0], startPosition[1]);
         this.grid.blocked[startIndex] = startIndex;
 
-        this.player = new Entity(
-            startIndex,
-            new Viewer(10, startIndex, this.grid.Point, this.isOpaque.bind(this), 'circle'),
-            new Render('@', 'yellow', 'black')
-        );
-        const player = this.player;
-        player.heatMap = new DijkstraMap(new Map(), this.neighborhood.bind(this), this.moveCost.bind(this));
+        const player = this.player = new Player(startIndex, 8, this.grid.Point,
+            this.isOpaque.bind(this), this.neighborhood.bind(this), this.moveCost.bind(this));
 
         this.addMonsters(startRoom);
 
@@ -74,73 +69,29 @@ class Game {
             this.loop();
         });
     }
-    
-    addMonsters(startRoom) {
-        const game = this;
-        const grid = this.grid;
-        const player = this.player;
 
+    addMonsters(startRoom) {
+        const grid = this.grid;
         grid.rooms.filter(r => r !== startRoom).forEach(room => {
             let [rx, ry] = room.center();
             let pos = this.grid.Point.from(rx, ry);
             grid.blocked[pos] = pos;
-            let monster = new Monster(
-                pos,
-                new Viewer(5, pos, grid.Point, this.isOpaque.bind(this)),
-                new Render('M', 'red', 'black'),
-            );
-
-            monster.update = function () {
-                if (this.viewer.isDirty) {
-                    this.viewer.calculate();
-                    this.viewer.isDirty = false;
-                }
-                if (this.viewer.lightMap.get(player.point) > 0) {
-                    let moveIndex = player.heatMap.flee(this.point);
-                    if (game.grid.Point.neighborhood(player.point).includes(this.point)) {
-                        game.message = 'The Monster Attacks!!!';
-                    } else {
-                        let [dx, dy] = grid.Point.to2D(moveIndex);
-                        let [x, y] = grid.Point.to2D(this.point);
-                        game.tryMove(this, dx - x, dy - y);
-                        game.message = 'Monster shouts a insult!';
-                    }
-                }
-            }
+            let monster = new Monster(pos, 5, grid.Point, this.isOpaque.bind(this));
             this.monsters.push(monster);
         });
     }
 
     loop() {
-        const player = this.player;
-
-        if (player.viewer.isDirty) {
-            this.hasFog && (this.grid.visible = []);
-            player.viewer.calculate((pos, light) => {
-                if (light > 0) {
-                    this.hasFog && (this.grid.visible[pos] = pos);
-                    this.grid.revealed[pos] = pos;
-                }
-            });
-        }
-
-        let awakeArea = [];
-        let [x, y] = this.grid.Point.to2D(player.point);
-        this.grid.area(x, y, (pos) => !this.isOpaque(pos) && awakeArea.push(pos));
-
-        player.heatMap.sources = new Map([[player.point, 0]]);
-        player.heatMap.calculate(awakeArea);
-        player.heatMap.makeFleeMap(-1.2);
-
-        this.monsters.forEach(m => m.update());
+        this.player.update(this);
+        this.monsters.forEach(m => m.update(this));
         this.draw();
     }
 
-    draw(){
+    draw() {
         const grid = this.grid;
         const player = this.player;
         const context = this.context;
-        
+
         context.clear();
         context.render(0, grid.height, this.message, 'white', 'black');
         this.message = '';
