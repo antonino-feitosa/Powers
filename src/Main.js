@@ -2,11 +2,9 @@
 "use strict";
 
 const { Context } = require('./Context');
-const { DijkstraMap } = require('./DijkstraMap');
-const { Entity, Render, Monster, Player } = require('./Entity');
+const { Monster, Player } = require('./Entity');
 const { Grid, Tile } = require('./Grid');
 const { Random } = require('./Random');
-const { Viewer } = require('./View');
 
 class Game {
 
@@ -15,7 +13,7 @@ class Game {
         this.height = height;
         this.rand = new Random(seed);
         this.hasFog = hasFog;
-        this.clearBuffer = false;
+        this.clearBuffer = true;
         this.monsters = [];
         this.message = '';
         this.start();
@@ -45,8 +43,8 @@ class Game {
         let startIndex = this.grid.Point.from(startPosition[0], startPosition[1]);
         this.grid.blocked[startIndex] = startIndex;
 
-        const player = this.player = new Player(startIndex, 8, this.grid.Point,
-            this.isOpaque.bind(this), this.neighborhood.bind(this), this.moveCost.bind(this));
+        const player = this.player = new Player(this, startIndex, 8);
+        //, this.grid.Point, this.isOpaque.bind(this), this.neighborhood.bind(this), this.moveCost.bind(this));
 
         this.addMonsters(startRoom);
 
@@ -76,7 +74,7 @@ class Game {
             let [rx, ry] = room.center();
             let pos = this.grid.Point.from(rx, ry);
             grid.blocked[pos] = pos;
-            let monster = new Monster(pos, 5, grid.Point, this.isOpaque.bind(this));
+            let monster = new Monster(this, pos, 5);
             this.monsters.push(monster);
         });
     }
@@ -97,9 +95,21 @@ class Game {
         this.message = '';
 
         this.drawGrid(grid, context);
-        this.drawMonster(grid, context);
-        let [x, y] = grid.Point.to2D(player.point);
-        context.render(x, y, player.render.glyph, player.render.fg, player.render.bg);
+        this.monsters.forEach(m => m.draw(this));
+        player.draw(this);
+
+        /*this.player.heatMap.fleeMap.dist.forEach((val, p) => {
+            val = -val;
+            if(val < 10){
+                let str = val.toFixed(0);
+                let [x, y] = this.grid.Point.to2D(p);
+                this.context.render(x, y, str);
+            } else {
+                let [x, y] = this.grid.Point.to2D(p);
+                this.context.render(x, y, '.','red');
+            }
+        });*/
+
         context.build();
     }
 
@@ -117,36 +127,6 @@ class Game {
                 this.context.render(x, y, glyph, 'white', 'black');
             });
         }
-    }
-
-    drawMonster() {
-        this.monsters.forEach(m => {
-            if (this.grid.visible[m.point] || !this.hasFog) {
-                let [x, y] = this.grid.Point.to2D(m.point);
-                this.context.render(x, y, m.render.glyph, m.render.fg, m.render.bg);
-
-                /*player.heatMap.neighborhood(m.point).forEach(n => {
-                    let val = player.heatMap.dist.get(n);
-                    if(val && val < 10){
-                        let str = val.toFixed(0);
-                        let [x, y] = grid.Point.to2D(n);
-                        context.render(x, y, str, m.render.fg, m.render.bg);
-                    }
-                });*/
-            }
-        });
-
-        /*this.player.heatMap.fleeMap.dist.forEach((val, p) => {
-            val = -val;
-            if(val < 10){
-                let str = val.toFixed(0);
-                let [x, y] = this.grid.Point.to2D(p);
-                this.context.render(x, y, str);
-            } else {
-                let [x, y] = this.grid.Point.to2D(p);
-                this.context.render(x, y, '.','red');
-            }
-        });*/
     }
 
     tryMove(entity, x, y) {

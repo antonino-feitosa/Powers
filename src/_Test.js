@@ -1,6 +1,14 @@
 
-let x = [4,5,7];
+class A{
+    myName(){
+        return 'a';
+    }
+}
 
-let y = new Array(... x.keys());
+class B extends A{
+    myName(){
+        return 'b' + super.myName();
+    }
+}
 
-console.log(y);
+console.log(new B().myName());
