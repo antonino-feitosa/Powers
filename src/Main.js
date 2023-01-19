@@ -8,29 +8,30 @@ const { Grid, Tile } = require('./Grid');
 const { Random } = require('./Random');
 const { Viewer } = require('./View');
 
-const Game = {
+class Game {
 
-    with(width, height, seed = 1, hasFog = true) {
+    constructor(width, height, seed = 1, hasFog = true) {
         this.width = width;
         this.height = height;
-        this.rand = Object.create(Random).with(seed);
+        this.rand = new Random(seed);
         this.hasFog = hasFog;
+        this.clearBuffer = false;
         this.monsters = [];
         this.message = '';
         this.start();
-    },
+    }
 
-    isOpaque(p) { return this.grid.tiles[p] === Tile.Wall },
+    isOpaque(p) { return this.grid.tiles[p] === Tile.Wall }
     moveCost(u, v) {
         let [x1, y1] = this.grid.Point.to2D(u);
         let [x2, y2] = this.grid.Point.to2D(v);
         return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
-    },
+    }
     neighborhood(p) {
         let ne = this.grid.Point.neighborhood(p);
         ne = ne.filter(n => !this.isOpaque(n));
         return ne;
-    },
+    }
 
     start() {
         //let grid = Grid.fromBernoulli(30, 20, rand);
@@ -44,20 +45,18 @@ const Game = {
         let startIndex = this.grid.Point.from(startPosition[0], startPosition[1]);
         this.grid.blocked[startIndex] = startIndex;
 
-        this.player = Object.create(Entity).with(
+        this.player = new Entity(
             startIndex,
-            Object.create(Viewer).with(10, startIndex, this.grid.Point, this.isOpaque.bind(this), 'circle'),
-            Object.create(Render).with('@', 'yellow', 'black'),
+            new Viewer(10, startIndex, this.grid.Point, this.isOpaque.bind(this), 'circle'),
+            new Render('@', 'yellow', 'black')
         );
         const player = this.player;
-        player.heatMap = Object.create(DijkstraMap);
-        player.heatMap.neighborhood = this.neighborhood.bind(this);
-        player.heatMap.cost = this.moveCost.bind(this);
+        player.heatMap = new DijkstraMap(new Map(), this.neighborhood.bind(this), this.moveCost.bind(this));
 
         this.addMonsters(startRoom);
 
-        this.context = Object.create(Context).with(this.width, this.height + 1);
-        this.context.clearBuffer = true;
+        this.context = new Context(this.width, this.height + 1);
+        this.context.clearBuffer = this.clearBuffer;
         this.context.start();
         this.context.listenInput((unicode, name) => {
             let key = name ? name : unicode;
@@ -74,8 +73,7 @@ const Game = {
             }
             this.loop();
         });
-    },
-
+    }
     
     addMonsters(startRoom) {
         const game = this;
@@ -86,19 +84,20 @@ const Game = {
             let [rx, ry] = room.center();
             let pos = this.grid.Point.from(rx, ry);
             grid.blocked[pos] = pos;
-            let monster = Object.create(Monster).with(
+            let monster = new Monster(
                 pos,
-                Object.create(Viewer).with(5, pos, grid.Point, this.isOpaque.bind(this)),
-                Object.create(Render).with('M', 'red', 'black'),
+                new Viewer(5, pos, grid.Point, this.isOpaque.bind(this)),
+                new Render('M', 'red', 'black'),
             );
+
             monster.update = function () {
                 if (this.viewer.isDirty) {
                     this.viewer.calculate();
                     this.viewer.isDirty = false;
                 }
-                if (this.viewer.lightMap.get(game.player.point) > 0) {
-                    let moveIndex = game.player.heatMap.flee(this.point);
-                    if (game.grid.Point.neighborhood(game.player.point).includes(this.point)) {
+                if (this.viewer.lightMap.get(player.point) > 0) {
+                    let moveIndex = player.heatMap.flee(this.point);
+                    if (game.grid.Point.neighborhood(player.point).includes(this.point)) {
                         game.message = 'The Monster Attacks!!!';
                     } else {
                         let [dx, dy] = grid.Point.to2D(moveIndex);
@@ -110,7 +109,7 @@ const Game = {
             }
             this.monsters.push(monster);
         });
-    },
+    }
 
     loop() {
         const player = this.player;
@@ -129,13 +128,13 @@ const Game = {
         let [x, y] = this.grid.Point.to2D(player.point);
         this.grid.area(x, y, (pos) => !this.isOpaque(pos) && awakeArea.push(pos));
 
-        player.heatMap.with(new Map([[player.point, 0]]));
+        player.heatMap.sources = new Map([[player.point, 0]]);
         player.heatMap.calculate(awakeArea);
         player.heatMap.makeFleeMap(-1.2);
 
         this.monsters.forEach(m => m.update());
         this.draw();
-    },
+    }
 
     draw(){
         const grid = this.grid;
@@ -151,7 +150,7 @@ const Game = {
         let [x, y] = grid.Point.to2D(player.point);
         context.render(x, y, player.render.glyph, player.render.fg, player.render.bg);
         context.build();
-    },
+    }
 
     drawGrid() {
         if (this.hasFog) {
@@ -167,7 +166,7 @@ const Game = {
                 this.context.render(x, y, glyph, 'white', 'black');
             });
         }
-    },
+    }
 
     drawMonster() {
         this.monsters.forEach(m => {
@@ -186,18 +185,18 @@ const Game = {
             }
         });
 
-        /*player.heatMap.fleeMap.dist.forEach((val, p) => {
+        /*this.player.heatMap.fleeMap.dist.forEach((val, p) => {
             val = -val;
             if(val < 10){
                 let str = val.toFixed(0);
-                let [x, y] = grid.Point.to2D(p);
-                context.render(x, y, str);
+                let [x, y] = this.grid.Point.to2D(p);
+                this.context.render(x, y, str);
             } else {
-                let [x, y] = grid.Point.to2D(p);
-                context.render(x, y, '.','red');
+                let [x, y] = this.grid.Point.to2D(p);
+                this.context.render(x, y, '.','red');
             }
         });*/
-    },
+    }
 
     tryMove(entity, x, y) {
         const grid = this.grid;
@@ -215,5 +214,4 @@ const Game = {
     }
 }
 
-Game.with(100, 20);
-Game.loop();
+new Game(100, 20).loop();

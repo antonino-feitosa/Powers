@@ -3,9 +3,9 @@
 
 const Diagonals = [[-1,-1],[1,-1],[-1,1],[1,1]];
 
-const Viewer = {
+class Viewer {
 
-    with(radius, center, Point, opaque = () => false, type = 'circle') {
+    constructor(radius, center, Point, opaque = () => false, type = 'circle') {
         this.isDirty = true;
         this.radius = radius;
         this.center = center;
@@ -17,8 +17,7 @@ const Viewer = {
             case 'square': this.radiusFunction = function (x, y) { return Math.max(Math.abs(x), Math.abs(y)); }; break;
             case 'diamond': this.radiusFunction = function (x, y) { return Math.abs(x) + Math.abs(y); }; break;
         }
-        return this;
-    },
+    }
 
     calculate(call = () => 0) {
         if (this.isDirty) {
@@ -31,7 +30,7 @@ const Viewer = {
         }
 
         this.lightMap.forEach((light, pos) => call(pos, light));
-    },
+    }
 
     // TODO merge other light fonts
     _castLight(row, st, end, xx, xy, yx, yy) {
