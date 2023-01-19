@@ -94,7 +94,10 @@ Context.Color = new Map([
     ['green', '00FF00'],
     ['blue', '0000FF'],
     ['red', 'FF0000'],
-    ['grey', '808080']
+    ['grey', '808080'],
+    ['silver', 'ADADC9'],
+    ['ash', '5654C4D'],
+    ['shadow', '373737']
 ]);
 
 Context._applyColor = function (text, fg = 'white', bg = 'black') {
