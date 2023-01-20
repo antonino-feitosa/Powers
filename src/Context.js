@@ -33,7 +33,7 @@ class Context {
     }
 
     build() {
-        this.clearBuffer && process.stdout.write(`\x1b[${this.height + 2}A`); // move to start
+        this.clearBuffer && process.stdout.write(`\x1b[${this.height + 1}A`); // move to start
         this.matrix.forEach(row => console.log(row.join('')));
         this.clear();
     }

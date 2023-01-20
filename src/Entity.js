@@ -90,11 +90,11 @@ class Player extends Moveable {
 
         this.damage.forEach(de => {
             this.combatStatus.hp -= de.force;
-            game.message = `You Suffer ${de.force} Points of Damage!`;
+            game.printMessage(`You Suffer ${de.force} Points of Damage!`);
         });
         this.damage = [];
         if(this.combatStatus.hp <= 0){
-            game.message = 'You Died!';
+            game.printMessage('You Died!');
             game.context.dispose();
             return;
         }
@@ -120,7 +120,7 @@ class Player extends Moveable {
         const game = this.game;
         const grid = game.grid;
         const heatMap = this.heatMap;
-        if (game.lit) {
+        if (game.lit && false) {
 
             player.viewer.calculate((pos, light) => {
                 if (light > 0) {
@@ -154,7 +154,7 @@ class Player extends Moveable {
 class Monster extends Moveable {
     constructor(game, pos, range) {
         super(game, pos, new Render('M', 'red', 'black'));
-        let neighborhood = (p) => game.neighborhood(p).filter(p => p === this.point || !game.grid.blocked[p]);
+        let neighborhood = (p) => game.neighborhood(p).filter(p => !game.grid.blocked[p] || game.grid.blocked[p].length === 0);
 
         this.viewer = new Viewer(range, pos, game.grid.Point, game.isOpaque.bind(game));
         this.revealed = [];
@@ -172,11 +172,11 @@ class Monster extends Moveable {
 
         this.damage.forEach(de => {
             this.combatStatus.hp -= de.force
-            game.message = 'The Monster Suffers Damage! ' + this.combatStatus.hp;
+            game.printMessage('The Monster Suffers Damage! ' + this.combatStatus.hp);
         });
         this.damage = [];
         if(this.combatStatus.hp <= 0){
-            game.message = 'The Monster Dies!';
+            game.printMessage('The Monster Dies!');
             this.isDead = true;
             return;
         }
@@ -194,12 +194,12 @@ class Monster extends Moveable {
             let moveIndex = heatMap.rangeMap.chase(this.point);
             if (this.inContact().includes(player)) {
                 player.damage.push(new CombatEvent(this, 5));
-                game.message = 'The Monster Attacks!!!';
+                game.printMessage('The Monster Attacks!!!');
             } else {
                 let [dx, dy] = grid.Point.to2D(moveIndex);
                 let [x, y] = grid.Point.to2D(this.point);
                 this.tryMove(dx - x, dy - y);
-                game.message = 'Monster shouts a insult!';
+                game.printMessage('Monster shouts a insult!');
             }
         }
     }

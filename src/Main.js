@@ -6,6 +6,7 @@ const { Monster, Player } = require('./Entity');
 const { Grid, Tile } = require('./Grid');
 const { Random } = require('./Random');
 const { TurnControl } = require('./Turn');
+const { range } = require('./Utils');
 
 class Game {
 
@@ -14,8 +15,10 @@ class Game {
         this.height = height;
         this.rand = new Random(seed);
         this.hasFog = hasFog;
-        this.clearBuffer = false;
-        this.message = '';
+        this.clearBuffer = true;
+        this._messages = [];
+        this._messagesIndex = 0;
+        this.turnCount = 0;
         this.turnControl = new TurnControl();
         this.start();
     }
@@ -47,13 +50,18 @@ class Game {
         this.turnControl.push(player);
         this.addMonsters(startRoom);
 
-        this.context = new Context(this.width, this.height + 1);
+        this.context = new Context(this.width, this.height + 4);
         this.context.clearBuffer = this.clearBuffer;
         this.context.start();
         this.context.listenInput((unicode, name) => {
             if (this.turnControl.peek() !== player) return;
 
             let key = name ? name : unicode;
+            switch (key) {
+                case 'space': this.lit = !this.lit; this.draw(); return;
+                case "'": this.showMessages = !this.showMessages; this.draw(); return;
+            }
+
             switch (key) {
                 case 'h': player.tryMove(-1, +0); break;
                 case 'k': player.tryMove(+0, -1); break;
@@ -63,10 +71,10 @@ class Game {
                 case 'u': player.tryMove(+1, -1); break;
                 case 'b': player.tryMove(-1, +1); break;
                 case 'n': player.tryMove(+1, +1); break;
-                case 'space': this.lit = !this.lit; this.draw(); break;
                 default: return;
             }
 
+            this.turnCount++;
             this.turnControl.nextTurn();
             this.loop();
         });
@@ -89,7 +97,6 @@ class Game {
         let current = turnControl.peek();
         while (current !== player && !current.update()) {
             if (current.isDead) {
-                console.log('Delete Monster');
                 turnControl.del(current);
                 current = turnControl.peek();
             } else {
@@ -113,13 +120,12 @@ class Game {
         const context = this.context;
 
         context.clear();
-        context.render(0, grid.height, this.message, 'white', 'black');
-        this.message = '';
-
-        this.drawGrid();
-        this.turnControl.values.forEach(m => m.draw());
-        player.draw();
-
+        if (!this.showMessages) {
+            this.drawGrid();
+            this.turnControl.values.forEach(m => m.draw());
+            player.draw();
+        }
+        this.drawUI();
         context.build();
     }
 
@@ -138,6 +144,28 @@ class Game {
             });
         }
     }
+
+    printMessage(message){
+        this._messages.push(this.turnCount + ': ' + message);
+    }
+
+    drawUI() {
+        const context = this.context;
+        const messages = this._messages;
+
+        let numToDisplay = messages.length - this._messageIndex;
+        if (this.showMessages) {
+            numToDisplay = Math.min(messages.length, context.height);
+        } else {
+            range(0, this.width, x => context.render(x, context.height - 4, '\u2505', 'white', 'black'));
+        }
+        for (let i = 0, index = messages.length - 1; i < numToDisplay; i++, index--) {
+            for (let c = 0; c < Math.min(context.width, messages[index].length); c++) {
+                context.render(c, context.height - 1 - i, messages[index][c], 'white', 'black');
+            }
+        }
+        this._messageIndex = messages.length;
+    }
 }
 
-new Game(50, 20).loop();
+new Game(100, 20).loop();
