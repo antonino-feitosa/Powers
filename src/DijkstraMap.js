@@ -58,7 +58,7 @@ class DijkstraMap {
     makeRangeMap(force = -1.2, range = 6) {
         let map = new DijkstraMap(this.sources, this.neighborhood, this.cost);
         this.dist.forEach((val, key) => {
-            let value = val < DijkstraMap.INF && val >= range && val < range + 2 ? force * val : DijkstraMap.INF;
+            let value = val < DijkstraMap.INF && val >= range && val < range + 1 ? force * val : DijkstraMap.INF;
             map.dist.set(key, value)
         });
         map.apply_dijkstra();

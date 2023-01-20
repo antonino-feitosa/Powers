@@ -68,13 +68,49 @@ class Combat {
     }
 }
 
+class Player extends Entity {
+
+    constructor(game, pos, range = 6) {
+        super(game, pos, new Render('@', 'yellow', 'black'));
+
+        let isOpaque = (p) => game.isOpaque(p) || game.grid.blocked[p];
+        this.viewer = new Viewer(range, pos, game.grid.Point, isOpaque, 'circle');
+        this.heatMap = new DijkstraMap(new Map(), game.neighborhood.bind(game), game.moveCost.bind(game));
+        this.initiative = 20;
+    }
+
+    update() {
+        const game = this.game;
+        const player = this;
+        const grid = game.grid;
+
+        if (player.viewer.isDirty) {
+            game.hasFog && (grid.visible = []);
+            player.viewer.calculate((pos, light) => {
+                if (light > 0) {
+                    game.hasFog && (grid.visible[pos] = pos);
+                    grid.revealed[pos] = pos;
+                }
+            });
+        }
+
+        player.heatMap.sources = new Map([[player.point, 0]]);
+        player.heatMap.calculate(grid.visible);
+        player.heatMap.makeFleeMap(-2);
+    }
+
+}
+
 class Monster extends Entity {
 
     constructor(game, pos, range) {
         super(game, pos, new Render('M', 'red', 'black'));
+        let neighborhood = (p) => game.neighborhood(p).filter(p => p === this.point || !game.grid.blocked[p]);
+        
         this.viewer = new Viewer(range, pos, game.grid.Point, game.isOpaque.bind(game));
         this.revealed = [];
-        this.heatMap = new DijkstraMap(new Map(), game.neighborhood.bind(game), game.moveCost.bind(game));
+        this.heatMap = new DijkstraMap(new Map(), neighborhood, game.moveCost.bind(game));
+        this.initiative = 20;
     }
 
     update() {
@@ -111,61 +147,34 @@ class Monster extends Entity {
         const grid = game.grid;
 
         if (grid.visible[this.point] || !game.hasFog) {
-            super.draw(game);
-
-            /*if (this.viewer.lightMap.get(game.player.point) > 0) {
-                this.heatMap.fleeMap.dist.forEach((val, p) => {
-                    val = -val;
-                    if (val < 10) {
-                        let str = val.toFixed(0);
-                        let [x, y] = grid.Point.to2D(p);
-                        game.context.render(x, y, str);
-                    } else {
-                        let [x, y] = grid.Point.to2D(p);
-                        game.context.render(x, y, '.', 'red');
-                    }
-                });
-            }*/
+            super.draw(game);   
         }
-    }
-}
 
+        if (game.lit  && this.heatMap.rangeMap) {
+            const viewer = this.viewer;
+            const heatMap = this.heatMap;
+            const player = game.player;
 
-class Player extends Entity {
+            viewer.calculate(pos => this.revealed[pos] = pos);
+            heatMap.sources = new Map([[player.point, 0]]);
+            heatMap.calculate(this.revealed);
+            heatMap.makeRangeMap(-1.2, viewer.radius);
+            heatMap.makeFleeMap(-1.2);
 
-    constructor(game, pos, range = 6) {
-        super(game, pos, new Render('@', 'yellow', 'black'));
-        this.viewer = new Viewer(range, pos, game.grid.Point, game.isOpaque.bind(game), 'circle');
-        this.heatMap = new DijkstraMap(new Map(), game.neighborhood.bind(game), game.moveCost.bind(game));
-    }
-
-    update() {
-        const game = this.game;
-        const player = this;
-        const grid = game.grid;
-
-        if (player.viewer.isDirty) {
-            game.hasFog && (grid.visible = []);
-            player.viewer.calculate((pos, light) => {
-                if (light > 0) {
-                    game.hasFog && (grid.visible[pos] = pos);
-                    grid.revealed[pos] = pos;
+            this.heatMap.rangeMap.dist.forEach((val, p) => {
+                val = Math.abs(val);
+                if (val < 9) {
+                    let str = val.toFixed(0);
+                    let [x, y] = grid.Point.to2D(p);
+                    game.context.render(x, y, str);
+                } else {
+                    let [x, y] = grid.Point.to2D(p);
+                    game.context.render(x, y, '.', 'red');
                 }
             });
         }
-
-        let awakeArea = [];
-        let [x, y] = grid.Point.to2D(player.point);
-        grid.area(x, y, (pos) => !game.isOpaque(pos) && awakeArea.push(pos));
-
-        player.heatMap.sources = new Map([[player.point, 0]]);
-        player.heatMap.calculate(awakeArea);
-        //player.heatMap.calculate(grid.visible);
-        player.heatMap.makeFleeMap(-2);
     }
-
 }
-
 
 module.exports = {
     Render,
