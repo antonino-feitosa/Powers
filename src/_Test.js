@@ -1,21 +1,13 @@
 
-const {TurnControl} = require('./Turn');
+//https://github.com/dd-pardal/tty-events/blob/master/index.js
 
-let queue = new TurnControl();
+if (process.stdin.isTTY)
+	process.stdin.setRawMode(true);
 
-queue.push({name: '\tplayer', initiative: 15});
-queue.push({name: 'orc', initiative: 20});
-queue.push({name: 'dwarf', initiative: 20});
-let elf = {name: 'elf', initiative: 20};
-queue.push(elf);
+const term = new (require("tty-events"));
 
-for(let i=0;i<48;i++){
-    console.log(i, '    ', queue.peek());
-    queue.nextTurn();
-    /*if(i === 24){
-        console.log(queue.del(elf));
-    }
-    if(i === 36){
-        queue.push(elf);
-    }*/
-}
+term.enableMouse();
+
+term.on("mousedown", (ev)=>{
+	console.log("You clicked at (%i, %i) with the button no. %i.", ev.x, ev.y, ev.button);
+});

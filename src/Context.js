@@ -34,7 +34,7 @@ class Context {
 
     build() {
         this.clearBuffer && process.stdout.write(`\x1b[${this.height + 2}A`); // move to start
-        this.matrix.forEach(row => console.log(row.join(' ')));
+        this.matrix.forEach(row => console.log(row.join('')));
         this.clear();
     }
 
@@ -46,7 +46,7 @@ class Context {
     dispose(timer) {
         process.stdin.pause();
         timer && clearInterval(timer);
-        process.stdout.write('\x1b[0m'); // reset colors and modes
+        process.stdout.write('\u001b[0m'); // reset colors and modes
         process.stdout.write('\u001b[?25h'); // restore cursor (ANSI escape sequence)
     }
 
@@ -109,7 +109,7 @@ class Context {
         };
         fgColor = convert(fgColor ? fgColor : '000000');
         bgColor = convert(bgColor ? bgColor : '000000');
-        return `\x1b[38;2;${fgColor}m\x1b[48;2;${bgColor}m` + text;
+        return `\u001b[38;2;${fgColor}m\u001b[48;2;${bgColor}m` + text;
     }
 }
 

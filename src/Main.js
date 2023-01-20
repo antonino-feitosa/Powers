@@ -15,7 +15,6 @@ class Game {
         this.rand = new Random(seed);
         this.hasFog = hasFog;
         this.clearBuffer = false;
-        this.monsters = [];
         this.message = '';
         this.turnControl = new TurnControl();
         this.start();
@@ -89,7 +88,13 @@ class Game {
 
         let current = turnControl.peek();
         while (current !== player && !current.update()) {
-            current = turnControl.nextTurn();
+            if (current.isDead) {
+                console.log('Delete Monster');
+                turnControl.del(current);
+                current = turnControl.peek();
+            } else {
+                current = turnControl.nextTurn();
+            }
         }
         if (current !== player) {
             nextTurn();
@@ -129,7 +134,7 @@ class Game {
             this.grid.visible.forEach((index) => {
                 let [x, y] = this.grid.Point.to2D(index);
                 let glyph = this.grid.tiles[index];
-                this.context.render(x, y, glyph, 'white', 'black');
+                this.context.render(x, y, glyph, 'green', 'black');
             });
         }
     }

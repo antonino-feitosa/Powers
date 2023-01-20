@@ -3,6 +3,7 @@
 
 const { Viewer } = require('./View');
 const { DijkstraMap } = require('./DijkstraMap');
+const {CombatEvent, CombatStatus} = require('./Combat');
 
 class Render {
     constructor(glyph, fg = 'white', bg = 'black') {
@@ -18,12 +19,12 @@ class Entity {
         this.render = render;
         this.damage = [];
         this.messages = [];
-        this.collision = [];
         this.isDead = false;
         this.game = game;
 
         const grid = game.grid;
-        grid.blocked[pos] ? grid.blocked[pos].push(this) : (grid.blocked[pos] = [this]);
+        !grid.blocked[pos] && (grid.blocked[pos] = []);
+        grid.blocked[pos].push(this);
     }
     update(game) { };
 
@@ -36,6 +37,11 @@ class Entity {
         let [x, y] = grid.Point.to2D(this.point);
         context.render(x, y, render.glyph, render.fg, render.bg);
     }
+}
+
+class Moveable extends Entity {
+
+    canOverlap(blocked) { return !blocked || blocked.length === 0; }
 
     tryMove(x, y) {
         const entity = this;
@@ -44,45 +50,54 @@ class Entity {
 
         let [ox, oy] = grid.Point.to2D(entity.point);
         let dest = grid.Point.from(x + ox, y + oy);
-        if (grid.Point.is2DValid(x + ox, y + oy) && !game.isOpaque(dest) && !grid.blocked[dest]) {
-            grid.blocked[entity.point] = false;
-            grid.blocked[dest] = true;
-            entity.point = dest;
-            entity.viewer.center = dest;
-            entity.viewer.isDirty = true;
+        if (grid.Point.is2DValid(x + ox, y + oy) && !game.isOpaque(dest)) {
+            if (this.canOverlap(grid.blocked[dest])) {
+                !grid.blocked[dest] && (grid.blocked[dest] = []);
+
+                grid.blocked[entity.point] = grid.blocked[entity.point].filter(e => e !== this);
+                grid.blocked[dest].push(this);
+                entity.point = dest;
+                entity.viewer.center = dest;
+                entity.viewer.isDirty = true;
+            }
         } else {
             entity.viewer.isDirty = false;
         }
     }
 }
 
-class Attack {
-    constructor() {
-
-    }
-}
-
-class Combat {
-    constructor(maxHP, force, defense) {
-
-    }
-}
-
-class Player extends Entity {
-
+class Player extends Moveable {
     constructor(game, pos, range = 6) {
         super(game, pos, new Render('@', 'yellow', 'black'));
-
-        let isOpaque = (p) => game.isOpaque(p) || game.grid.blocked[p];
-        this.viewer = new Viewer(range, pos, game.grid.Point, isOpaque, 'circle');
+        this.viewer = new Viewer(range, pos, game.grid.Point, game.isOpaque.bind(game), 'circle');
         this.heatMap = new DijkstraMap(new Map(), game.rand, game.neighborhood.bind(game), game.moveCost.bind(game));
         this.initiative = 20;
+        this.combatStatus = new CombatStatus();
+    }
+
+    canOverlap(blocked) {
+        if(blocked){
+            blocked.filter(e => e instanceof Monster)
+                .forEach(e => e.damage.push(new CombatEvent(this, 8)));
+        }
+        return !blocked || blocked.length === 0;
     }
 
     update() {
         const game = this.game;
         const player = this;
         const grid = game.grid;
+
+        this.damage.forEach(de => {
+            this.combatStatus.hp -= de.force;
+            game.message = `You Suffer ${de.force} Points of Damage!`;
+        });
+        this.damage = [];
+        if(this.combatStatus.hp <= 0){
+            game.message = 'You Died!';
+            game.context.dispose();
+            return;
+        }
 
         if (player.viewer.isDirty) {
             game.hasFog && (grid.visible = []);
@@ -134,11 +149,9 @@ class Player extends Entity {
         }
 
     }
-
 }
 
-class Monster extends Entity {
-
+class Monster extends Moveable {
     constructor(game, pos, range) {
         super(game, pos, new Render('M', 'red', 'black'));
         let neighborhood = (p) => game.neighborhood(p).filter(p => p === this.point || !game.grid.blocked[p]);
@@ -147,6 +160,7 @@ class Monster extends Entity {
         this.revealed = [];
         this.heatMap = new DijkstraMap(new Map(), game.rand, neighborhood, game.moveCost.bind(game));
         this.initiative = 20;
+        this.combatStatus = new CombatStatus();
     }
 
     update() {
@@ -155,6 +169,17 @@ class Monster extends Entity {
         const player = game.player;
         const viewer = this.viewer;
         const heatMap = this.heatMap;
+
+        this.damage.forEach(de => {
+            this.combatStatus.hp -= de.force
+            game.message = 'The Monster Suffers Damage! ' + this.combatStatus.hp;
+        });
+        this.damage = [];
+        if(this.combatStatus.hp <= 0){
+            game.message = 'The Monster Dies!';
+            this.isDead = true;
+            return;
+        }
 
         if (viewer.isDirty) {
             viewer.calculate(pos => this.revealed[pos] = pos);
@@ -167,7 +192,8 @@ class Monster extends Entity {
             heatMap.makeFleeMap(-1.2);
 
             let moveIndex = heatMap.rangeMap.chase(this.point);
-            if (game.grid.Point.neighborhood(player.point).includes(this.point)) {
+            if (this.inContact().includes(player)) {
+                player.damage.push(new CombatEvent(this, 5));
                 game.message = 'The Monster Attacks!!!';
             } else {
                 let [dx, dy] = grid.Point.to2D(moveIndex);
@@ -176,6 +202,14 @@ class Monster extends Entity {
                 game.message = 'Monster shouts a insult!';
             }
         }
+    }
+
+    inContact() {
+        const game = this.game;
+        const grid = game.grid;
+        let entities = [];
+        game.neighborhood(this.point).forEach(n => grid.blocked[n] && entities.push(...grid.blocked[n]));
+        return entities;
     }
 
     draw() {
