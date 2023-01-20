@@ -19,6 +19,7 @@ class Game {
         this._messages = [];
         this._messagesIndex = 0;
         this.turnCount = 0;
+        this._alertMessage = null;
         this.turnControl = new TurnControl();
         this.start();
     }
@@ -82,11 +83,19 @@ class Game {
 
     addMonsters(startRoom) {
         const grid = this.grid;
+        const Point = grid.Point;
+        const rand = this.rand;
+        let names = ['orc', 'dwarf', 'human', 'elf', 'goblin', 'troll'];
         grid.rooms.filter(r => r !== startRoom).forEach(room => {
-            let [rx, ry] = room.center();
-            let pos = this.grid.Point.from(rx, ry);
-            let monster = new Monster(this, pos, 6);
-            this.turnControl.push(monster);
+            let maxMonsters = Math.ceil((room.x1 - room.x2) * (room.y1 - room.y2) / 16);
+            range(0, rand.nextInt(maxMonsters), () => {
+                let [rx, ry] = room.randPos(rand);
+                let pos = Point.from(rx, ry);
+                if (!grid.blocked[pos]) {
+                    let monster = new Monster(this, pos, 6, rand.pick(names) + ' #' + this.turnControl.length());
+                    this.turnControl.push(monster);
+                }
+            });
         });
     }
 
@@ -115,7 +124,6 @@ class Game {
     }
 
     draw() {
-        const grid = this.grid;
         const player = this.player;
         const context = this.context;
 
@@ -145,26 +153,49 @@ class Game {
         }
     }
 
-    printMessage(message){
-        this._messages.push(this.turnCount + ': ' + message);
+    printMessage(message) {
+        this._messages.push(' Turn ' + this.turnCount + ': ' + message);
+    }
+
+    alertMessage(message) {
+        this._alertMessage = message;
     }
 
     drawUI() {
+        const player = this.player;
         const context = this.context;
         const messages = this._messages;
+
+        let fillMessage = function (msg, index, height, color) {
+            let width = Math.min(context.width, msg.length);
+            for (let c = 0; c < width; c++) {
+                context.render(c + index, height, msg[c], color, 'black');
+            }
+            return index + width;
+        }
 
         let numToDisplay = messages.length - this._messageIndex;
         if (this.showMessages) {
             numToDisplay = Math.min(messages.length, context.height);
         } else {
-            range(0, this.width, x => context.render(x, context.height - 4, '\u2505', 'white', 'black'));
+            let hp = player.combatStatus.hp;
+            let max = player.combatStatus.maxHP;
+            let str = '\u250D\u2501 HP ' + hp + '/' + max + ' ';
+            let index = fillMessage(str, 0, context.height - 4, 'white');
+            if (this._alertMessage) {
+                this._alertMessage = '\u2501\u2501 ' + this._alertMessage + ' ';
+                index = fillMessage(this._alertMessage, index, context.height - 4, 'yellow');
+            }
+            index = fillMessage('\u2501'.repeat(context.width - index -1), index, context.height - 4, 'white');
+            index = fillMessage('\u2511', index, context.height - 4, 'white');
         }
         for (let i = 0, index = messages.length - 1; i < numToDisplay; i++, index--) {
-            for (let c = 0; c < Math.min(context.width, messages[index].length); c++) {
-                context.render(c, context.height - 1 - i, messages[index][c], 'white', 'black');
-            }
+            let dy = numToDisplay < 3 ? numToDisplay - 3 : 0;
+            fillMessage(messages[index], 0, context.height - 1 - i + dy, 'white');
         }
-        this._messageIndex = messages.length;
+
+        this._alertMessage = null;
+        this._messageIndex = this._messages.length;
     }
 }
 

@@ -152,10 +152,11 @@ class Player extends Moveable {
 }
 
 class Monster extends Moveable {
-    constructor(game, pos, range) {
-        super(game, pos, new Render('M', 'red', 'black'));
+    constructor(game, pos, range, name) {
+        super(game, pos, new Render(name[0], 'red', 'black'));
         let neighborhood = (p) => game.neighborhood(p).filter(p => !game.grid.blocked[p] || game.grid.blocked[p].length === 0);
 
+        this.name = name;
         this.viewer = new Viewer(range, pos, game.grid.Point, game.isOpaque.bind(game));
         this.revealed = [];
         this.heatMap = new DijkstraMap(new Map(), game.rand, neighborhood, game.moveCost.bind(game));
@@ -172,11 +173,11 @@ class Monster extends Moveable {
 
         this.damage.forEach(de => {
             this.combatStatus.hp -= de.force
-            game.printMessage('The Monster Suffers Damage! ' + this.combatStatus.hp);
+            game.printMessage(`The ${this.name} Suffers ${de.force} Points of Damage! `);
         });
         this.damage = [];
         if(this.combatStatus.hp <= 0){
-            game.printMessage('The Monster Dies!');
+            game.printMessage(`The ${this.name} Dies!`);
             this.isDead = true;
             return;
         }
@@ -194,12 +195,12 @@ class Monster extends Moveable {
             let moveIndex = heatMap.rangeMap.chase(this.point);
             if (this.inContact().includes(player)) {
                 player.damage.push(new CombatEvent(this, 5));
-                game.printMessage('The Monster Attacks!!!');
+                game.printMessage(`The ${this.name} Attacks!`);
             } else {
                 let [dx, dy] = grid.Point.to2D(moveIndex);
                 let [x, y] = grid.Point.to2D(this.point);
                 this.tryMove(dx - x, dy - y);
-                game.printMessage('Monster shouts a insult!');
+                game.rand.nextDouble() < 0.3 && game.printMessage(`${this.name} shouts a insult!`);
             }
         }
     }

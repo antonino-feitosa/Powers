@@ -38,6 +38,7 @@ class Rect {
     overlaps(other) { return !(this.x1 > other.x2 || this.x2 < other.x1 || this.y1 > other.y2 || this.y2 < other.y1); }
     center() { return [Math.floor((this.x1 + this.x2) / 2), Math.floor((this.y1 + this.y2) / 2)]; }
     includes(x, y) { return x >= this.x1 && x < this.x2 && y >= this.y1 && y < this.y2; }
+    randPos(rand){return [rand.nextRange(this.x1, this.x2), rand.nextRange(this.y1, this.y2)];};
 }
 
 const Tile = { Floor: '.', Wall: '#', Tunnel: 'C' };
