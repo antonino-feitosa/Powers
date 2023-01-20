@@ -7,8 +7,9 @@ class DijkstraMap {
 
     static INF = 100;
 
-    constructor(sources = new Map(), neighborhood, cost, dist) {
+    constructor(sources = new Map(), rand, neighborhood, cost, dist) {
         this.sources = sources || new Map();
+        this.rand = rand;
         this.dist = dist || new Map();
         this.cost = cost || this.cost;
         this.neighborhood = neighborhood || this.neighborhood;
@@ -59,6 +60,7 @@ class DijkstraMap {
         let map = new DijkstraMap(this.sources, this.neighborhood, this.cost);
         this.dist.forEach((val, key) => {
             let value = val < DijkstraMap.INF && val >= range && val < range + 1 ? force * val : DijkstraMap.INF;
+            value += (0.01 * this.rand.nextDouble());
             map.dist.set(key, value)
         });
         map.apply_dijkstra();
@@ -70,6 +72,7 @@ class DijkstraMap {
         let map = new DijkstraMap(this.sources, this.neighborhood, this.cost);
         this.dist.forEach((val, key) => {
             let value = val < DijkstraMap.INF && val >= this.max ? force * val : DijkstraMap.INF;
+            value += (0.01 * this.rand.nextDouble());
             map.dist.set(key, value)
         });
         map.apply_dijkstra();

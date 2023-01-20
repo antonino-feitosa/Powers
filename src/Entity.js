@@ -32,7 +32,7 @@ class Entity {
         const grid = game.grid;
         const context = game.context;
         const render = this.render;
-        
+
         let [x, y] = grid.Point.to2D(this.point);
         context.render(x, y, render.glyph, render.fg, render.bg);
     }
@@ -75,7 +75,7 @@ class Player extends Entity {
 
         let isOpaque = (p) => game.isOpaque(p) || game.grid.blocked[p];
         this.viewer = new Viewer(range, pos, game.grid.Point, isOpaque, 'circle');
-        this.heatMap = new DijkstraMap(new Map(), game.neighborhood.bind(game), game.moveCost.bind(game));
+        this.heatMap = new DijkstraMap(new Map(), game.rand, game.neighborhood.bind(game), game.moveCost.bind(game));
         this.initiative = 20;
     }
 
@@ -96,7 +96,43 @@ class Player extends Entity {
 
         player.heatMap.sources = new Map([[player.point, 0]]);
         player.heatMap.calculate(grid.visible);
-        player.heatMap.makeFleeMap(-2);
+        //player.heatMap.makeFleeMap(-2);
+    }
+
+    draw() {
+        super.draw();
+        const player = this;
+        const game = this.game;
+        const grid = game.grid;
+        const heatMap = this.heatMap;
+        if (game.lit) {
+
+            player.viewer.calculate((pos, light) => {
+                if (light > 0) {
+                    game.hasFog && (grid.visible[pos] = pos);
+                    grid.revealed[pos] = pos;
+                }
+            });
+
+            heatMap.sources = new Map([[player.point, 0]]);
+            heatMap.calculate(grid.visible);
+            heatMap.makeFleeMap(-1.2);
+            //heatMap.makeRangeMap(-1.2);
+
+            const context = game.context;
+            heatMap.fleeMap.dist.forEach((val, p) => {
+                val = Math.abs(val);
+                if (val < 9) {
+                    let str = val.toFixed(0);
+                    let [x, y] = grid.Point.to2D(p);
+                    context.render(x, y, str);
+                } else {
+                    let [x, y] = grid.Point.to2D(p);
+                    context.render(x, y, '.', 'red');
+                }
+            });
+        }
+
     }
 
 }
@@ -106,10 +142,10 @@ class Monster extends Entity {
     constructor(game, pos, range) {
         super(game, pos, new Render('M', 'red', 'black'));
         let neighborhood = (p) => game.neighborhood(p).filter(p => p === this.point || !game.grid.blocked[p]);
-        
+
         this.viewer = new Viewer(range, pos, game.grid.Point, game.isOpaque.bind(game));
         this.revealed = [];
-        this.heatMap = new DijkstraMap(new Map(), neighborhood, game.moveCost.bind(game));
+        this.heatMap = new DijkstraMap(new Map(), game.rand, neighborhood, game.moveCost.bind(game));
         this.initiative = 20;
     }
 
@@ -147,10 +183,10 @@ class Monster extends Entity {
         const grid = game.grid;
 
         if (grid.visible[this.point] || !game.hasFog) {
-            super.draw(game);   
+            super.draw(game);
         }
 
-        if (game.lit  && this.heatMap.rangeMap) {
+        if (game.lit && this.heatMap.rangeMap) {
             const viewer = this.viewer;
             const heatMap = this.heatMap;
             const player = game.player;
@@ -159,7 +195,7 @@ class Monster extends Entity {
             heatMap.sources = new Map([[player.point, 0]]);
             heatMap.calculate(this.revealed);
             heatMap.makeRangeMap(-1.2, viewer.radius);
-            heatMap.makeFleeMap(-1.2);
+            //heatMap.makeFleeMap(-1.2);
 
             this.heatMap.rangeMap.dist.forEach((val, p) => {
                 val = Math.abs(val);

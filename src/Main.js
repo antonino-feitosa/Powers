@@ -115,18 +115,6 @@ class Game {
         this.turnControl.values.forEach(m => m.draw());
         player.draw();
 
-        /*this.player.heatMap.fleeMap.dist.forEach((val, p) => {
-            val = -val;
-            if(val < 10){
-                let str = val.toFixed(0);
-                let [x, y] = this.grid.Point.to2D(p);
-                this.context.render(x, y, str);
-            } else {
-                let [x, y] = this.grid.Point.to2D(p);
-                this.context.render(x, y, '.','red');
-            }
-        });*/
-
         context.build();
     }
 
