@@ -18,11 +18,12 @@ class Game {
         this.height = height;
         this.rand = new Random(seed);
         this.hasFog = hasFog;
+        this.depth = 1;
         this.turnCount = 0;
         
         this.turnControl = new TurnControl();
-        this.context = new Context(this.width, this.height + 4);
-        this.ui = new UI(this.context);
+        this.context = new Context(this.width + 20, this.height + 4);
+        this.ui = new UI(this, 4, 15);
         this.start();
     }
 

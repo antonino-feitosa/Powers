@@ -1,12 +1,13 @@
 
-const UIState = { Idle: 0, Log: 1, Tooltip: 2, Message: 3 };
+const UIState = { Idle: 0, Log: 1, Tooltip: 2, Message: 3, Invetory: 4, Equipment:5, Skill:6 };
 
 class UI {
-    constructor(context, numLinesBottom = 4, numColsLeft = 20) {
-        this.context = context;
+    constructor(game, numLinesBottom = 4, numColsRight = 15) {
+        this.game = game;
+        this.context = game.context;
         this.turn = 0;
         this.state = UIState.Idle;
-        this.numColsLeft = numColsLeft;
+        this.numColsRight = numColsRight;
         this.numLinesBottom = numLinesBottom;
 
         this.messages = [];
@@ -26,7 +27,8 @@ class UI {
             this.state = this.state === UIState.Log ? UIState.Idle : UIState.Log;
             return 'draw';
         }
-        return this.inputActions(player, key);
+        if(!player.isDead)
+            return this.inputActions(player, key);
     }
 
     inputText() {
@@ -57,7 +59,8 @@ class UI {
     }
 
     formatNumber(number, numPlaces) {
-        return (' '.repeat(numPlaces) + number).substring(numPlaces);
+        let str = ' '.repeat(numPlaces-1) + number;
+        return str.substring(str.length - numPlaces);
     }
 
     printLog(message) {
@@ -70,7 +73,7 @@ class UI {
             this.context.clear();
             this.drawLog();
         } else {
-            this.drawLeftBar();
+            this.drawRightBar();
             this.drawBottomBar();
         }
     }
@@ -87,7 +90,7 @@ class UI {
 
     drawBottomBar() {
         const context = this.context;
-        let start = '\u250D' + '\u2501'.repeat(this.numColsLeft + 3);
+        let start = '\u250D\u2501';
         let middle = this.alertMessage ? ' ' + this.alertMessage + ' ' : '';
         let end = '\u2501'.repeat(context.width - start.length - middle.length - 1) + '\u2511';
 
@@ -100,7 +103,7 @@ class UI {
         const count = this.log.index;
         let numToDisplay = messages.length - count;
 
-        if (numToDisplay > this.numLinesBottom - 1) {
+        if (numToDisplay > this.numLinesBottom) {
             let num = numToDisplay - this.numLinesBottom - 1;
             num = this.formatNumber(num, 2);
             let str = ` more ${num} ... `;
@@ -113,8 +116,24 @@ class UI {
         }
     }
 
-    drawLeftBar() {
+    drawRightBar() {
+        const context = this.context;
+        const barX = context.width - this.numColsRight;
+        context.render(barX, 0, '\u2503');
+        for(let i=1;i<context.height - this.numLinesBottom;i++){
+            context.render(barX, i, '\u2503');
+        }
 
+        let turnMessage = 'Turn: ' + this.formatNumber(this.turn, 6)
+        this.fillMessage(turnMessage, barX + 2, 1);
+        let depthMessage = 'Depth: ' + this.formatNumber(this.game.depth, 5);
+        this.fillMessage(depthMessage, barX + 2, 2);
+
+        const player = this.game.player;
+        let hp = player.combatStatus.hp;
+        let maxHP = player.combatStatus.maxHP;
+        let hpMessage = 'HP:  ' + this.formatNumber(hp, 3) + '/' + this.formatNumber(maxHP, 3);
+        this.fillMessage(hpMessage, barX + 2, 4);
     }
 
     drawToolTip(x, y, message) {

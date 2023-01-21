@@ -17,9 +17,6 @@ class Entity {
     constructor(game, pos, render) {
         this.point = pos;
         this.render = render;
-        this.damage = [];
-        this.messages = [];
-        this.isDead = false;
         this.game = game;
 
         const grid = game.grid;
@@ -66,13 +63,22 @@ class Moveable extends Entity {
     }
 }
 
-class Player extends Moveable {
+class Unit extends Moveable {
+    constructor(game, pos, render){
+        super(game, pos, render);
+        this.damage = [];
+        this.messages = [];
+        this.isDead = false;
+        this.initiative = 20;
+        this.combatStatus = new CombatStatus();
+    }
+}
+
+class Player extends Unit {
     constructor(game, pos, range = 6) {
         super(game, pos, new Render('@', 'yellow', 'black'));
         this.viewer = new Viewer(range, pos, game.grid.Point, game.isOpaque.bind(game), 'circle');
         this.heatMap = new DijkstraMap(new Map(), game.rand, game.neighborhood.bind(game), game.moveCost.bind(game));
-        this.initiative = 20;
-        this.combatStatus = new CombatStatus();
     }
 
     canOverlap(blocked) {
@@ -94,8 +100,8 @@ class Player extends Moveable {
         });
         this.damage = [];
         if(this.combatStatus.hp <= 0){
+            this.isDead = true;
             game.printMessage('You Died!');
-            game.context.dispose();
             return;
         }
 
@@ -151,7 +157,7 @@ class Player extends Moveable {
     }
 }
 
-class Monster extends Moveable {
+class Monster extends Unit {
     constructor(game, pos, range, name) {
         super(game, pos, new Render(name[0], 'red', 'black'));
         let neighborhood = (p) => game.neighborhood(p).filter(p => !game.grid.blocked[p] || game.grid.blocked[p].length === 0);
