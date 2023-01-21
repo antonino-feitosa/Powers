@@ -178,6 +178,7 @@ class Monster extends Moveable {
         this.damage = [];
         if(this.combatStatus.hp <= 0){
             game.printMessage(`The ${this.name} Dies!`);
+            grid.blocked[this.point] = grid.blocked[this.point].filter(e => e !== this);
             this.isDead = true;
             return;
         }
@@ -200,7 +201,7 @@ class Monster extends Moveable {
                 let [dx, dy] = grid.Point.to2D(moveIndex);
                 let [x, y] = grid.Point.to2D(this.point);
                 this.tryMove(dx - x, dy - y);
-                game.rand.nextDouble() < 0.3 && game.printMessage(`${this.name} shouts a insult!`);
+                game.rand.nextDouble() < 1 && game.printMessage(`${this.name} shouts a insult!`);
             }
         }
     }

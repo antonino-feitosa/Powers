@@ -7,21 +7,22 @@ const { Grid, Tile } = require('./Grid');
 const { Random } = require('./Random');
 const { TurnControl } = require('./Turn');
 const { range } = require('./Utils');
+const {UI} = require('./UI');
 
 class Game {
 
     constructor(width, height, seed = 1, hasFog = true) {
-        this.clearBuffer = false;
+        this.clearBuffer = true;
 
         this.width = width;
         this.height = height;
         this.rand = new Random(seed);
         this.hasFog = hasFog;
-        this._messages = [];
-        this._messagesIndex = 0;
         this.turnCount = 0;
-        this._alertMessage = null;
+        
         this.turnControl = new TurnControl();
+        this.context = new Context(this.width, this.height + 4);
+        this.ui = new UI(this.context);
         this.start();
     }
 
@@ -53,33 +54,18 @@ class Game {
         this.turnControl.push(player);
         this.addMonsters(startRoom);
 
-        this.context = new Context(this.width, this.height + 4);
         this.context.clearBuffer = this.clearBuffer;
         this.context.start();
         this.context.listenInput((unicode, name) => {
             if (this.turnControl.peek() !== player) return;
-
+            
             let key = name ? name : unicode;
-            switch (key) {
-                case 'space': this.lit = !this.lit; this.draw(); return;
-                case "'": this.showMessages = !this.showMessages; this.draw(); return;
+            let res = this.ui.input(player, key);
+            if(res === 'draw'){
+                this.draw();
+            } else if(res === 'action'){
+                this.loop();
             }
-
-            switch (key) {
-                case 'h': player.tryMove(-1, +0); break;
-                case 'k': player.tryMove(+0, -1); break;
-                case 'j': player.tryMove(+0, +1); break;
-                case 'l': player.tryMove(+1, +0); break;
-                case 'y': player.tryMove(-1, -1); break;
-                case 'u': player.tryMove(+1, -1); break;
-                case 'b': player.tryMove(-1, +1); break;
-                case 'n': player.tryMove(+1, +1); break;
-                default: return;
-            }
-
-            this.turnCount++;
-            this.turnControl.nextTurn();
-            this.loop();
         });
     }
 
@@ -102,6 +88,11 @@ class Game {
     }
 
     loop() {
+        this.turnCount++;
+        this.turnControl.nextTurn();
+        this.ui.nextTurn();
+        this.ui.printAlertMessage('Turn ' + this.turnCount);
+
         const turnControl = this.turnControl;
         const player = this.player;
 
@@ -130,12 +121,11 @@ class Game {
         const context = this.context;
 
         context.clear();
-        if (!this.showMessages) {
-            this.drawGrid();
-            this.turnControl.values.forEach(m => m.draw());
-            player.draw();
-        }
-        this.drawUI();
+        this.drawGrid();
+        this.turnControl.values.forEach(m => m.draw());
+        player.draw();
+
+        this.ui.draw();
         context.build();
     }
 
@@ -156,50 +146,11 @@ class Game {
     }
 
     printMessage(message) {
-        this._messages.push(' Turn ' + this.turnCount + ': ' + message);
+        this.ui.printLog(message);
     }
 
     alertMessage(message) {
-        this._alertMessage = message;
-    }
-
-    drawUI() {
-        const player = this.player;
-        const context = this.context;
-        const messages = this._messages;
-
-        let fillMessage = function (msg, index, height, color) {
-            let width = Math.min(context.width, msg.length);
-            for (let c = 0; c < width; c++) {
-                context.render(c + index, height, msg[c], color, 'black');
-            }
-            return index + width;
-        }
-
-        let numToDisplay = messages.length - this._messageIndex;
-        if (this.showMessages) {
-            numToDisplay = Math.min(messages.length, context.height);
-        } else {
-            numToDisplay = Math.min(3, messages.length - this._messageIndex);
-
-            let hp = player.combatStatus.hp;
-            let max = player.combatStatus.maxHP;
-            let str = '\u250D\u2501 HP ' + hp + '/' + max + ' ';
-            let index = fillMessage(str, 0, context.height - 4, 'white');
-            if (this._alertMessage) {
-                this._alertMessage = '\u2501\u2501 ' + this._alertMessage + ' ';
-                index = fillMessage(this._alertMessage, index, context.height - 4, 'yellow');
-            }
-            index = fillMessage('\u2501'.repeat(context.width - index - 1), index, context.height - 4, 'white');
-            index = fillMessage('\u2511', index, context.height - 4, 'white');
-        }
-        for (let i = 0, index = messages.length - 1; i < numToDisplay; i++, index--) {
-            let dy = numToDisplay < 3 ? numToDisplay - 3 : 0;
-            fillMessage(messages[index], 0, context.height - 1 - i + dy, 'white');
-        }
-
-        this._alertMessage = null;
-        this._messageIndex = this._messages.length;
+        this.ui.printAlertMessage(message);
     }
 }
 
