@@ -92,7 +92,6 @@ class Game {
         this.turnCount++;
         this.turnControl.nextTurn();
         this.ui.nextTurn();
-        this.ui.printAlertMessage('Turn ' + this.turnCount);
 
         const turnControl = this.turnControl;
         const player = this.player;
@@ -155,4 +154,4 @@ class Game {
     }
 }
 
-new Game(100, 20).loop();
+new Game(80, 20).loop();

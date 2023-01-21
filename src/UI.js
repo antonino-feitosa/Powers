@@ -124,7 +124,7 @@ class UI {
             context.render(barX, i, '\u2503');
         }
 
-        let turnMessage = 'Turn: ' + this.formatNumber(this.turn, 6)
+        let turnMessage = 'Turn: ' + this.formatNumber(this.game.turnCount, 6)
         this.fillMessage(turnMessage, barX + 2, 1);
         let depthMessage = 'Depth: ' + this.formatNumber(this.game.depth, 5);
         this.fillMessage(depthMessage, barX + 2, 2);
