@@ -11,11 +11,12 @@ const { range } = require('./Utils');
 class Game {
 
     constructor(width, height, seed = 1, hasFog = true) {
+        this.clearBuffer = false;
+
         this.width = width;
         this.height = height;
         this.rand = new Random(seed);
         this.hasFog = hasFog;
-        this.clearBuffer = true;
         this._messages = [];
         this._messagesIndex = 0;
         this.turnCount = 0;
@@ -28,7 +29,8 @@ class Game {
     moveCost(u, v) {
         let [x1, y1] = this.grid.Point.to2D(u);
         let [x2, y2] = this.grid.Point.to2D(v);
-        return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+        //return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+        return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
     }
     neighborhood(p) {
         let ne = this.grid.Point.neighborhood(p);
@@ -92,7 +94,7 @@ class Game {
                 let [rx, ry] = room.randPos(rand);
                 let pos = Point.from(rx, ry);
                 if (!grid.blocked[pos]) {
-                    let monster = new Monster(this, pos, 6, rand.pick(names) + ' #' + this.turnControl.length());
+                    let monster = new Monster(this, pos, 5, rand.pick(names) + ' #' + this.turnControl.length());
                     this.turnControl.push(monster);
                 }
             });
@@ -178,6 +180,8 @@ class Game {
         if (this.showMessages) {
             numToDisplay = Math.min(messages.length, context.height);
         } else {
+            numToDisplay = Math.min(3, messages.length - this._messageIndex);
+
             let hp = player.combatStatus.hp;
             let max = player.combatStatus.maxHP;
             let str = '\u250D\u2501 HP ' + hp + '/' + max + ' ';
@@ -186,7 +190,7 @@ class Game {
                 this._alertMessage = '\u2501\u2501 ' + this._alertMessage + ' ';
                 index = fillMessage(this._alertMessage, index, context.height - 4, 'yellow');
             }
-            index = fillMessage('\u2501'.repeat(context.width - index -1), index, context.height - 4, 'white');
+            index = fillMessage('\u2501'.repeat(context.width - index - 1), index, context.height - 4, 'white');
             index = fillMessage('\u2511', index, context.height - 4, 'white');
         }
         for (let i = 0, index = messages.length - 1; i < numToDisplay; i++, index--) {

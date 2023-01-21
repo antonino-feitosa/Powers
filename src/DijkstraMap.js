@@ -59,9 +59,11 @@ class DijkstraMap {
     makeRangeMap(force = -1.2, range = 6) {
         let map = new DijkstraMap(this.sources, this.rand, this.neighborhood, this.cost);
         this.dist.forEach((val, key) => {
-            let value = val < DijkstraMap.INF && val >= range && val < range + 1 ? force * val : DijkstraMap.INF;
-            value += (0.01 * this.rand.nextDouble());
-            map.dist.set(key, value)
+            if(val < DijkstraMap.INF && val >= range){
+                map.dist.set(key, force * val + (0.01 * this.rand.nextDouble()));
+            } else {
+                map.dist.set(key, DijkstraMap.INF);
+            }
         });
         map.apply_dijkstra();
         this.rangeMap = map;
@@ -71,9 +73,11 @@ class DijkstraMap {
     makeFleeMap(force = -1.2) {
         let map = new DijkstraMap(this.sources, this.rand, this.neighborhood, this.cost);
         this.dist.forEach((val, key) => {
-            let value = val < DijkstraMap.INF && val >= this.max ? force * val : DijkstraMap.INF;
-            value += (0.01 * this.rand.nextDouble());
-            map.dist.set(key, value)
+            if(val < DijkstraMap.INF && val >= this.max){
+                map.dist.set(key, force * val + (0.01 * this.rand.nextDouble()));
+            } else {
+                map.dist.set(key, DijkstraMap.INF);
+            }
         });
         map.apply_dijkstra();
         this.fleeMap = map;

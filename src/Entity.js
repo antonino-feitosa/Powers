@@ -132,11 +132,11 @@ class Player extends Moveable {
             heatMap.sources = new Map([[player.point, 0]]);
             heatMap.calculate(grid.visible);
             heatMap.makeFleeMap(-1.2);
-            //heatMap.makeRangeMap(-1.2);
+            heatMap.makeRangeMap(-1.2, 4);
 
             const context = game.context;
-            heatMap.fleeMap.dist.forEach((val, p) => {
-                val = Math.abs(val);
+            heatMap.rangeMap.dist.forEach((val, p) => {
+                //val = Math.abs(val);
                 if (val < 9) {
                     let str = val.toFixed(0);
                     let [x, y] = grid.Point.to2D(p);
@@ -192,7 +192,7 @@ class Monster extends Moveable {
             heatMap.makeRangeMap(-1.2, viewer.radius);
             heatMap.makeFleeMap(-1.2);
 
-            let moveIndex = heatMap.rangeMap.chase(this.point);
+            let moveIndex = heatMap.fleeMap.chase(this.point);
             if (this.inContact().includes(player)) {
                 player.damage.push(new CombatEvent(this, 5));
                 game.printMessage(`The ${this.name} Attacks!`);
@@ -230,9 +230,9 @@ class Monster extends Moveable {
             heatMap.sources = new Map([[player.point, 0]]);
             heatMap.calculate(this.revealed);
             heatMap.makeRangeMap(-1.2, viewer.radius);
-            //heatMap.makeFleeMap(-1.2);
+            heatMap.makeFleeMap(-1.2);
 
-            this.heatMap.rangeMap.dist.forEach((val, p) => {
+            this.heatMap.fleeMap.dist.forEach((val, p) => {
                 val = Math.abs(val);
                 if (val < 9) {
                     let str = val.toFixed(0);
