@@ -84,7 +84,7 @@ class UI {
         let numToDisplay = Math.min(messages.length, context.height);
         for (let i = 0, index = messages.length - 1; i < numToDisplay; i++, index--) {
             let dy = numToDisplay < this.numLinesBottom - 1 ? numToDisplay - this.numLinesBottom - 1 : 0;
-            this.fillMessage(messages[index], 0, context.height - 1 - i + dy, 'office green');
+            this.fillMessage(messages[index], 0, context.height - 1 - i + dy, 'irish green');
         }
     }
 
@@ -103,8 +103,8 @@ class UI {
         const count = this.log.index;
         let numToDisplay = messages.length - count;
 
-        if (numToDisplay > this.numLinesBottom) {
-            let num = numToDisplay - this.numLinesBottom - 1;
+        if (numToDisplay > this.numLinesBottom - 1) {
+            let num = numToDisplay - this.numLinesBottom + 1;
             num = this.formatNumber(num, 2);
             let str = ` more ${num} ... `;
             this.fillMessage(str, context.width - (str.length + 2), context.height - 4);

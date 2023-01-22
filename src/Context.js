@@ -81,7 +81,8 @@ class Context {
         ['silver', 'ADADC9'],
         ['ash', '5654C4D'],
         ['shadow', '373737'],
-        ['office green', '008000']
+        ['office green', '008000'],
+        ['irish green', '13A10E']
     ]);
 
     static CodeToName = new Map([

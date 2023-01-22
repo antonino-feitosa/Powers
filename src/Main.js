@@ -51,7 +51,7 @@ class Game {
         let startPosition = startRoom.center();
         let startIndex = this.grid.Point.from(startPosition[0], startPosition[1]);
 
-        const player = this.player = new Player(this, startIndex, 8);
+        const player = this.player = new Player(this, startIndex);
         this.turnControl.push(player);
         this.addMonsters(startRoom);
 
@@ -81,7 +81,7 @@ class Game {
                 let [rx, ry] = room.randPos(rand);
                 let pos = Point.from(rx, ry);
                 if (!grid.blocked[pos]) {
-                    let monster = new Monster(this, pos, 5, rand.pick(names) + ' #' + this.turnControl.length());
+                    let monster = new Monster(rand.pick(names) + ' #' + this.turnControl.length(), this, pos);
                     this.turnControl.push(monster);
                 }
             });
