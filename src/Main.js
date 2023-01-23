@@ -2,12 +2,12 @@
 "use strict";
 
 const { Context } = require('./Context');
-const { Monster, Player } = require('./Entity');
+const { Monster, Player, Item, Render } = require('./Entity');
 const { Grid, Tile } = require('./Grid');
 const { Random } = require('./Random');
 const { TurnControl } = require('./Turn');
 const { range } = require('./Utils');
-const {UI} = require('./UI');
+const { UI } = require('./UI');
 
 class Game {
 
@@ -20,8 +20,9 @@ class Game {
         this.hasFog = hasFog;
         this.depth = 1;
         this.turnCount = 0;
-        
+
         this.turnControl = new TurnControl();
+        this.passiveEntities = [];
         this.context = new Context(this.width + 20, this.height + 4);
         this.ui = new UI(this, 4, 15);
         this.start();
@@ -52,7 +53,10 @@ class Game {
         let startIndex = this.grid.Point.from(startPosition[0], startPosition[1]);
 
         const player = this.player = new Player(this, startIndex);
+
+        let potion = new Item(this, startIndex - 2, new Render('i', 'white', 'green'), 'Heal Potion');
         this.turnControl.push(player);
+        this.passiveEntities.push(potion);
         //this.addMonsters(startRoom);
         this.addMonsters(null);
 
@@ -60,12 +64,12 @@ class Game {
         this.context.start();
         this.context.listenInput((unicode, name) => {
             if (this.turnControl.peek() !== player) return;
-            
+
             let key = name ? name : unicode;
             let res = this.ui.input(player, key);
-            if(res === 'draw'){
+            if (res === 'draw') {
                 this.draw();
-            } else if(res === 'action'){
+            } else if (res === 'action') {
                 this.loop();
             }
         });
@@ -117,12 +121,23 @@ class Game {
         setTimeout(this.loop.bind(this), 300);
     }
 
+    useItem(index) {
+        if (index !== null) {
+            const player = this.player;
+            let item = player.inventory[index];
+            player.inventory = player.inventory.filter(i => i !== item);
+            item.process(player);
+            this.loop();
+        }
+    }
+
     draw() {
         const player = this.player;
         const context = this.context;
 
         context.clear();
         this.drawGrid();
+        this.passiveEntities.forEach(p => p.draw());
         this.turnControl.values.forEach(m => m.draw());
         player.draw();
 
@@ -144,14 +159,6 @@ class Game {
                 this.context.render(x, y, glyph, 'green', 'black');
             });
         }
-    }
-
-    printMessage(message) {
-        this.ui.printLog(message);
-    }
-
-    alertMessage(message) {
-        this.ui.printAlertMessage(message);
     }
 }
 

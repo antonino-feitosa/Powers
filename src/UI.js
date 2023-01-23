@@ -5,7 +5,6 @@ class UI {
     constructor(game, numLinesBottom = 4, numColsRight = 15) {
         this.game = game;
         this.context = game.context;
-        this.turn = 0;
         this.state = UIState.Idle;
         this.numColsRight = numColsRight;
         this.numLinesBottom = numLinesBottom;
@@ -13,14 +12,13 @@ class UI {
         this.messages = [];
         this.alertMessage = '';
         this.selection = { title: 'select', options: [], index: 0, call: () => 0 };
-        this.log = { messages: [], index: 0 };
+        this.log = { messages: [], index: 0, processed: 0 };
         this.tooltip = { x: 0, y: 0, message: 0 };
     }
 
     nextTurn() {
-        this.turn += 1;
         this.alertMessage = '';
-        this.log.index = this.log.messages.length;
+        this.log.index = this.log.processed;
     }
 
     input(player, key) {
@@ -28,7 +26,11 @@ class UI {
             case UIState.Idle:
                 switch (key) {
                     case "'": this.state = UIState.Log; break;
-                    case '1': this.state = UIState.Invetory; break;
+                    case '1':
+                        let options = player.inventory.map(item => item.name);
+                        this.selection = { title: 'Use Item', options: options, index: 0, call: this.game.useItem.bind(this.game) };
+                        this.state = UIState.Invetory;
+                        break;
                     default:
                         if (!player.isDead)
                             return this.inputActions(player, key);
@@ -95,7 +97,7 @@ class UI {
     }
 
     printLog(message) {
-        let index = this.formatNumber(this.turn, 4);
+        let index = this.formatNumber(this.game.turnCount, 4);
         this.log.messages.push(` Turn ${index}: ` + message);
     }
 
@@ -148,6 +150,7 @@ class UI {
             let dy = numToDisplay < 3 ? numToDisplay - 3 : 0;
             this.fillMessage(messages[index], 0, context.height - 1 - i + dy, 'white');
         }
+        this.log.processed = messages.length;
     }
 
     drawRightBar() {

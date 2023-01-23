@@ -41,12 +41,14 @@ class Item extends Entity {
         super(game, pos, render);
         this.inInventory = false;
         this.name = name;
+        this.initiative = 20;
     }
 
     process(target) {
         let inc = Math.min(target.combatStatus.hp + 2, target.combatStatus.maxHP);
         target.combatStatus.hp = inc;
-        this.game.turnControl.del(this);
+        this.game.ui.printLog(`The ${target.name} was healed!`);
+        this.game.passiveEntities = this.game.passiveEntities.filter(x => x !== this);
     }
 
     draw() {
@@ -108,11 +110,11 @@ class Unit extends Moveable {
         const blocked = grid.blocked;
         this.damage.forEach(de => {
             this.combatStatus.hp -= de.force
-            game.printMessage(`The ${this.name} Suffers ${de.force} Points of Damage! `);
+            game.ui.printLog(`The ${this.name} Suffers ${de.force} Points of Damage! `);
         });
         this.damage = [];
         if (this.combatStatus.hp <= 0) {
-            game.printMessage(`The ${this.name} Dies!`);
+            game.ui.printLog(`The ${this.name} Dies!`);
             blocked[this.point] = blocked[this.point].filter(e => e !== this);
             this.isDead = true;
         }
@@ -121,13 +123,15 @@ class Unit extends Moveable {
     processPick() {
         const game = this.game;
         const grid = game.grid;
+        const point = this.point;
         const blocked = grid.blocked;
-        if (blocked[this.point].length > 1) {
-            blocked[this.point].filter(x => x instanceof Item).forEach(item => {
+        if (blocked[point].length > 1) {
+            blocked[point].filter(x => x instanceof Item).forEach(item => {
                 item.inInventory = true;
                 this.inventory.push(item);
+                game.ui.printLog(`The ${this.name} picked up: ${item.name}`);
             });
-            blocked[this.point] = blocked[this.point].filter(x => x instanceof Item);
+            blocked[point] = blocked[point].filter(x => x instanceof Item);
         }
     }
 
@@ -243,12 +247,12 @@ class Monster extends Unit {
             let moveIndex = heatMap.fleeMap.chase(this.point);
             if (this.inContact().includes(player)) {
                 player.damage.push(new CombatEvent(this, 5));
-                game.printMessage(`The ${this.name} Attacks!`);
+                game.ui.printLog(`The ${this.name} Attacks!`);
             } else {
                 let [dx, dy] = grid.Point.to2D(moveIndex);
                 let [x, y] = grid.Point.to2D(this.point);
                 this.tryMove(dx - x, dy - y);
-                game.rand.nextDouble() < 1 && game.printMessage(`${this.name} shouts a insult!`);
+                game.rand.nextDouble() < 1 && game.ui.printLog(`${this.name} shouts a insult!`);
             }
         }
     }
