@@ -1,5 +1,5 @@
 
-const UIState = { Idle: 0, Log: 1, Tooltip: 2, Message: 3, Invetory: 4, Equipment: 5, Skill: 6 };
+const UIState = { Idle: 0, Log: 1, Invetory: 2, Cursor: 3, TextInput: 4, Messages: 5, ToolTip: 6 };
 
 class UI {
     constructor(game, numLinesBottom = 4, numColsRight = 15) {
@@ -9,11 +9,13 @@ class UI {
         this.numColsRight = numColsRight;
         this.numLinesBottom = numLinesBottom;
 
-        this.messages = [];
         this.alertMessage = '';
+        this.messages = { current: 0, sequence: [], call: () => 0 };
+        this.tooltip = { title: '', text: '', x: 0, y: 0, call: () => 0 }
+        this.textInput = { text: '', call: () => 0 };
+        this.cursorSelect = { x: 0, y: 0, canMoveTo: () => true, call: () => 0 };
         this.selection = { title: 'select', options: [], index: 0, call: () => 0 };
         this.log = { messages: [], index: 0, processed: 0 };
-        this.tooltip = { x: 0, y: 0, message: 0 };
     }
 
     nextTurn() {
@@ -61,11 +63,53 @@ class UI {
                         break;
                 }
                 return 'draw';
+            case UIState.Cursor:
+                let x = this.cursorSelect.x;
+                let y = this.cursorSelect.y;
+                switch (key) {
+                    case 'h': this.cursorSelect.canMoveTo(x - 1, y + 0); this.cursorSelect.x -= 1; break;
+                    case 'k': this.cursorSelect.canMoveTo(x + 0, y - 1); this.cursorSelect.y -= 1; break;
+                    case 'j': this.cursorSelect.canMoveTo(x + 0, y + 1); this.cursorSelect.y += 1; break;
+                    case 'l': this.cursorSelect.canMoveTo(x + 1, y + 0); this.cursorSelect.x += 1; break;
+                    case 'y': this.cursorSelect.call(x, y); this.state = UIState.Idle; break;
+                    case 'b': this.state = UIState.Idle; break;
+                }
+                return 'draw';
+            case UIState.TextInput:
+                if (key === 'enter') {
+                    this.textInput.call(this.textInput.text);
+                    this.textInput.text = '';
+                    this.state = UIState.Idle;
+                } else if (key === 'backspace') {
+                    this.textInput.text = this.textInput.text.substring(0, this.textInput.text.length - 1);
+                } else if (key === 'escape') {
+                    this.textInput.text = '';
+                    this.state = UIState.Idle;
+                } else if (key === 'space') {
+                    this.textInput.text += ' ';
+                } else {
+                    this.textInput.text += key;
+                }
+                return 'draw';
+            case UIState.Messages:
+                if (key === 'y') {
+                    this.messages.current += 1;
+                    if (this.messages.current >= this.messages.sequence.length) {
+                        this.messages.call();
+                        this.state = UIState.Idle;
+                    }
+                    return 'draw';
+                } else if (key === 'b') {
+                    this.messages.current = Math.max(0, this.messages.current - 1);
+                    return 'draw';
+                }
+            case UIState.ToolTip:
+                if (key === 'y' || key === 'b') {
+                    this.tooltip.call();
+                    this.state = UIState.Idle;
+                    return 'draw';
+                }
         }
-    }
-
-    inputText() {
-
     }
 
     inputActions(player, key) {
@@ -83,22 +127,49 @@ class UI {
         return 'action';
     }
 
-    printMessage(messages) {
+    inputText(call) {
+        this.textInput.text = '';
+        this.textInput.call = call;
+        this.state = UIState.TextInput;
+    }
 
+    inputCursor(x, y, canMoveTo, call) {
+        this.cursorSelect.x = x;
+        this.cursorSelect.y = y;
+        this.cursorSelect.canMoveTo = canMoveTo;
+        this.cursorSelect.call = call;
+    }
+
+    printMessage(messages, call) {
+        this.messages.current = 0;
+        this.messages.sequence = messages;
+        this.messages.call = call;
+        this.state = UIState.Messages;
+    }
+
+    printToolTip(title, x, y, text, call) {
+        this.tooltip.title = title;
+        this.tooltip.x = x;
+        this.tooltip.y = y;
+        this.tooltip.text = text;
+        this.tooltip.call = call;
+        this.state = UIState.ToolTip;
     }
 
     printAlertMessage(message) {
         this.alertMessage = message;
     }
 
-    formatNumber(number, numPlaces) {
-        let str = ' '.repeat(numPlaces - 1) + number;
-        return str.substring(str.length - numPlaces);
-    }
-
     printLog(message) {
         let index = this.formatNumber(this.game.turnCount, 4);
         this.log.messages.push(` Turn ${index}: ` + message);
+    }
+
+    printSelection(title, options, call) {
+        this.selection.title = title;
+        this.selection.index = 0;
+        this.selection.options = options;
+        this.selection.call = call;
     }
 
     draw() {
@@ -110,6 +181,14 @@ class UI {
             this.drawBottomBar();
             if (this.state === UIState.Invetory) {
                 this.drawSelect();
+            } else if (this.state === UIState.Cursor) {
+                this.drawCursorSelect();
+            } else if (this.state === UIState.TextInput) {
+                this.drawInputText();
+            } else if (this.state === UIState.Messages) {
+                this.drawMessage();
+            } else if (this.state === UIState.ToolTip) {
+                this.drawToolTip();
             }
         }
     }
@@ -173,15 +252,37 @@ class UI {
         this.fillMessage(hpMessage, barX + 2, 4);
     }
 
-    drawToolTip(title, x, y, message) {
-
+    drawToolTip() {
+        let text = this.tooltip.text.split('\n');
+        let max = text.reduce((max, cur) => cur.length > max ? cur.length : max, 0);
+        const title = this.tooltip.title;
+        const x = this.tooltip.x;
+        const y = this.tooltip.y;
+        this.drawBox(title, x, y, max + 2, text.length + 2);
+        for (let i = 0; i < text.length; i++) {
+            this.fillMessage(text[i], x + 1, y + 1 + i);
+        }
+        this.fillMessage('(y)', x + 1, y + text.length + 1);
     }
 
-    printSelection(title, options, call) {
-        this.selection.title = title;
-        this.selection.index = 0;
-        this.selection.options = options;
-        this.selection.call = call;
+    drawMessage() {
+        let text = this.messages.sequence[this.messages.current].split('\n');
+        this.drawBox('Message', 5, 5, 45, text.length + 2);
+        for (let i = 0; i < text.length; i++) {
+            this.fillMessage(text[i], 6, 6 + i);
+        }
+        this.fillMessage('(y) Next  (b) Previous', 6, 6 + text.length);
+    }
+
+    drawInputText() {
+        this.drawBox('Input Text', 5, 5, 45, 3);
+        this.fillMessage(this.textInput.text, 6, 6);
+    }
+
+    drawCursorSelect() {
+        let x = this.cursorSelect.x;
+        let y = this.cursorSelect.y;
+        this.context.render(x, y, ' ', 'white', 'green');
     }
 
     drawSelect() {
@@ -189,8 +290,8 @@ class UI {
         const index = this.selection.index;
         const options = this.selection.options;
         const height = Math.min(8, options.length + 3);
-        const x = 10;
-        const y = 10;
+        const x = 5;
+        const y = 5;
         this.drawBox(this.selection.title, x, y, 20, height);
         if (index < 2) {
             for (let i = 0; i < Math.min(options.length, numDisplay); i++) {
@@ -229,6 +330,11 @@ class UI {
             this.context.render(c + index, height, msg[c], fg, bg);
         }
         return index + width;
+    }
+
+    formatNumber(number, numPlaces) {
+        let str = ' '.repeat(numPlaces - 1) + number;
+        return str.substring(str.length - numPlaces);
     }
 }
 
