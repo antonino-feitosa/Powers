@@ -1,5 +1,5 @@
 
-const UIState = { Idle: 0, Log: 1, Tooltip: 2, Message: 3, Invetory: 4, Equipment:5, Skill:6 };
+const UIState = { Idle: 0, Log: 1, Tooltip: 2, Message: 3, Invetory: 4, Equipment: 5, Skill: 6 };
 
 class UI {
     constructor(game, numLinesBottom = 4, numColsRight = 15) {
@@ -12,6 +12,7 @@ class UI {
 
         this.messages = [];
         this.alertMessage = '';
+        this.selection = { title: 'select', options: [], index: 0, call: () => 0 };
         this.log = { messages: [], index: 0 };
         this.tooltip = { x: 0, y: 0, message: 0 };
     }
@@ -23,12 +24,42 @@ class UI {
     }
 
     input(player, key) {
-        if (key === "'") {
-            this.state = this.state === UIState.Log ? UIState.Idle : UIState.Log;
-            return 'draw';
+        switch (this.state) {
+            case UIState.Idle:
+                switch (key) {
+                    case "'": this.state = UIState.Log; break;
+                    case '1': this.state = UIState.Invetory; break;
+                    default:
+                        if (!player.isDead)
+                            return this.inputActions(player, key);
+                }
+                return 'draw';
+            case UIState.Log:
+                key === "'" && (this.state = UIState.Idle);
+                return 'draw';
+            case UIState.Invetory:
+                switch (key) {
+                    case 'y':
+                        this.selection.call(this.selection.index);
+                        this.state = UIState.Idle;
+                        this.selection = { title: 'select', options: [], index: 0, call: () => 0 };
+                        break;
+                    case 'b':
+                    case '1':
+                        this.selection.call(null);
+                        this.state = UIState.Idle;
+                        this.selection = { title: 'select', options: [], index: 0, call: () => 0 };
+                        break;
+                    case 'j':
+                        let maxOption = this.selection.options.length - 1;
+                        this.selection.index = Math.min(maxOption, this.selection.index + 1);
+                        break;
+                    case 'k':
+                        this.selection.index = Math.max(0, this.selection.index - 1);
+                        break;
+                }
+                return 'draw';
         }
-        if(!player.isDead)
-            return this.inputActions(player, key);
     }
 
     inputText() {
@@ -59,7 +90,7 @@ class UI {
     }
 
     formatNumber(number, numPlaces) {
-        let str = ' '.repeat(numPlaces-1) + number;
+        let str = ' '.repeat(numPlaces - 1) + number;
         return str.substring(str.length - numPlaces);
     }
 
@@ -75,6 +106,9 @@ class UI {
         } else {
             this.drawRightBar();
             this.drawBottomBar();
+            if (this.state === UIState.Invetory) {
+                this.drawSelect();
+            }
         }
     }
 
@@ -120,7 +154,7 @@ class UI {
         const context = this.context;
         const barX = context.width - this.numColsRight;
         context.render(barX, 0, '\u2503');
-        for(let i=1;i<context.height - this.numLinesBottom;i++){
+        for (let i = 1; i < context.height - this.numLinesBottom; i++) {
             context.render(barX, i, '\u2503');
         }
 
@@ -136,8 +170,54 @@ class UI {
         this.fillMessage(hpMessage, barX + 2, 4);
     }
 
-    drawToolTip(x, y, message) {
+    drawToolTip(title, x, y, message) {
 
+    }
+
+    printSelection(title, options, call) {
+        this.selection.title = title;
+        this.selection.index = 0;
+        this.selection.options = options;
+        this.selection.call = call;
+    }
+
+    drawSelect() {
+        const numDisplay = 5;
+        const index = this.selection.index;
+        const options = this.selection.options;
+        const height = Math.min(8, options.length + 3);
+        const x = 10;
+        const y = 10;
+        this.drawBox(this.selection.title, x, y, 20, height);
+        if (index < 2) {
+            for (let i = 0; i < Math.min(options.length, numDisplay); i++) {
+                this.fillMessage(options[i], x + 1, y + i + 1, index === i ? 'green' : 'white');
+            }
+        } else if (index >= options.length - 3) {
+            for (let i = options.length - numDisplay, count = y + 1; i < options.length; i++, count++) {
+                this.fillMessage(options[i], x + 1, count, index === i ? 'green' : 'white');
+            }
+        } else {
+            for (let i = index - 2, count = y + 1; i < index + 3; i++, count++) {
+                this.fillMessage(options[i], x + 1, count, index === i ? 'green' : 'white');
+            }
+        }
+        this.fillMessage('(y) OK  (b) Cancel', x + 1, y + height - 2);
+    }
+
+    drawBox(title, x, y, width, height) {
+        const context = this.context;
+        width = Math.max(title.length + 6, width);
+        let str = '\u250C\u2500 ' + title + ' ';
+        str += '\u2500'.repeat(width - str.length) + '\u2510';
+        this.fillMessage(str, x, y);
+        str = '\u2514' + '\u2500'.repeat(width - 1) + '\u2518';
+        this.fillMessage(str, x, y + height - 1);
+        for (let i = 1; i < height - 1; i++) {
+            context.render(x, y + i, '\u2502', 'white', 'black');
+            this.fillMessage(' '.repeat(width - 2), x + 1, y + i);
+            context.render(x + width, y + i, '\u2502', 'white', 'black');
+        }
     }
 
     fillMessage(msg, index, height, fg = 'white', bg = 'black') {

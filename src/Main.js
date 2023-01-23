@@ -41,9 +41,9 @@ class Game {
     }
 
     start() {
-        //let grid = Grid.fromBernoulli(30, 20, rand);
-        this.grid = Grid.fromRandom(this.width, this.height, this.rand, 100);
-        //let grid = Grid.fromEmpty(20, 20);
+        //this.grid = Grid.fromBernoulli(30, 20, rand);
+        //this.grid = Grid.fromRandom(this.width, this.height, this.rand, 100);
+        this.grid = Grid.fromEmpty(20, 20);
 
         !this.hasFog && (this.grid.visible = [... this.tiles.keys()]);
 
@@ -53,7 +53,8 @@ class Game {
 
         const player = this.player = new Player(this, startIndex);
         this.turnControl.push(player);
-        this.addMonsters(startRoom);
+        //this.addMonsters(startRoom);
+        this.addMonsters(null);
 
         this.context.clearBuffer = this.clearBuffer;
         this.context.start();
