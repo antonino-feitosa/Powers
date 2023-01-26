@@ -611,7 +611,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   seed: 0
   center: 0
-  radius: 2
+  radius: 5
+  hasFog: 0
   tilemap: {fileID: 1470512911}
   fieldOfView: {fileID: 1122615611}
   player: {fileID: 2409131245762495430}

@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Random = UnityEngine.Random;
 
 public class ProceduralGenerator : MonoBehaviour {
 
 	public int seed = 0;    
     public int center = 0;
     public int radius = 5;
+	public bool hasFog = true;
 	
     public Tilemap tilemap;
 	public Tilemap fieldOfView;
