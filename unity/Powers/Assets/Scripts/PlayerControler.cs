@@ -32,6 +32,8 @@ public class PlayerControler : MonoBehaviour{
 	private enum State {Idle, Moving};
 
     public float moveSpeed = 5f;
+
+	public int radius = 5;
 	
 	private State state = State.Idle;
 	
@@ -40,6 +42,9 @@ public class PlayerControler : MonoBehaviour{
 	
     void Start(){
 		anim = GetComponent<Animator>();
+		var game = GameManager.instance;
+		Vector2Int pos = new Vector2Int((int)transform.position.x, (int)transform.position.y);
+		game.ApplyFieldOfView(pos, radius);
     }
 
     void Update(){
@@ -58,9 +63,14 @@ public class PlayerControler : MonoBehaviour{
 	
 	protected void TryMoveTo(Vector3 dir){
 		Vector3 destination = dir + transform.position;
-		Vector2Int dest = new Vector2Int((int)destination.x, (int)destination.y);
-		if(GameManager.instance.floor.Contains(dest)){
+		
+		Vector2Int origin = new Vector2Int((int)transform.position.x, (int)transform.position.y);
+		Vector2Int dest = new Vector2Int((int)(destination.x - 0.5), (int)(destination.y - 0.5));
+		
+		var game = GameManager.instance;
+		if(game.TryMoveTo(origin, dest)){
 			state = State.Moving;
+			game.ApplyFieldOfView(dest, radius);
 			anim.Play("Walk " + mapAnim[dir], 0);
 			StartCoroutine(SmoothMovement(dir));
 		}

@@ -11,8 +11,11 @@ public class ProceduralGenerator : MonoBehaviour {
     public int radius = 5;
 	
     public Tilemap tilemap;
+	public Tilemap fieldOfView;
 	public Transform player;
 	
+	public TileBase hiddenTile;
+	public TileBase revealedTile;
     public TileBase[] floorTile;
 	
 	public TileBase wallPillar;

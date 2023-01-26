@@ -10,20 +10,62 @@ public class GameManager : MonoBehaviour {
 	public int level = 1;
 	public HashSet<Vector2Int> floor;
 	public HashSet<Vector2Int> walls;
+	public HashSet<Vector2Int> blocked;
+	public HashSet<Vector2Int> visible;
+	public HashSet<Vector2Int> revealed;
 	public ProceduralGenerator proc;
 	
 	void Awake(){
 		instance = this;
 		floor = new HashSet<Vector2Int>();
+		walls = new HashSet<Vector2Int>();
+		blocked = new HashSet<Vector2Int>();
+		
+		visible = new HashSet<Vector2Int>();
+		revealed = new HashSet<Vector2Int>();
 		
 		MakeRandomWalkMap();
 		DetectWalls();
 		PaintFloor();
 		PaintWalls();
 	}
+
+	public void ApplyFieldOfView(Vector2Int center, int radius){
+		HashSet<Vector2Int> view = FieldOfView(center, radius);
+		
+		HashSet<Vector2Int> newRevealed = new HashSet<Vector2Int>(visible);
+		newRevealed.ExceptWith(view);
+		
+		foreach(var pos in newRevealed){
+			var v = new Vector3Int(pos.x, pos.y, 0);
+			var tilePosition = proc.fieldOfView.WorldToCell(v);
+			proc.fieldOfView.SetTile(tilePosition, proc.revealedTile);
+		}
+
+		foreach(var pos in view){
+			var v = new Vector3Int(pos.x, pos.y, 0);
+			var tilePosition = proc.fieldOfView.WorldToCell(v);
+			proc.fieldOfView.SetTile(tilePosition, null);
+		}
+		revealed.UnionWith(view);
+		visible = view;
+	}
+
+	public HashSet<Vector2Int> FieldOfView(Vector2Int center, int radius){
+		return FOV.Calculate(center, radius, (pos) => !floor.Contains(pos) );
+	}
+	
+	public bool TryMoveTo(Vector2Int current, Vector2Int destination){
+		if(floor.Contains(destination)){
+			blocked.Remove(current);
+			blocked.Add(destination);
+			return true;
+		}
+		return false;
+	}
 	
 	void MakeEmptyMap(){
-		proc.player.position = new Vector3(proc.center, proc.center, 0);
+		proc.player.position = new Vector3(proc.center + 0.5f, proc.center + 0.5f, 0);
 		for (int y = proc.center - proc.radius; y < proc.center + proc.radius; y++){
             for (int x = proc.center - proc.radius; x < proc.center + proc.radius; x++){
                 floor.Add(new Vector2Int(x, y));
@@ -32,7 +74,7 @@ public class GameManager : MonoBehaviour {
 	}
 	
 	void MakeRandomWalkMap(){
-		proc.player.position = new Vector3(proc.center, proc.center, 0);
+		proc.player.position = new Vector3(proc.center + 0.5f, proc.center + 0.5f, 0);
 		floor.Add(new Vector2Int(proc.center, proc.center));
 		
 		int length = 100;
@@ -55,7 +97,6 @@ public class GameManager : MonoBehaviour {
 	void DetectWalls(){
 		int [] incx = new int[8]{-1, -1, -1, +0, +0, +1, +1, +1};
 		int [] incy = new int[8]{-1, +0, +1, -1, +1, -1, +0, +1};
-		walls = new HashSet<Vector2Int>();
 		foreach(var pos in floor){
 			for(int i=0;i<incx.Length;i++){
 				var wall = new Vector2Int(pos.x + incx[i], pos.y + incy[i]);
@@ -106,6 +147,7 @@ public class GameManager : MonoBehaviour {
 		var pos = new Vector3Int(x, y, 0);
         var tilePosition = proc.tilemap.WorldToCell(pos);
         proc.tilemap.SetTile(tilePosition, tile);
+		proc.fieldOfView.SetTile(tilePosition, proc.hiddenTile);
     }
 
     void Clear(){

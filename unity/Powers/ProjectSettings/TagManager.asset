@@ -41,3 +41,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Ground
+    uniqueID: 918965969
+    locked: 0
+  - name: FOV
+    uniqueID: 1880683227
+    locked: 0
+  - name: Player
+    uniqueID: 1871341493
+    locked: 0
