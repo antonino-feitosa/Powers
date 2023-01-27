@@ -15,11 +15,12 @@ public class GameManager : MonoBehaviour
     public HashSet<Vector2Int> blocked;
     public HashSet<Vector2Int> visible;
     public HashSet<Vector2Int> revealed;
-    public ProceduralGenerator proc;
+    public ProceduralGeneratorParameters proc;
+    public ProceduralMap[] maps;
 
     void Awake()
     {
-		Random.InitState(proc.seed);
+        Random.InitState(proc.seed);
         instance = this;
         floor = new HashSet<Vector2Int>();
         walls = new HashSet<Vector2Int>();
@@ -28,10 +29,11 @@ public class GameManager : MonoBehaviour
         visible = new HashSet<Vector2Int>();
         revealed = new HashSet<Vector2Int>();
 
-        MakeEmptyMap();
+        MakeMap();
         DetectWalls();
         PaintFloor();
         PaintWalls();
+        proc.cameraPosition.position = new Vector3(proc.player.position.x, proc.player.position.y, proc.cameraPosition.position.z);
     }
 
     public List<Vector2Int> Neighborhood(Vector2Int pos)
@@ -50,13 +52,15 @@ public class GameManager : MonoBehaviour
         return neighborhood;
     }
 
-	public void DebugDijkstraMap(DijkstraMap map){
-		foreach(var entry in map.distance){
-			Vector3 pos = proc.tilemap.WorldToCell(new Vector3(entry.Key.x, entry.Key.y));
-			GUI.color = pos.x == 0 && pos.y == 0 ? Color.red : Color.black;
-			GUI.Label(new Rect(320 + pos.x  * 32, 640 - (320 + pos.y * 32), 100, 100), entry.Value.ToString("0.0"));
-		}
-	}
+    public void DebugDijkstraMap(DijkstraMap map)
+    {
+        foreach (var entry in map.distance)
+        {
+            Vector3 pos = proc.tilemap.WorldToCell(new Vector3(entry.Key.x, entry.Key.y));
+            GUI.color = pos.x == 0 && pos.y == 0 ? Color.red : Color.black;
+            GUI.Label(new Rect(320 + pos.x * 32, 640 - (320 + pos.y * 32), 100, 100), entry.Value.ToString("0.0"));
+        }
+    }
 
     public float MoveCost(Vector2Int source, Vector2Int dest)
     {
@@ -118,12 +122,21 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
+    void MakeMap()
+    {
+        int index = Random.Range(0, maps.Length);
+        var map = maps[index];
+        map.Generate();
+        floor = map.floor;
+        proc.player.position = new Vector3(map.stairsUp.x + 0.5f, map.stairsUp.y + 0.5f, 0);
+    }
+
     void MakeEmptyMap()
     {
         //proc.player.position = new Vector3(proc.center + 0.5f, proc.center + 0.5f, 0);
-        for (int y = proc.center - proc.radius; y < proc.center + proc.radius; y++)
+        for (int y = proc.center.y - proc.radius; y < proc.center.y + proc.radius; y++)
         {
-            for (int x = proc.center - proc.radius; x < proc.center + proc.radius; x++)
+            for (int x = proc.center.x - proc.radius; x < proc.center.x + proc.radius; x++)
             {
                 floor.Add(new Vector2Int(x, y));
             }
@@ -132,35 +145,35 @@ public class GameManager : MonoBehaviour
 
     void MakeBernoulliMap()
     {
-        for (int y = proc.center - proc.radius; y < proc.center + proc.radius; y++)
+        for (int y = proc.center.y - proc.radius; y < proc.center.y + proc.radius; y++)
         {
-            for (int x = proc.center - proc.radius; x < proc.center + proc.radius; x++)
+            for (int x = proc.center.x - proc.radius; x < proc.center.x + proc.radius; x++)
             {
                 floor.Add(new Vector2Int(x, y));
             }
         }
-        for (int y = proc.center - proc.radius + 2; y < proc.center + proc.radius; y += 3)
+        for (int y = proc.center.y - proc.radius + 2; y < proc.center.y + proc.radius; y += 3)
         {
-            for (int x = proc.center - proc.radius + 2; x < proc.center + proc.radius; x += 3)
+            for (int x = proc.center.x - proc.radius + 2; x < proc.center.x + proc.radius; x += 3)
             {
                 int dx = -1 + Random.Range(0, 2);
                 int dy = -1 + Random.Range(0, 2);
                 floor.Remove(new Vector2Int(x + dx, y + dy));
             }
         }
-		//proc.player.position = new Vector3(proc.center + 0.5f, proc.center + 0.5f, 0);
-		floor.Add(new Vector2Int(proc.center, proc.center));
+        //proc.player.position = new Vector3(proc.center + 0.5f, proc.center + 0.5f, 0);
+        floor.Add(proc.center);
     }
 
     void MakeRandomWalkMap()
     {
-        proc.player.position = new Vector3(proc.center + 0.5f, proc.center + 0.5f, 0);
-        floor.Add(new Vector2Int(proc.center, proc.center));
+        proc.player.position = new Vector3(proc.center.x + 0.5f, proc.center.y + 0.5f, 0);
+        floor.Add(proc.center);
 
         int length = 100;
         int iterations = 10;
         bool reset = false;
-        Vector2Int pos = new Vector2Int(proc.center, proc.center);
+        Vector2Int pos = new Vector2Int(proc.center.x, proc.center.y);
         Vector2Int[] inc = new Vector2Int[4] { Vector2Int.left, Vector2Int.right, Vector2Int.up, Vector2Int.down };
         for (int r = 0; r < iterations; r++)
         {
@@ -172,7 +185,7 @@ public class GameManager : MonoBehaviour
             }
             if (reset)
             {
-                pos = new Vector2Int(proc.center, proc.center);
+                pos = new Vector2Int(proc.center.x, proc.center.y);
             }
         }
     }

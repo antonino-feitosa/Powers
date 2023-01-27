@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class ProceduralGenerator : MonoBehaviour {
+public class ProceduralGeneratorParameters : MonoBehaviour {
 
-	public int seed = 0;    
-    public int center = 0;
+	public int seed = 0;
     public int radius = 5;
 	public bool hasFog = true;
+	public Vector2Int center = Vector2Int.zero;
 	
     public Tilemap tilemap;
 	public Tilemap fieldOfView;
 	public Transform player;
+	public Transform cameraPosition;
 	
 	public TileBase hiddenTile;
 	public TileBase revealedTile;
