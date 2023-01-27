@@ -13,8 +13,8 @@ public class DijkstraMap : IComparer<Vector2Int>
     private HashSet<Vector2Int> grid;
 
     private Dictionary<Vector2Int, float> attractionPoints;
-    private Dictionary<Vector2Int, float> repulsionPoints;
-    private Dictionary<Vector2Int, float> distance;
+    private Dictionary<Vector2Int, (float, float)> repulsionPoints;
+    public Dictionary<Vector2Int, float> distance;
 
     public DijkstraMap(HashSet<Vector2Int> grid, Func<Vector2Int, List<Vector2Int>> neighborhood, Func<Vector2Int, Vector2Int, float> moveCost)
     {
@@ -22,7 +22,7 @@ public class DijkstraMap : IComparer<Vector2Int>
         this.moveCost = moveCost;
         this.neighborhood = neighborhood;
         distance = new Dictionary<Vector2Int, float>();
-        repulsionPoints = new Dictionary<Vector2Int, float>();
+        repulsionPoints = new Dictionary<Vector2Int, (float, float)>();
         attractionPoints = new Dictionary<Vector2Int, float>();
     }
 
@@ -31,9 +31,9 @@ public class DijkstraMap : IComparer<Vector2Int>
         attractionPoints.Add(point, force);
     }
 
-    public void AddRepulsionPoint(Vector2Int point, float force = 1f)
+    public void AddRepulsionPoint(Vector2Int point, float radius = 3f, float force = 1.2f)
     {
-        repulsionPoints.Add(point, force);
+        repulsionPoints.Add(point, (radius, force));
     }
 
     public int Compare(Vector2Int x, Vector2Int y)
@@ -42,22 +42,27 @@ public class DijkstraMap : IComparer<Vector2Int>
         return diff == 0 ? 0 : (diff < 0 ? -1 : +1);
     }
 
-    protected float Cost(Vector2Int source, Vector2Int dest)
+    public float Cost(Vector2Int source, Vector2Int dest)
     {
-        float inc = 0;
+        float cost = moveCost(source, dest);
+
         foreach (var entry in repulsionPoints)
         {
-            float sourceToRep = Vector2Int.Distance(source, entry.Key);
-            float destToRep = Vector2Int.Distance(dest, entry.Key);
-            if (destToRep < sourceToRep)
+            Vector2Int center = entry.Key;
+            var (radius, force) = entry.Value;
+            float costSource = moveCost(source, center);
+            float costDest = moveCost(dest, center);
+            bool sourceRadius = Vector2Int.Distance(source, center) < radius;
+            bool destRadius = Vector2Int.Distance(dest, center) < radius;
+            if (sourceRadius && destRadius && costDest < costSource)
             {
-                inc += entry.Value * (destToRep - sourceToRep); // approximation
+                cost = cost * force + (costSource - costDest);
             }
         }
-        return Vector2Int.Distance(source, dest) + inc;
+        return cost;
     }
 
-    protected void Calculate()
+    public void Calculate()
     {
         distance.Clear();
         foreach (var pos in grid)
@@ -66,7 +71,7 @@ public class DijkstraMap : IComparer<Vector2Int>
         }
         foreach (var entry in attractionPoints)
         {
-            distance.Add(entry.Key, entry.Value);
+            distance[entry.Key] = entry.Value;
         }
         ApplyDijkstra();
     }

@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
+		Random.InitState(proc.seed);
         instance = this;
         floor = new HashSet<Vector2Int>();
         walls = new HashSet<Vector2Int>();
@@ -49,9 +50,17 @@ public class GameManager : MonoBehaviour
         return neighborhood;
     }
 
+	public void DebugDijkstraMap(DijkstraMap map){
+		foreach(var entry in map.distance){
+			Vector3 pos = proc.tilemap.WorldToCell(new Vector3(entry.Key.x, entry.Key.y));
+			GUI.color = pos.x == 0 && pos.y == 0 ? Color.red : Color.black;
+			GUI.Label(new Rect(320 + pos.x  * 32, 640 - (320 + pos.y * 32), 100, 100), entry.Value.ToString("0.0"));
+		}
+	}
+
     public float MoveCost(Vector2Int source, Vector2Int dest)
     {
-        return Mathf.Max(Mathf.Abs(source.x - dest.x), Mathf.Abs(source.y - dest.y));
+        return Vector2.Distance(source, dest);
     }
 
     public bool isOpaque(Vector2Int pos)
@@ -66,10 +75,11 @@ public class GameManager : MonoBehaviour
 
     public void ApplyFieldOfView(Vector2Int center, int radius)
     {
-		if(!proc.hasFog){
-			return;
-		}
-		
+        if (!proc.hasFog)
+        {
+            return;
+        }
+
         HashSet<Vector2Int> view = FieldOfView(center, radius);
 
         HashSet<Vector2Int> newRevealed = new HashSet<Vector2Int>(visible);
@@ -110,7 +120,7 @@ public class GameManager : MonoBehaviour
 
     void MakeEmptyMap()
     {
-        proc.player.position = new Vector3(proc.center + 0.5f, proc.center + 0.5f, 0);
+        //proc.player.position = new Vector3(proc.center + 0.5f, proc.center + 0.5f, 0);
         for (int y = proc.center - proc.radius; y < proc.center + proc.radius; y++)
         {
             for (int x = proc.center - proc.radius; x < proc.center + proc.radius; x++)
@@ -118,6 +128,28 @@ public class GameManager : MonoBehaviour
                 floor.Add(new Vector2Int(x, y));
             }
         }
+    }
+
+    void MakeBernoulliMap()
+    {
+        for (int y = proc.center - proc.radius; y < proc.center + proc.radius; y++)
+        {
+            for (int x = proc.center - proc.radius; x < proc.center + proc.radius; x++)
+            {
+                floor.Add(new Vector2Int(x, y));
+            }
+        }
+        for (int y = proc.center - proc.radius + 2; y < proc.center + proc.radius; y += 3)
+        {
+            for (int x = proc.center - proc.radius + 2; x < proc.center + proc.radius; x += 3)
+            {
+                int dx = -1 + Random.Range(0, 2);
+                int dy = -1 + Random.Range(0, 2);
+                floor.Remove(new Vector2Int(x + dx, y + dy));
+            }
+        }
+		//proc.player.position = new Vector3(proc.center + 0.5f, proc.center + 0.5f, 0);
+		floor.Add(new Vector2Int(proc.center, proc.center));
     }
 
     void MakeRandomWalkMap()
@@ -208,9 +240,10 @@ public class GameManager : MonoBehaviour
         var pos = new Vector3Int(x, y, 0);
         var tilePosition = proc.tilemap.WorldToCell(pos);
         proc.tilemap.SetTile(tilePosition, tile);
-		if(proc.hasFog){
-        	proc.fieldOfView.SetTile(tilePosition, proc.hiddenTile);
-		}
+        if (proc.hasFog)
+        {
+            proc.fieldOfView.SetTile(tilePosition, proc.hiddenTile);
+        }
     }
 
     void Clear()

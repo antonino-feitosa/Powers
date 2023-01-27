@@ -39,8 +39,10 @@ public class PriorityQueue<T> : IComparer<T>
     }
 
     public void Update(T element){ // TODO
-        Remove(element);
-        Push(element);
+        T e = Remove(element);
+        if(!EqualityComparer<T>.Default.Equals(e, default(T))){
+            Push(element);
+        }
     }
 
     public void Push(T element)
