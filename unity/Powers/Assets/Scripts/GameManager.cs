@@ -6,7 +6,8 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    public class Level {
+    public class Level
+    {
         public int level = 1;
         public Vector2Int player;
         public Vector2Int stairsUp;
@@ -16,16 +17,19 @@ public class GameManager : MonoBehaviour
         public HashSet<Vector2Int> blocked = new HashSet<Vector2Int>();
         public HashSet<Vector2Int> visible = new HashSet<Vector2Int>();
         public HashSet<Vector2Int> revealed = new HashSet<Vector2Int>();
+        public LinkedList<Moveable> turn = new LinkedList<Moveable>();
     }
 
     public static GameManager instance;
     public int currentLevel = 0;
+    public int maxLevel = 100;
     public List<Level> levels = new List<Level>();
 
-    public Level level {get {return levels[currentLevel];}}
-    
+    public Level level { get { return levels[currentLevel]; } }
+
     public ProceduralGeneratorParameters proc;
     public ProceduralMap[] maps;
+    public Moveable player;
 
     void Awake()
     {
@@ -35,7 +39,26 @@ public class GameManager : MonoBehaviour
         ChangeMap();
     }
 
-    public Level NewLevel(int nv){
+    public void NextTurn()
+    {
+        Moveable current = level.turn.First.Value;
+        level.turn.RemoveFirst();
+        level.turn.AddLast(current);
+    }
+
+    void Update()
+    {
+        Moveable current = level.turn.First.Value;
+        while (!current.Turn())
+        {
+            level.turn.RemoveFirst();
+            level.turn.AddLast(current);
+            current = level.turn.First.Value;
+        }
+    }
+
+    public Level NewLevel(int nv)
+    {
         Level level = new Level();
         level.level = nv;
         int index = Random.Range(0, maps.Length);
@@ -45,28 +68,34 @@ public class GameManager : MonoBehaviour
         level.player = map.stairsUp;
         level.stairsUp = map.stairsUp;
         level.stairsDown = map.stairsDown;
+        level.turn.AddFirst(player);
         return level;
     }
 
-    public bool IsUpStairs(Vector2Int pos){
+    public bool IsUpStairs(Vector2Int pos)
+    {
         return level.level > 0 && pos == level.stairsUp;
     }
 
-    public bool IsDownStairs(Vector2Int pos){
-        Debug.Log(pos.ToString() + " -- " + level.stairsDown.ToString());
-        return pos == level.stairsDown; // TODO max level
+    public bool IsDownStairs(Vector2Int pos)
+    {
+        return level.level < maxLevel && pos == level.stairsDown;
     }
 
-    public static Vector2Int ToVector2Int(Vector3 vec){
+    public static Vector2Int ToVector2Int(Vector3 vec)
+    {
         return new Vector2Int((int)(vec.x), (int)(vec.y));
     }
-    public static Vector3 ToVector3(Vector2Int vec){
+    public static Vector3 ToVector3(Vector2Int vec)
+    {
         return new Vector3(vec.x, vec.y);
     }
 
-    public void LevelForward(){
+    public void LevelForward()
+    {
         int nextLevel = level.level + 1;
-        if(nextLevel >= levels.Count){
+        if (nextLevel >= levels.Count)
+        {
             levels.Add(NewLevel(nextLevel));
         }
         level.player = ToVector2Int(proc.player.position);
@@ -74,9 +103,11 @@ public class GameManager : MonoBehaviour
         ChangeMap();
     }
 
-    public void LevelBackward(){
+    public void LevelBackward()
+    {
         int nextLevel = level.level - 1;
-        if(nextLevel < 0){
+        if (nextLevel < 0)
+        {
             Debug.Log("You cannot ascend to a negative level!");
             return;
         }
@@ -85,7 +116,8 @@ public class GameManager : MonoBehaviour
         ChangeMap();
     }
 
-    public void ChangeMap(){
+    public void ChangeMap()
+    {
         proc.player.position = ToVector3(level.player);
         proc.cameraPosition.position = new Vector3(proc.player.position.x, proc.player.position.y, proc.cameraPosition.position.z);
         Clear();
@@ -205,9 +237,9 @@ public class GameManager : MonoBehaviour
             TileBase tile = proc.floorTile[index];
             PaintTile(pos, tile);
         }
-        // TODO instantiate stairs
-        PaintTile(level.stairsDown, proc.stairsDown);
-        if(level.level > 0)
+        if (level.level < maxLevel)
+            PaintTile(level.stairsDown, proc.stairsDown);
+        if (level.level > 0)
             PaintTile(level.stairsUp, proc.stairsUp);
     }
 

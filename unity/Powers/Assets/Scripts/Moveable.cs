@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,7 +32,11 @@ public class Moveable : MonoBehaviour
         anim = GetComponent<Animator>();
     }
 
-    protected bool TryMoveTo(Vector2Int dir)
+    public virtual bool Turn(){
+        return false; // false -> end of turn
+    }
+
+    protected bool TryMoveTo(Vector2Int dir, Action call = null)
     {
         Vector2Int origin = GameManager.ToVector2Int(transform.position);
         Vector2Int dest = origin + dir;
@@ -41,13 +46,13 @@ public class Moveable : MonoBehaviour
         {
             stateMoveable = StateMoveable.Moving;
             anim.Play("Walk " + mapAnim[dir], 0);
-            StartCoroutine(SmoothMovement(dir));
+            StartCoroutine(SmoothMovement(dir, call));
             return true;
         }
         return false;
     }
 
-    private IEnumerator SmoothMovement(Vector2Int dir)
+    private IEnumerator SmoothMovement(Vector2Int dir, Action call = null)
     {
         Vector3 destination = new Vector3(transform.position.x + dir.x, transform.position.y + dir.y);
         while (Vector3.Distance(transform.position, destination) > 0.05f)
@@ -58,5 +63,8 @@ public class Moveable : MonoBehaviour
         transform.position = destination;
         anim.Play("Idle " + mapAnim[dir], 0);
         stateMoveable = StateMoveable.Idle;
+        if(call != null){
+            call();
+        }
     }
 }

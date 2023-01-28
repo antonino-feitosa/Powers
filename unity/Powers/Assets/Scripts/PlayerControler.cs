@@ -4,25 +4,23 @@ using UnityEngine;
 
 public class PlayerControler : Moveable
 {
-
     private static Dictionary<KeyCode, Vector2Int> mapKeys;
 
     static PlayerControler()
     {
         mapKeys = new Dictionary<KeyCode, Vector2Int>();
-        mapKeys.Add(KeyCode.L, new Vector2Int(+1, +0));
-        mapKeys.Add(KeyCode.H, new Vector2Int(-1, +0));
-        mapKeys.Add(KeyCode.K, new Vector2Int(+0, +1));
-        mapKeys.Add(KeyCode.J, new Vector2Int(+0, -1));
-        mapKeys.Add(KeyCode.Y, new Vector2Int(-1, +1));
-        mapKeys.Add(KeyCode.U, new Vector2Int(+1, +1));
-        mapKeys.Add(KeyCode.B, new Vector2Int(-1, -1));
-        mapKeys.Add(KeyCode.N, new Vector2Int(+1, -1));
+        mapKeys.Add(KeyCode.D, new Vector2Int(+1, +0));
+        mapKeys.Add(KeyCode.A, new Vector2Int(-1, +0));
+        mapKeys.Add(KeyCode.W, new Vector2Int(+0, +1));
+        mapKeys.Add(KeyCode.X, new Vector2Int(+0, -1));
+        mapKeys.Add(KeyCode.Q, new Vector2Int(-1, +1));
+        mapKeys.Add(KeyCode.E, new Vector2Int(+1, +1));
+        mapKeys.Add(KeyCode.Z, new Vector2Int(-1, -1));
+        mapKeys.Add(KeyCode.C, new Vector2Int(+1, -1));
     }
 
     public int radius = 5;
-
-    protected enum StatePlayer { Idle, Forward, Backward };
+    protected enum StatePlayer { Idle, EndOfTurn, Forward, Backward };
     protected StatePlayer statePlayer = StatePlayer.Idle;
 
     protected override void Start()
@@ -31,6 +29,11 @@ public class PlayerControler : Moveable
         var game = GameManager.instance;
         Vector2Int pos = GameManager.ToVector2Int(transform.position);
         game.ApplyFieldOfView(pos, radius);
+    }
+
+    public override bool Turn()
+    {
+        return true;
     }
 
     void Update()
@@ -60,7 +63,7 @@ public class PlayerControler : Moveable
                 Vector2Int dir = kvp.Value;
                 var game = GameManager.instance;
                 Vector2Int dest = GameManager.ToVector2Int(transform.position) + dir;
-                if (TryMoveTo(dir))
+                if (TryMoveTo(dir, () => game.NextTurn()))
                 {
                     game.ApplyFieldOfView(dest, radius);
                     if (game.IsUpStairs(dest))
