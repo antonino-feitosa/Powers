@@ -603,9 +603,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentLevel: 0
+  maxLevel: 100
   proc: {fileID: 1967526702}
   maps:
   - {fileID: 11400000, guid: ad806efbc989612449cadf30994be1ec, type: 2}
+  player: {fileID: 9113324638653074204}
 --- !u!4 &1967526704
 Transform:
   m_ObjectHideFlags: 0

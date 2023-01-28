@@ -1,8 +1,9 @@
 
 # GAME
 
-- [ ] Refactor Controls
-- [ ] Hurt Animation
+- [x] Refactor Controls
+- [x] Turns
+- [x] Hurt Animation
 - [ ] Trap Spikes
 - [ ] Enemy Random
 - [ ] Basic HUD

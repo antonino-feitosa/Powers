@@ -1,4 +1,5 @@
 
+using System.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,7 +29,23 @@ public class CreateAnim : MonoBehaviour
         "Walk Left",
         "Walk DownLeft",
         "Walk Up",
-        "Walk UpLeft"
+        "Walk UpLeft",
+        "Run Right",
+        "Run UpRight",
+        "Run Down",
+        "Run DownRight",
+        "Run Left",
+        "Run DownLeft",
+        "Run Up",
+        "Run UpLeft",
+        "Hurt Right",
+        "Hurt UpRight",
+        "Hurt Down",
+        "Hurt DownRight",
+        "Hurt Left",
+        "Hurt DownLeft",
+        "Hurt Up",
+        "Hurt UpLeft"
     };
 
     public void Create()
@@ -42,10 +59,12 @@ public class CreateAnim : MonoBehaviour
             for (int i = 0; i < NAMES.Length; i++)
             {
                 var dest = new Sprite[4];
-                Array.Copy(sprites, i, dest, 0, 4);
+                Array.Copy(sprites, i * 4, dest, 0, 4);
                 var anim = CreateAnimation(prefix, NAMES[i], dest);
                 anim.name = NAMES[i];
-                controller.AddMotion(anim);
+                anim.wrapMode = anim.name.StartsWith("Hurt") ? WrapMode.Once : WrapMode.Loop;
+                AnimatorState state = controller.AddMotion(anim);
+
             }
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -56,8 +75,6 @@ public class CreateAnim : MonoBehaviour
     {
         AnimationClip animClip = new AnimationClip();
         animClip.name = name;
-        animClip.frameRate = 12;   // FPS
-        animClip.wrapMode = WrapMode.Loop;
 
         EditorCurveBinding spriteBinding = new EditorCurveBinding();
         spriteBinding.type = typeof(SpriteRenderer);
@@ -73,7 +90,7 @@ public class CreateAnim : MonoBehaviour
         }
         AnimationUtility.SetObjectReferenceCurve(animClip, spriteBinding, spriteKeyFrames);
 
-        AssetDatabase.CreateAsset(animClip, "assets/Animations/" + prefix + " " + name + ".anim");
+        AssetDatabase.CreateAsset(animClip, "assets/Animations/Anim/" + prefix + " " + name + ".anim");
         return animClip;
     }
 }

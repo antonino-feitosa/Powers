@@ -22,38 +22,79 @@ public class Moveable : MonoBehaviour
 
     public float moveSpeed = 5f;
 
-    protected enum StateMoveable {Moving, Idle};
+    protected enum StateMoveable { Moving, Idle, IdleHurt, MovingHurt };
     protected StateMoveable stateMoveable = StateMoveable.Idle;
-    
+
     private Animator anim;
+    private Vector2Int dir = Vector2Int.right;
+    private object Monitor = new object();
 
     protected virtual void Start()
     {
         anim = GetComponent<Animator>();
     }
 
-    public virtual bool Turn(){
+    public virtual bool Turn()
+    {
         return false; // false -> end of turn
+    }
+
+    public virtual void ReceiveDamage(Moveable ohter, Action call = null)
+    {
+        lock (Monitor)
+        {
+            if (stateMoveable == StateMoveable.Idle || stateMoveable == StateMoveable.Moving)
+            {
+                anim.Play("Hurt " + mapAnim[dir], 1);
+                if (stateMoveable == StateMoveable.Idle)
+                    stateMoveable = StateMoveable.IdleHurt;
+                else if (stateMoveable == StateMoveable.Moving)
+                    stateMoveable = StateMoveable.MovingHurt;
+            }
+        }
+    }
+
+    void OnAnimatorMove()
+    {
+        lock (Monitor)
+        {
+            if (stateMoveable == StateMoveable.IdleHurt)
+            {
+                anim.Play("Idle " + mapAnim[dir]);
+                stateMoveable = StateMoveable.Idle;
+            }
+            else if (stateMoveable == StateMoveable.IdleHurt)
+            {
+                anim.Play("Walk " + mapAnim[dir]);
+                stateMoveable = StateMoveable.Moving;
+            }
+        }
     }
 
     protected bool TryMoveTo(Vector2Int dir, Action call = null)
     {
-        Vector2Int origin = GameManager.ToVector2Int(transform.position);
-        Vector2Int dest = origin + dir;
-
-        var game = GameManager.instance;
-        if (game.TryMoveTo(origin, dest))
+        lock (Monitor)
         {
-            stateMoveable = StateMoveable.Moving;
-            anim.Play("Walk " + mapAnim[dir], 0);
-            StartCoroutine(SmoothMovement(dir, call));
-            return true;
+            if (stateMoveable != StateMoveable.Idle) return false;
+
+            Vector2Int origin = GameManager.ToVector2Int(transform.position);
+            Vector2Int dest = origin + dir;
+
+            var game = GameManager.instance;
+            if (game.TryMoveTo(origin, dest))
+            {
+                stateMoveable = StateMoveable.Moving;
+                anim.Play("Walk " + mapAnim[dir]);
+                StartCoroutine(SmoothMovement(dir, call));
+                return true;
+            }
         }
         return false;
     }
 
     private IEnumerator SmoothMovement(Vector2Int dir, Action call = null)
     {
+        this.dir = dir;
         Vector3 destination = new Vector3(transform.position.x + dir.x, transform.position.y + dir.y);
         while (Vector3.Distance(transform.position, destination) > 0.05f)
         {
@@ -61,10 +102,11 @@ public class Moveable : MonoBehaviour
             yield return null;
         }
         transform.position = destination;
-        anim.Play("Idle " + mapAnim[dir], 0);
-        stateMoveable = StateMoveable.Idle;
-        if(call != null){
-            call();
+        lock (Monitor)
+        {
+            anim.Play("Idle " + mapAnim[dir]);
+            stateMoveable = StateMoveable.Idle;
+            if (call != null) call();
         }
     }
 }
