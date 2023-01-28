@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26f90c39cc92f124aa93eff6344872ca, type: 3}
   m_Name: Room - Empty - Small
   m_EditorClassIdentifier: 
-  center: {x: 0, y: 0}
-  radius: 20
-  stairsUp: {x: 0, y: 0}
-  stairsDown: {x: 0, y: 0}
+  radius: 5
+  center: {x: 20, y: 0}
+  stairsUp: {x: 20, y: -5}
+  stairsDown: {x: 15, y: 0}

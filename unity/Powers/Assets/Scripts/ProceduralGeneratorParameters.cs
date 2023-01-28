@@ -15,6 +15,8 @@ public class ProceduralGeneratorParameters : MonoBehaviour {
 	public Transform player;
 	public Transform cameraPosition;
 	
+	public TileBase stairsUp;
+	public TileBase stairsDown;
 	public TileBase hiddenTile;
 	public TileBase revealedTile;
     public TileBase[] floorTile;

@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54fc4befafa4e3c41a562d814d34e835, type: 3}
   m_Name: Room - Island - Big
   m_EditorClassIdentifier: 
-  center: {x: -60, y: 60}
   radius: 5
-  stairsUp: {x: -60, y: 60}
-  stairsDown: {x: -57, y: 60}
-  iterations: 20
+  center: {x: 20, y: 0}
+  stairsUp: {x: 20, y: 0}
+  stairsDown: {x: 21, y: 1}
+  iterations: 10
   restart: 1

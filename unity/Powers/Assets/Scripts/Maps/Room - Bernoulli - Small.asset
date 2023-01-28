@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49b5589a9f361d647ae5ba27dd582424, type: 3}
   m_Name: Room - Bernoulli - Small
   m_EditorClassIdentifier: 
-  center: {x: 0, y: 60}
   radius: 5
-  stairsUp: {x: 0, y: 90}
-  stairsDown: {x: -30, y: 30}
+  center: {x: 0, y: 0}
+  stairsUp: {x: 5, y: 0}
+  stairsDown: {x: 5, y: -5}

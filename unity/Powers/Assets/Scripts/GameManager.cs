@@ -6,15 +6,24 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
+    public class Level {
+        public int level = 1;
+        public Vector2Int player;
+        public Vector2Int stairsUp;
+        public Vector2Int stairsDown;
+        public HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
+        public HashSet<Vector2Int> walls = new HashSet<Vector2Int>();
+        public HashSet<Vector2Int> blocked = new HashSet<Vector2Int>();
+        public HashSet<Vector2Int> visible = new HashSet<Vector2Int>();
+        public HashSet<Vector2Int> revealed = new HashSet<Vector2Int>();
+    }
 
     public static GameManager instance;
+    public int currentLevel = 0;
+    public List<Level> levels = new List<Level>();
 
-    public int level = 1;
-    public HashSet<Vector2Int> floor;
-    public HashSet<Vector2Int> walls;
-    public HashSet<Vector2Int> blocked;
-    public HashSet<Vector2Int> visible;
-    public HashSet<Vector2Int> revealed;
+    public Level level {get {return levels[currentLevel];}}
+    
     public ProceduralGeneratorParameters proc;
     public ProceduralMap[] maps;
 
@@ -22,18 +31,67 @@ public class GameManager : MonoBehaviour
     {
         Random.InitState(proc.seed);
         instance = this;
-        floor = new HashSet<Vector2Int>();
-        walls = new HashSet<Vector2Int>();
-        blocked = new HashSet<Vector2Int>();
+        levels.Add(NewLevel(currentLevel));
+        ChangeMap();
+    }
 
-        visible = new HashSet<Vector2Int>();
-        revealed = new HashSet<Vector2Int>();
+    public Level NewLevel(int nv){
+        Level level = new Level();
+        level.level = nv;
+        int index = Random.Range(0, maps.Length);
+        var map = maps[index];
+        map.Generate();
+        level.floor = map.floor;
+        level.player = map.stairsUp;
+        level.stairsUp = map.stairsUp;
+        level.stairsDown = map.stairsDown;
+        return level;
+    }
 
-        MakeMap();
+    public bool IsUpStairs(Vector2Int pos){
+        return level.level > 0 && pos == level.stairsUp;
+    }
+
+    public bool IsDownStairs(Vector2Int pos){
+        Debug.Log(pos.ToString() + " -- " + level.stairsDown.ToString());
+        return pos == level.stairsDown; // TODO max level
+    }
+
+    public static Vector2Int ToVector2Int(Vector3 vec){
+        return new Vector2Int((int)(vec.x), (int)(vec.y));
+    }
+    public static Vector3 ToVector3(Vector2Int vec){
+        return new Vector3(vec.x, vec.y);
+    }
+
+    public void LevelForward(){
+        int nextLevel = level.level + 1;
+        if(nextLevel >= levels.Count){
+            levels.Add(NewLevel(nextLevel));
+        }
+        level.player = ToVector2Int(proc.player.position);
+        currentLevel = nextLevel;
+        ChangeMap();
+    }
+
+    public void LevelBackward(){
+        int nextLevel = level.level - 1;
+        if(nextLevel < 0){
+            Debug.Log("You cannot ascend to a negative level!");
+            return;
+        }
+        level.player = ToVector2Int(proc.player.position);
+        currentLevel = nextLevel;
+        ChangeMap();
+    }
+
+    public void ChangeMap(){
+        proc.player.position = ToVector3(level.player);
+        proc.cameraPosition.position = new Vector3(proc.player.position.x, proc.player.position.y, proc.cameraPosition.position.z);
+        Clear();
         DetectWalls();
         PaintFloor();
         PaintWalls();
-        proc.cameraPosition.position = new Vector3(proc.player.position.x, proc.player.position.y, proc.cameraPosition.position.z);
     }
 
     public List<Vector2Int> Neighborhood(Vector2Int pos)
@@ -44,7 +102,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < incx.Length; i++)
         {
             var n = new Vector2Int(pos.x + incx[i], pos.y + incy[i]);
-            if (floor.Contains(n) && !blocked.Contains(n))
+            if (level.floor.Contains(n) && !level.blocked.Contains(n))
             {
                 neighborhood.Add(n);
             }
@@ -69,7 +127,7 @@ public class GameManager : MonoBehaviour
 
     public bool isOpaque(Vector2Int pos)
     {
-        return !floor.Contains(pos);
+        return !level.floor.Contains(pos);
     }
 
     public DijkstraMap MakeDijkstraMap(HashSet<Vector2Int> grid)
@@ -86,7 +144,7 @@ public class GameManager : MonoBehaviour
 
         HashSet<Vector2Int> view = FieldOfView(center, radius);
 
-        HashSet<Vector2Int> newRevealed = new HashSet<Vector2Int>(visible);
+        HashSet<Vector2Int> newRevealed = new HashSet<Vector2Int>(level.visible);
         newRevealed.ExceptWith(view);
 
         foreach (var pos in newRevealed)
@@ -102,8 +160,8 @@ public class GameManager : MonoBehaviour
             var tilePosition = proc.fieldOfView.WorldToCell(v);
             proc.fieldOfView.SetTile(tilePosition, null);
         }
-        revealed.UnionWith(view);
-        visible = view;
+        level.revealed.UnionWith(view);
+        level.visible = view;
     }
 
     public HashSet<Vector2Int> FieldOfView(Vector2Int center, int radius)
@@ -113,95 +171,27 @@ public class GameManager : MonoBehaviour
 
     public bool TryMoveTo(Vector2Int current, Vector2Int destination)
     {
-        if (floor.Contains(destination) && !blocked.Contains(destination))
+        if (level.floor.Contains(destination) && !level.blocked.Contains(destination))
         {
-            blocked.Remove(current);
-            blocked.Add(destination);
+            level.blocked.Remove(current);
+            level.blocked.Add(destination);
             return true;
         }
         return false;
-    }
-
-    void MakeMap()
-    {
-        int index = Random.Range(0, maps.Length);
-        var map = maps[index];
-        map.Generate();
-        floor = map.floor;
-        proc.player.position = new Vector3(map.stairsUp.x + 0.5f, map.stairsUp.y + 0.5f, 0);
-    }
-
-    void MakeEmptyMap()
-    {
-        //proc.player.position = new Vector3(proc.center + 0.5f, proc.center + 0.5f, 0);
-        for (int y = proc.center.y - proc.radius; y < proc.center.y + proc.radius; y++)
-        {
-            for (int x = proc.center.x - proc.radius; x < proc.center.x + proc.radius; x++)
-            {
-                floor.Add(new Vector2Int(x, y));
-            }
-        }
-    }
-
-    void MakeBernoulliMap()
-    {
-        for (int y = proc.center.y - proc.radius; y < proc.center.y + proc.radius; y++)
-        {
-            for (int x = proc.center.x - proc.radius; x < proc.center.x + proc.radius; x++)
-            {
-                floor.Add(new Vector2Int(x, y));
-            }
-        }
-        for (int y = proc.center.y - proc.radius + 2; y < proc.center.y + proc.radius; y += 3)
-        {
-            for (int x = proc.center.x - proc.radius + 2; x < proc.center.x + proc.radius; x += 3)
-            {
-                int dx = -1 + Random.Range(0, 2);
-                int dy = -1 + Random.Range(0, 2);
-                floor.Remove(new Vector2Int(x + dx, y + dy));
-            }
-        }
-        //proc.player.position = new Vector3(proc.center + 0.5f, proc.center + 0.5f, 0);
-        floor.Add(proc.center);
-    }
-
-    void MakeRandomWalkMap()
-    {
-        proc.player.position = new Vector3(proc.center.x + 0.5f, proc.center.y + 0.5f, 0);
-        floor.Add(proc.center);
-
-        int length = 100;
-        int iterations = 10;
-        bool reset = false;
-        Vector2Int pos = new Vector2Int(proc.center.x, proc.center.y);
-        Vector2Int[] inc = new Vector2Int[4] { Vector2Int.left, Vector2Int.right, Vector2Int.up, Vector2Int.down };
-        for (int r = 0; r < iterations; r++)
-        {
-            for (int i = 0; i < length; i++)
-            {
-                int index = Random.Range(0, inc.Length);
-                pos += inc[index];
-                floor.Add(pos);
-            }
-            if (reset)
-            {
-                pos = new Vector2Int(proc.center.x, proc.center.y);
-            }
-        }
     }
 
     void DetectWalls()
     {
         int[] incx = new int[8] { -1, -1, -1, +0, +0, +1, +1, +1 };
         int[] incy = new int[8] { -1, +0, +1, -1, +1, -1, +0, +1 };
-        foreach (var pos in floor)
+        foreach (var pos in level.floor)
         {
             for (int i = 0; i < incx.Length; i++)
             {
                 var wall = new Vector2Int(pos.x + incx[i], pos.y + incy[i]);
-                if (!floor.Contains(wall))
+                if (!level.floor.Contains(wall))
                 {
-                    walls.Add(wall);
+                    level.walls.Add(wall);
                 }
             }
         }
@@ -209,48 +199,52 @@ public class GameManager : MonoBehaviour
 
     void PaintFloor()
     {
-        foreach (var pos in floor)
+        foreach (var pos in level.floor)
         {
             int index = Random.Range(0, proc.floorTile.Length);
             TileBase tile = proc.floorTile[index];
-            PaintTile(pos.x, pos.y, tile);
+            PaintTile(pos, tile);
         }
+        // TODO instantiate stairs
+        PaintTile(level.stairsDown, proc.stairsDown);
+        if(level.level > 0)
+            PaintTile(level.stairsUp, proc.stairsUp);
     }
 
     void PaintWalls()
     {
-        foreach (var pos in walls)
+        foreach (var pos in level.walls)
         {
             int mask = 0;
-            if (walls.Contains(new Vector2Int(pos.x, pos.y + 1))) { mask += 1; }
-            if (walls.Contains(new Vector2Int(pos.x, pos.y - 1))) { mask += 2; }
-            if (walls.Contains(new Vector2Int(pos.x - 1, pos.y))) { mask += 4; }
-            if (walls.Contains(new Vector2Int(pos.x + 1, pos.y))) { mask += 8; }
+            if (level.walls.Contains(new Vector2Int(pos.x, pos.y + 1))) { mask += 1; }
+            if (level.walls.Contains(new Vector2Int(pos.x, pos.y - 1))) { mask += 2; }
+            if (level.walls.Contains(new Vector2Int(pos.x - 1, pos.y))) { mask += 4; }
+            if (level.walls.Contains(new Vector2Int(pos.x + 1, pos.y))) { mask += 8; }
             switch (mask)
             {
-                case 0: PaintTile(pos.x, pos.y, proc.wallPillar); break;
-                case 1: PaintTile(pos.x, pos.y, proc.wallNorth); break;
-                case 2: PaintTile(pos.x, pos.y, proc.wallSouth); break;
-                case 3: PaintTile(pos.x, pos.y, proc.wallNorthSouth); break;
-                case 4: PaintTile(pos.x, pos.y, proc.wallWest); break;
-                case 5: PaintTile(pos.x, pos.y, proc.wallNorthWest); break;
-                case 6: PaintTile(pos.x, pos.y, proc.wallSouthWest); break;
-                case 7: PaintTile(pos.x, pos.y, proc.wallNorthSouthWest); break;
-                case 8: PaintTile(pos.x, pos.y, proc.wallEast); break;
-                case 9: PaintTile(pos.x, pos.y, proc.wallNorthEast); break;
-                case 10: PaintTile(pos.x, pos.y, proc.wallSouthEast); break;
-                case 11: PaintTile(pos.x, pos.y, proc.wallNorthSouthEast); break;
-                case 12: PaintTile(pos.x, pos.y, proc.wallEastWest); break;
-                case 13: PaintTile(pos.x, pos.y, proc.wallEastWestNorth); break;
-                case 14: PaintTile(pos.x, pos.y, proc.wallEastWestSouth); break;
-                case 15: PaintTile(pos.x, pos.y, proc.wallAllSides); break;
+                case 0: PaintTile(pos, proc.wallPillar); break;
+                case 1: PaintTile(pos, proc.wallNorth); break;
+                case 2: PaintTile(pos, proc.wallSouth); break;
+                case 3: PaintTile(pos, proc.wallNorthSouth); break;
+                case 4: PaintTile(pos, proc.wallWest); break;
+                case 5: PaintTile(pos, proc.wallNorthWest); break;
+                case 6: PaintTile(pos, proc.wallSouthWest); break;
+                case 7: PaintTile(pos, proc.wallNorthSouthWest); break;
+                case 8: PaintTile(pos, proc.wallEast); break;
+                case 9: PaintTile(pos, proc.wallNorthEast); break;
+                case 10: PaintTile(pos, proc.wallSouthEast); break;
+                case 11: PaintTile(pos, proc.wallNorthSouthEast); break;
+                case 12: PaintTile(pos, proc.wallEastWest); break;
+                case 13: PaintTile(pos, proc.wallEastWestNorth); break;
+                case 14: PaintTile(pos, proc.wallEastWestSouth); break;
+                case 15: PaintTile(pos, proc.wallAllSides); break;
             }
         }
     }
 
-    void PaintTile(int x, int y, TileBase tile)
+    void PaintTile(Vector2Int p, TileBase tile)
     {
-        var pos = new Vector3Int(x, y, 0);
+        var pos = ToVector3(p);
         var tilePosition = proc.tilemap.WorldToCell(pos);
         proc.tilemap.SetTile(tilePosition, tile);
         if (proc.hasFog)
@@ -261,6 +255,7 @@ public class GameManager : MonoBehaviour
 
     void Clear()
     {
+        proc.fieldOfView.ClearAllTiles();
         proc.tilemap.ClearAllTiles();
     }
 }

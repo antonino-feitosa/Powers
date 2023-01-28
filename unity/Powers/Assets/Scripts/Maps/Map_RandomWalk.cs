@@ -10,8 +10,10 @@ public class Map_RandomWalk : ProceduralMap
     public ProceduralMap[] rooms;
     public override void Generate(int level = 1)
     {
-        stairsUp = AddRoom(center, level) + Vector2Int.zero;
-        stairsDown = stairsUp;
+        floor = new HashSet<Vector2Int>();
+        ProceduralMap room = AddRoom(center, level);
+        stairsUp = room.stairsUp;
+        stairsDown = room.stairsDown;
         Vector2Int pos = new Vector2Int(center.x, center.y);
         Vector2Int[] inc = new Vector2Int[4] { Vector2Int.left, Vector2Int.right, Vector2Int.up, Vector2Int.down };
         for (int i = 0; i < iterations; i++)
@@ -22,16 +24,16 @@ public class Map_RandomWalk : ProceduralMap
                 floor.Add(pos);
                 pos += inc[index];
             }
-            stairsDown = AddRoom(pos, level) + Vector2Int.zero;
+            stairsDown = AddRoom(pos, level).stairsDown;
         }
     }
 
-    public Vector2Int AddRoom(Vector2Int pos, int level)
+    public ProceduralMap AddRoom(Vector2Int pos, int level)
     {
         ProceduralMap room = rooms[Random.Range(0, rooms.Length)];
         room.center = pos;
         room.Generate(level);
         floor.UnionWith(room.floor);
-        return room.stairsUp;
+        return room;
     }
 }

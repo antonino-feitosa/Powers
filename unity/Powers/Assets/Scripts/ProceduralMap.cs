@@ -7,7 +7,7 @@ public abstract class ProceduralMap : ScriptableObject
     public int radius = 20;
     [HideInInspector]
     public Vector2Int center = Vector2Int.zero;
-    public HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
+    public HashSet<Vector2Int> floor;
     [HideInInspector]
     public Vector2Int stairsUp = Vector2Int.zero;
     [HideInInspector]

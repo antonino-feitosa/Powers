@@ -9,6 +9,7 @@ public class Room_RandomWalk : ProceduralMap
     public bool restart = false;
     public override void Generate(int level = 1)
     {
+        floor = new HashSet<Vector2Int>();
         stairsUp = new Vector2Int(center.x, center.y);
         
         Vector2Int pos = new Vector2Int(center.x, center.y);
@@ -21,7 +22,7 @@ public class Room_RandomWalk : ProceduralMap
                 pos += inc[index];
                 floor.Add(pos);
             }
-            stairsDown = new Vector2Int(pos.x, pos.y);
+            stairsDown = new Vector2Int(pos.x, pos.y); // can be the upStairs
             if (restart){
                 pos = new Vector2Int(center.x, center.y);
             }

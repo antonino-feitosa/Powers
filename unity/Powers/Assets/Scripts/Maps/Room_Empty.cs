@@ -7,6 +7,7 @@ public class Room_Empty : ProceduralMap
 {
     public override void Generate(int level = 1)
     {
+        floor = new HashSet<Vector2Int>();
         for (int y = center.y - radius; y < center.y + radius + 1; y++)
         {
             for (int x = center.x - radius; x < center.x + radius + 1; x++)

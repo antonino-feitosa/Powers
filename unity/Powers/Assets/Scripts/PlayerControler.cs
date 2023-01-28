@@ -22,29 +22,55 @@ public class PlayerControler : Moveable
 
     public int radius = 5;
 
+    protected enum StatePlayer { Idle, Forward, Backward };
+    protected StatePlayer statePlayer = StatePlayer.Idle;
+
     protected override void Start()
     {
         base.Start();
         var game = GameManager.instance;
-        Vector2Int pos = new Vector2Int((int)transform.position.x, (int)transform.position.y);
+        Vector2Int pos = GameManager.ToVector2Int(transform.position);
         game.ApplyFieldOfView(pos, radius);
     }
 
     void Update()
     {
-        if (state != IDLE)
+        if (stateMoveable != StateMoveable.Idle)
             return;
+
+        if (statePlayer == StatePlayer.Backward)
+        {
+            var game = GameManager.instance;
+            statePlayer = StatePlayer.Idle;
+            game.LevelBackward();
+            return;
+        }
+        else if (statePlayer == StatePlayer.Forward)
+        {
+            var game = GameManager.instance;
+            statePlayer = StatePlayer.Idle;
+            game.LevelForward();
+            return;
+        }
 
         foreach (KeyValuePair<KeyCode, Vector2Int> kvp in mapKeys)
         {
             if (Input.GetKey(kvp.Key))
             {
                 Vector2Int dir = kvp.Value;
+                var game = GameManager.instance;
+                Vector2Int dest = GameManager.ToVector2Int(transform.position) + dir;
                 if (TryMoveTo(dir))
                 {
-                    var game = GameManager.instance;
-                    Vector2Int dest = new Vector2Int((int)(transform.position.x - 0.5f), (int)(transform.position.y - 0.5f));
                     game.ApplyFieldOfView(dest, radius);
+                    if (game.IsUpStairs(dest))
+                    {
+                        statePlayer = StatePlayer.Backward;
+                    }
+                    else if (game.IsDownStairs(dest))
+                    {
+                        statePlayer = StatePlayer.Forward;
+                    }
                 }
                 break;
             }

@@ -21,9 +21,8 @@ public class Moveable : MonoBehaviour
 
     public float moveSpeed = 5f;
 
-    protected const int IDLE = 0;
-    protected const int MOVING = 1;
-    protected int state = IDLE;
+    protected enum StateMoveable {Moving, Idle};
+    protected StateMoveable stateMoveable = StateMoveable.Idle;
     
     private Animator anim;
 
@@ -34,13 +33,13 @@ public class Moveable : MonoBehaviour
 
     protected bool TryMoveTo(Vector2Int dir)
     {
-        Vector2Int origin = new Vector2Int((int)(transform.position.x - 0.5), (int)(transform.position.y - 0.5));
+        Vector2Int origin = GameManager.ToVector2Int(transform.position);
         Vector2Int dest = origin + dir;
 
         var game = GameManager.instance;
         if (game.TryMoveTo(origin, dest))
         {
-            state = MOVING;
+            stateMoveable = StateMoveable.Moving;
             anim.Play("Walk " + mapAnim[dir], 0);
             StartCoroutine(SmoothMovement(dir));
             return true;
@@ -58,6 +57,6 @@ public class Moveable : MonoBehaviour
         }
         transform.position = destination;
         anim.Play("Idle " + mapAnim[dir], 0);
-        state = IDLE;
+        stateMoveable = StateMoveable.Idle;
     }
 }

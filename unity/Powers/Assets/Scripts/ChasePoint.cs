@@ -11,7 +11,7 @@ public class ChasePoint : Moveable
     {
         base.Start();
         var game = GameManager.instance;
-        map = game.MakeDijkstraMap(game.floor);
+        map = game.MakeDijkstraMap(game.level.floor);
         map.AddAttractionPoint(target);
         map.AddRepulsionPoint(new Vector2Int(0, 0), 5, 1.2f);
         map.AddRepulsionPoint(new Vector2Int(-2, 0), 5, 1.2f);
@@ -22,7 +22,7 @@ public class ChasePoint : Moveable
 
     void Update()
     {
-        if (state != IDLE) return;
+        if (stateMoveable != StateMoveable.Idle) return;
 
         Vector2Int current = new Vector2Int((int)(transform.position.x - 0.5f), (int)(transform.position.y - 0.5f));
         if(Vector2Int.Distance(current, target) > 0.05){
