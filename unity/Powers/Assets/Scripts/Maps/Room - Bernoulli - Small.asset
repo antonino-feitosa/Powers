@@ -9,14 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: afc1d4a1ac8a1694d92372f3aae600f8, type: 3}
-  m_Name: Map - Random Walk - M1
+  m_Script: {fileID: 11500000, guid: 49b5589a9f361d647ae5ba27dd582424, type: 3}
+  m_Name: Room - Bernoulli - Small
   m_EditorClassIdentifier: 
-  center: {x: 0, y: 0}
-  radius: 30
+  center: {x: 0, y: 60}
+  radius: 5
   stairsUp: {x: 0, y: 90}
-  stairsDown: {x: 0, y: 220}
-  iterations: 1
-  roomPercent: 1
-  rooms:
-  - {fileID: 11400000, guid: 4d8f6841360d37f4188d694248d88142, type: 2}
+  stairsDown: {x: -30, y: 30}

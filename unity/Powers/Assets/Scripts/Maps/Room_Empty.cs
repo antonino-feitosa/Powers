@@ -15,11 +15,23 @@ public class Room_Empty : ProceduralMap
             }
         }
 
-        int [] xpos = {center.x - radius, 0, center.x + radius};
-        int [] ypos = {center.y - radius, 0, center.y + radius};
-        int px = Random.Range(0, xpos.Length);
-        int py = px == 1 ? 2 * Random.Range(0, 2) : Random.Range(0, ypos.Length);
-        stairsUp = new Vector2Int(xpos[px] + 2 < xpos.Length ? xpos[px] + 2 : 0, ypos[py]);
-        stairsDown = new Vector2Int(xpos[xpos.Length - px], ypos[ypos.Length - py]);
+        List<Vector2Int> points = new List<Vector2Int>{
+            new Vector2Int(center.x - radius, center.y - radius),
+            new Vector2Int(center.x - radius, center.y + 0),
+            new Vector2Int(center.x - radius, center.y + radius),
+            new Vector2Int(center.x, center.y - radius),
+            new Vector2Int(center.x, center.y + 0),
+            new Vector2Int(center.x, center.y + radius),
+            new Vector2Int(center.x + radius, center.y - radius),
+            new Vector2Int(center.x + radius, center.y + 0),
+            new Vector2Int(center.x + radius, center.y + radius)
+        };
+        int index = Random.Range(0, points.Count);
+        stairsUp = points[index];
+        floor.Add(stairsUp);
+        points.RemoveAt(index);
+        index = Random.Range(0, points.Count);
+        stairsDown = points[index];
+        floor.Add(stairsDown);
     }
 }

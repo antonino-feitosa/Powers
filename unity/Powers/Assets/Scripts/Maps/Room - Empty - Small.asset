@@ -9,13 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54fc4befafa4e3c41a562d814d34e835, type: 3}
-  m_Name: Island
+  m_Script: {fileID: 11500000, guid: 26f90c39cc92f124aa93eff6344872ca, type: 3}
+  m_Name: Room - Empty - Small
   m_EditorClassIdentifier: 
   center: {x: 0, y: 0}
-  radius: 15
+  radius: 20
   stairsUp: {x: 0, y: 0}
-  stairsDown: {x: -3, y: 3}
-  iterations: 20
-  length: 20
-  restart: 1
+  stairsDown: {x: 0, y: 0}

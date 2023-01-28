@@ -36,21 +36,23 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Maps\Room_RandomWalk.cs" />
+     <Compile Include="Assets\Scripts\Maps\Room_Bernoulli.cs" />
      <Compile Include="Assets\Scripts\PlayerControler.cs" />
      <Compile Include="Assets\Scripts\CameraFollow.cs" />
      <Compile Include="Assets\Scripts\Loader.cs" />
      <Compile Include="Assets\Scripts\PriorityQueue.cs" />
+     <Compile Include="Assets\Scripts\ProceduralGeneratorParameters.cs" />
      <Compile Include="Assets\Scripts\Moveable.cs" />
      <Compile Include="Assets\Scripts\ChasePoint.cs" />
      <Compile Include="Assets\Scripts\DijkstraMap.cs" />
-     <Compile Include="Assets\Scripts\GameManager.cs" />
-     <Compile Include="Assets\Scripts\FOV.cs" />
-     <Compile Include="Assets\Scripts\ProceduralGeneratorParameters.cs" />
+     <Compile Include="Assets\Scripts\Maps\Map_RandomWalk.cs" />
      <Compile Include="Assets\Scripts\ProceduralMap.cs" />
      <Compile Include="Assets\Scripts\Maps\Room_Empty.cs" />
-     <Compile Include="Assets\Scripts\Maps\Room_RandomWalk.cs" />
-     <Compile Include="Assets\Scripts\Maps\Room_Bernoulli.cs" />
-     <Compile Include="Assets\Scripts\Maps\Map_RandomWalk.cs" />
+     <Compile Include="Assets\Scripts\GameManager.cs" />
+     <Compile Include="Assets\Scripts\FOV.cs" />
+     <Compile Include="Assets\Scripts\CreateAnim.cs" />
+     <Compile Include="Assets\Scripts\CreateAnimEditor.cs" />
     <Reference Include="UnityEngine">
         <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.44f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>

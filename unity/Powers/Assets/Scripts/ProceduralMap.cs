@@ -4,10 +4,9 @@ using UnityEngine;
 
 public abstract class ProceduralMap : ScriptableObject
 {
-    public Vector2Int center = Vector2Int.zero;
-    public int radius = 5;
-
+    public int radius = 20;
     [HideInInspector]
+    public Vector2Int center = Vector2Int.zero;
     public HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
     [HideInInspector]
     public Vector2Int stairsUp = Vector2Int.zero;

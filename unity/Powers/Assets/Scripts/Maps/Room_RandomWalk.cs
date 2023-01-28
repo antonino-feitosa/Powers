@@ -6,7 +6,6 @@ using UnityEngine;
 public class Room_RandomWalk : ProceduralMap
 {
     public int iterations = 20;
-    public int length = 20;
     public bool restart = false;
     public override void Generate(int level = 1)
     {
@@ -16,7 +15,7 @@ public class Room_RandomWalk : ProceduralMap
         Vector2Int[] inc = new Vector2Int[4] { Vector2Int.left, Vector2Int.right, Vector2Int.up, Vector2Int.down };
         for (int r = 0; r < iterations; r++)
         {
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < radius * 2; i++)
             {
                 int index = Random.Range(0, inc.Length);
                 pos += inc[index];
