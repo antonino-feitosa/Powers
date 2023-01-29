@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
         public HashSet<Vector2Int> visible = new HashSet<Vector2Int>();
         public HashSet<Vector2Int> revealed = new HashSet<Vector2Int>();
         public LinkedList<Moveable> turn = new LinkedList<Moveable>();
+        public Dictionary<Vector2Int, List<Moveable>> positionToEntity = new Dictionary<Vector2Int, List<Moveable>>();
     }
 
     public static GameManager instance;
@@ -31,29 +32,36 @@ public class GameManager : MonoBehaviour
     public ProceduralMap[] maps;
     public Moveable player;
 
+    private object Monitor = new object();
     void Awake()
     {
         Random.InitState(proc.seed);
         instance = this;
-        levels.Add(NewLevel(currentLevel));
-        ChangeMap();
+        NewLevel(currentLevel);
+        ChangeMap(currentLevel);
     }
 
     public void NextTurn()
     {
-        Moveable current = level.turn.First.Value;
-        level.turn.RemoveFirst();
-        level.turn.AddLast(current);
+        lock (Monitor)
+        {
+            Moveable current = level.turn.First.Value;
+            level.turn.RemoveFirst();
+            level.turn.AddLast(current);
+        }
     }
 
     void Update()
     {
-        Moveable current = level.turn.First.Value;
-        while (!current.Turn())
+        lock (Monitor)
         {
-            level.turn.RemoveFirst();
-            level.turn.AddLast(current);
-            current = level.turn.First.Value;
+            Moveable current = level.turn.First.Value;
+            while (!current.Turn())
+            {
+                level.turn.RemoveFirst();
+                level.turn.AddLast(current);
+                current = level.turn.First.Value;
+            }
         }
     }
 
@@ -69,6 +77,9 @@ public class GameManager : MonoBehaviour
         level.stairsUp = map.stairsUp;
         level.stairsDown = map.stairsDown;
         level.turn.AddFirst(player);
+        level.positionToEntity.Add(level.player, new List<Moveable> { player });
+        levels.Add(level);
+        AddTraps(level);
         return level;
     }
 
@@ -93,37 +104,86 @@ public class GameManager : MonoBehaviour
 
     public void LevelForward()
     {
-        int nextLevel = level.level + 1;
-        if (nextLevel >= levels.Count)
+        lock (Monitor)
         {
-            levels.Add(NewLevel(nextLevel));
+            int nextLevel = level.level + 1;
+            if (nextLevel >= levels.Count)
+            {
+                NewLevel(nextLevel);
+            }
+            ChangeMap(nextLevel);
         }
-        level.player = ToVector2Int(proc.player.position);
-        currentLevel = nextLevel;
-        ChangeMap();
     }
 
     public void LevelBackward()
     {
-        int nextLevel = level.level - 1;
-        if (nextLevel < 0)
+        lock (Monitor)
         {
-            Debug.Log("You cannot ascend to a negative level!");
-            return;
+            int nextLevel = level.level - 1;
+            if (nextLevel < 0)
+            {
+                Debug.Log("You cannot ascend to a negative level!");
+                return;
+            }
+            ChangeMap(nextLevel);
         }
-        level.player = ToVector2Int(proc.player.position);
-        currentLevel = nextLevel;
-        ChangeMap();
     }
 
-    public void ChangeMap()
+    public void ChangeMap(int nextLevel)
     {
+        if (nextLevel > 0)
+        {
+            level.player = ToVector2Int(proc.player.position);
+            foreach (Moveable ent in level.turn)
+            {
+                ent.gameObject.SetActive(false);
+                Debug.Log("Deactive " + ent.gameObject.name + " " + ent.gameObject.activeSelf);
+            }
+        }
+
+        currentLevel = nextLevel;
+
         proc.player.position = ToVector3(level.player);
         proc.cameraPosition.position = new Vector3(proc.player.position.x, proc.player.position.y, proc.cameraPosition.position.z);
+        foreach (Moveable ent in level.turn)
+        {
+            ent.gameObject.SetActive(true);
+            Debug.Log("Active " + ent.gameObject.name + " " + ent.gameObject.activeSelf);
+        }
         Clear();
         DetectWalls();
         PaintFloor();
         PaintWalls();
+    }
+
+    public bool IsVisible(Vector2Int position)
+    {
+        return !proc.hasFog || level.visible.Contains(position);
+    }
+
+    protected void AddTraps(Level level)
+    {
+        int numFloors = level.floor.Count;
+        int numTraps = Mathf.Max((int)(numFloors * proc.trapFrequency), 1);
+        List<Vector2Int> list = new List<Vector2Int>(level.floor);
+        for (int i = 0; i < numTraps; i++)
+        {
+            var model = proc.traps[Random.Range(0, proc.traps.Length)];
+            for (int j = 0; j < 10; j++)
+            {
+                var pos = list[Random.Range(0, list.Count)];
+                if (model.AcceptPosition(pos))
+                {
+                    if (!level.positionToEntity.ContainsKey(pos))
+                        level.positionToEntity.Add(pos, new List<Moveable>());
+                    var trap = Instantiate(model.gameObject).GetComponent<TriggerTrap>();
+                    trap.gameObject.name = "Trap" + level.level;
+                    level.positionToEntity[pos].Add(trap);
+                    level.turn.AddLast(trap);
+                    break;
+                }
+            }
+        }
     }
 
     public List<Vector2Int> Neighborhood(Vector2Int pos)
@@ -201,15 +261,24 @@ public class GameManager : MonoBehaviour
         return FOV.Calculate(center, radius, isOpaque);
     }
 
-    public bool TryMoveTo(Vector2Int current, Vector2Int destination)
+    public bool TryMoveTo(Moveable entity, Vector2Int current, Vector2Int destination)
     {
-        if (level.floor.Contains(destination) && !level.blocked.Contains(destination))
+        lock (Monitor)
         {
-            level.blocked.Remove(current);
-            level.blocked.Add(destination);
-            return true;
+            if (level.floor.Contains(destination) && !level.blocked.Contains(destination))
+            {
+                level.blocked.Remove(current);
+                level.blocked.Add(destination);
+                level.positionToEntity[current].Remove(entity);
+                if (level.positionToEntity[current].Count == 0)
+                    level.positionToEntity.Remove(current);
+                if (!level.positionToEntity.ContainsKey(destination))
+                    level.positionToEntity.Add(destination, new List<Moveable>());
+                level.positionToEntity[destination].Add(entity);
+                return true;
+            }
+            return false;
         }
-        return false;
     }
 
     void DetectWalls()

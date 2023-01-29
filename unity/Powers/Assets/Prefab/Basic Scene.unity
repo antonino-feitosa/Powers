@@ -192,9 +192,9 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1880683227
-  m_SortingLayer: 2
-  m_SortingOrder: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 1
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -334,8 +334,8 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 918965969
-  m_SortingLayer: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -561,6 +561,9 @@ MonoBehaviour:
   fieldOfView: {fileID: 1122615611}
   player: {fileID: 2409131245762495430}
   cameraPosition: {fileID: 1818550964}
+  traps:
+  - {fileID: 2300946626248862424, guid: 97cc367c2bb11254f81bfee8a08864ce, type: 3}
+  trapFrequency: 0.05
   stairsUp: {fileID: 11400000, guid: f2f6988939a3f65409c4f8c691066a8d, type: 2}
   stairsDown: {fileID: 11400000, guid: 7b8bc0b17e6d5494abe21f8677c48029, type: 2}
   hiddenTile: {fileID: 11400000, guid: 042f9058c8e0e8b48a99df7961a00a8e, type: 2}
@@ -693,9 +696,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1871341493
-  m_SortingLayer: 3
-  m_SortingOrder: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 5
   m_Sprite: {fileID: -2381071629303766383, guid: 42ec5e7fb9e5f2f4b8611e9ebf1ab463, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

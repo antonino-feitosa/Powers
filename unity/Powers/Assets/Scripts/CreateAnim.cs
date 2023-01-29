@@ -60,21 +60,25 @@ public class CreateAnim : MonoBehaviour
             {
                 var dest = new Sprite[4];
                 Array.Copy(sprites, i * 4, dest, 0, 4);
-                var anim = CreateAnimation(prefix, NAMES[i], dest);
+                var anim = CreateAnimation(prefix, NAMES[i], 12, !NAMES[i].StartsWith("Hurt"), dest);
                 anim.name = NAMES[i];
-                anim.wrapMode = anim.name.StartsWith("Hurt") ? WrapMode.Once : WrapMode.Loop;
-                AnimatorState state = controller.AddMotion(anim);
-
+                controller.AddMotion(anim);
             }
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
     }
 
-    protected AnimationClip CreateAnimation(string prefix, string name, Sprite[] sprites)
+    protected AnimationClip CreateAnimation(string prefix, string name, float frameRate, bool isLooping, Sprite[] sprites)
     {
         AnimationClip animClip = new AnimationClip();
         animClip.name = name;
+        animClip.frameRate = frameRate;
+        animClip.wrapMode = isLooping ? WrapMode.Once : WrapMode.Loop;
+
+        AnimationClipSettings clipSettings = new AnimationClipSettings();
+        clipSettings.loopTime = isLooping;
+        AnimationUtility.SetAnimationClipSettings(animClip, clipSettings);
 
         EditorCurveBinding spriteBinding = new EditorCurveBinding();
         spriteBinding.type = typeof(SpriteRenderer);
@@ -85,7 +89,7 @@ public class CreateAnim : MonoBehaviour
         for (int i = 0; i < (sprites.Length); i++)
         {
             spriteKeyFrames[i] = new ObjectReferenceKeyframe();
-            spriteKeyFrames[i].time = i;
+            spriteKeyFrames[i].time = i/animClip.frameRate;
             spriteKeyFrames[i].value = sprites[i];
         }
         AnimationUtility.SetObjectReferenceCurve(animClip, spriteBinding, spriteKeyFrames);

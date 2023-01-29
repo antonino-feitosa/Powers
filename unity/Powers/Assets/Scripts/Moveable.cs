@@ -25,7 +25,7 @@ public class Moveable : MonoBehaviour
     protected enum StateMoveable { Moving, Idle, IdleHurt, MovingHurt };
     protected StateMoveable stateMoveable = StateMoveable.Idle;
 
-    private Animator anim;
+    protected Animator anim;
     private Vector2Int dir = Vector2Int.right;
     private object Monitor = new object();
 
@@ -36,37 +36,36 @@ public class Moveable : MonoBehaviour
 
     public virtual bool Turn()
     {
-        return false; // false -> end of turn
+        if (anim.GetCurrentAnimatorStateInfo(0).normalizedTime > 1)
+        {
+            lock (Monitor)
+            {
+                if (stateMoveable == StateMoveable.IdleHurt)
+                {
+                    anim.Play("Idle " + mapAnim[dir]);
+                    stateMoveable = StateMoveable.Idle;
+                }
+                else if (stateMoveable == StateMoveable.IdleHurt)
+                {
+                    anim.Play("Walk " + mapAnim[dir]);
+                    stateMoveable = StateMoveable.Moving;
+                }
+            }
+        }
+        return false;
     }
 
-    public virtual void ReceiveDamage(Moveable ohter, Action call = null)
+    public virtual void ReceiveDamage(Moveable ohter, string damageType, int damage, Action call = null)
     {
         lock (Monitor)
         {
             if (stateMoveable == StateMoveable.Idle || stateMoveable == StateMoveable.Moving)
             {
-                anim.Play("Hurt " + mapAnim[dir], 1);
+                anim.Play("Hurt " + mapAnim[dir]);
                 if (stateMoveable == StateMoveable.Idle)
                     stateMoveable = StateMoveable.IdleHurt;
                 else if (stateMoveable == StateMoveable.Moving)
                     stateMoveable = StateMoveable.MovingHurt;
-            }
-        }
-    }
-
-    void OnAnimatorMove()
-    {
-        lock (Monitor)
-        {
-            if (stateMoveable == StateMoveable.IdleHurt)
-            {
-                anim.Play("Idle " + mapAnim[dir]);
-                stateMoveable = StateMoveable.Idle;
-            }
-            else if (stateMoveable == StateMoveable.IdleHurt)
-            {
-                anim.Play("Walk " + mapAnim[dir]);
-                stateMoveable = StateMoveable.Moving;
             }
         }
     }
@@ -81,7 +80,7 @@ public class Moveable : MonoBehaviour
             Vector2Int dest = origin + dir;
 
             var game = GameManager.instance;
-            if (game.TryMoveTo(origin, dest))
+            if (game.TryMoveTo(this, origin, dest))
             {
                 stateMoveable = StateMoveable.Moving;
                 anim.Play("Walk " + mapAnim[dir]);

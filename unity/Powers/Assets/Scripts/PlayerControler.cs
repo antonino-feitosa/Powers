@@ -33,27 +33,23 @@ public class PlayerControler : Moveable
 
     public override bool Turn()
     {
-        return true;
-    }
-
-    void Update()
-    {
+        base.Turn();
         if (stateMoveable != StateMoveable.Idle)
-            return;
+            return true;
 
         if (statePlayer == StatePlayer.Backward)
         {
             var game = GameManager.instance;
             statePlayer = StatePlayer.Idle;
             game.LevelBackward();
-            return;
+            return true;
         }
         else if (statePlayer == StatePlayer.Forward)
         {
             var game = GameManager.instance;
             statePlayer = StatePlayer.Idle;
             game.LevelForward();
-            return;
+            return true;
         }
 
         foreach (KeyValuePair<KeyCode, Vector2Int> kvp in mapKeys)
@@ -78,5 +74,6 @@ public class PlayerControler : Moveable
                 break;
             }
         }
+        return true;
     }
 }

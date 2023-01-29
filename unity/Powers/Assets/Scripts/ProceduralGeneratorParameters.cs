@@ -14,6 +14,9 @@ public class ProceduralGeneratorParameters : MonoBehaviour {
 	public Tilemap fieldOfView;
 	public Transform player;
 	public Transform cameraPosition;
+
+	public TriggerTrap [] traps;
+	public float trapFrequency = 0.05f;
 	
 	public TileBase stairsUp;
 	public TileBase stairsDown;
