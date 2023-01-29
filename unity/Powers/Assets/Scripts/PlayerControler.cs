@@ -26,16 +26,12 @@ public class PlayerControler : Moveable
     protected override void Start()
     {
         base.Start();
-        var game = GameManager.instance;
-        Vector2Int pos = GameManager.ToVector2Int(transform.position);
-        game.ApplyFieldOfView(pos, radius);
+        block = true;
     }
 
     public override bool Turn()
     {
-        base.Turn();
-        if (stateMoveable != StateMoveable.Idle)
-            return true;
+        if (base.Turn()) return true;
 
         if (statePlayer == StatePlayer.Backward)
         {

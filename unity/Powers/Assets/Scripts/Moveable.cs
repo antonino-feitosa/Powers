@@ -25,6 +25,9 @@ public class Moveable : MonoBehaviour
     protected enum StateMoveable { Moving, Idle, IdleHurt, MovingHurt };
     protected StateMoveable stateMoveable = StateMoveable.Idle;
 
+    [HideInInspector]
+    public bool block = false;
+    public bool isDead = false;
     protected Animator anim;
     private Vector2Int dir = Vector2Int.right;
     private object Monitor = new object();
@@ -52,7 +55,7 @@ public class Moveable : MonoBehaviour
                 }
             }
         }
-        return false;
+        return stateMoveable != StateMoveable.Idle;
     }
 
     public virtual void ReceiveDamage(Moveable ohter, string damageType, int damage, Action call = null)

@@ -16,23 +16,19 @@ public class TriggerTrap : Moveable
 
     public bool AcceptPosition(Vector2Int pos)
     {
+        var game = GameManager.instance;
+        if(game.HasEntityAt(pos)){
+            return false;
+        }
         int[] incx = new int[8] { -1, -1, -1, +0, +0, +1, +1, +1 };
         int[] incy = new int[8] { -1, +0, +1, -1, +1, -1, +0, +1 };
-        var floor = GameManager.instance.level.floor;
+        var floor = game.level.floor;
         for (int i = 0; i < incx.Length; i++)
         {
             var n = new Vector2Int(pos.x + incx[i], pos.y + incy[i]);
-            if (!floor.Contains(n))
+            if (game.HasEntityAt(pos) || game.level.positionToEntity.ContainsKey(position))
                 return false;
         }
-        if (GameManager.instance.level.positionToEntity.ContainsKey(position))
-            return false;
-        if (GameManager.instance.level.stairsUp == position)
-            return false;
-        if (GameManager.instance.level.stairsDown == position)
-            return false;
-        if (GameManager.instance.level.player == position)
-            return false;
         position = pos;
         transform.position = new Vector3(pos.x, pos.y);
         return true;
@@ -40,9 +36,10 @@ public class TriggerTrap : Moveable
 
     public override bool Turn()
     {
-        base.Turn();
+        if (base.Turn()) return true;
+        
         var game = GameManager.instance;
-        gameObject.SetActive(game.IsVisible(position));
+        gameObject.SetActive(game.IsVisibleAt(position));
 
         if (stateTrap == StateTrap.Idle)
         {
