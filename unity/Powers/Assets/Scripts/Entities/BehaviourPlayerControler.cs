@@ -47,6 +47,11 @@ public class BehaviourPlayerControler : StateBehaviour
             return State.Running;
         }
 
+        if(Input.GetKey(KeyCode.S)){
+            statePlayer = StatePlayer.EndOfTurn;
+            return State.Running;
+        }
+
         foreach (KeyValuePair<KeyCode, Vector2Int> kvp in mapKeys)
         {
             if (Input.GetKey(kvp.Key))

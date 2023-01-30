@@ -4,7 +4,11 @@
 - [x] Refactor Controls
 - [x] Turns
 - [x] Hurt Animation
-- [ ] Trap Spikes
+- [x] Trap Spikes
+- [ ] Death Animation
+- [ ] Battle System
+- [ ] Enemy Follow
+- [ ] Enemy Stand
 - [ ] Enemy Random
 - [ ] Basic HUD
 

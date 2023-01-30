@@ -6,6 +6,10 @@ public class BehaviourEnemyChaseHalfTurn : BehaviourEnemy
 {
     public int radius = 5;
     private bool passTurn = false;
+
+    private enum StateEnemy {Pass, Chase, EndOfTurn};
+    private StateEnemy stateEnemy = StateEnemy.Pass;
+
     public override State Turn(Entity entity)
     {
         var game = GameManager.instance;
@@ -17,20 +21,26 @@ public class BehaviourEnemyChaseHalfTurn : BehaviourEnemy
             return State.Running;
         }
 
-        passTurn = !passTurn;
-        if (passTurn)
-        {
+        if(stateEnemy == StateEnemy.EndOfTurn){
             entity.isEndOfTurn = true;
+            stateEnemy = passTurn ? StateEnemy.Pass : StateEnemy.Chase;
+            passTurn = !passTurn;
+            return State.Running;
+        } else if(stateEnemy == StateEnemy.Pass){
+            stateEnemy = StateEnemy.EndOfTurn;
+            return State.Running;
+        } else if(stateEnemy == StateEnemy.Chase){
+            var map = game.MakeDijkstraMap(game.level.floor);
+            map.AddAttractionPoint(playerPosition);
+            map.Calculate();
+
+            Vector2Int pos = map.Chase(entity.position);
+            var moveable = entity.GetBehaviour<BehaviourMoveable>();
+            moveable.TryMoveTo(entity, pos - entity.position);
+
+            stateEnemy = StateEnemy.EndOfTurn;
             return State.Running;
         }
-
-        var map = game.MakeDijkstraMap(game.level.floor);
-        map.AddAttractionPoint(playerPosition);
-        map.Calculate();
-
-        Vector2Int pos = map.Chase(entity.position);
-        var moveable = entity.GetBehaviour<BehaviourMoveable>();
-        moveable.TryMoveTo(entity, pos - entity.position, () => entity.isEndOfTurn = true);
         return State.Running;
     }
 }

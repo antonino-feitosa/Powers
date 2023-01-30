@@ -92,7 +92,7 @@ public class BehaviourMoveable : StateBehaviour
         }
     }
 
-    public bool TryMoveTo(Entity entity, Vector2Int dir, Action call = null)
+    public bool TryMoveTo(Entity entity, Vector2Int dir)
     {
         if (stateMoveable != StateMoveable.Idle) return false;
 

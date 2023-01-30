@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 1263969626958887705}
   - component: {fileID: 1263969626958887710}
   - component: {fileID: 1263969626958887711}
-  - component: {fileID: 92799075094922761}
+  - component: {fileID: -5117686018401078664}
+  - component: {fileID: -8493232515652860616}
   m_Layer: 0
   m_Name: Enemy Stand
   m_TagString: Untagged
@@ -27,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1263969626958887708}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -20, y: -20, z: 0}
+  m_LocalPosition: {x: 24, y: 4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -72,7 +73,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_Sprite: {fileID: 371996395501438148, guid: 05fc0b668f7912a4cbf8429e7daab1ea, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -104,7 +105,24 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
---- !u!114 &92799075094922761
+--- !u!114 &-5117686018401078664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1263969626958887708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf1a488a43d5e794daff7c06c55579f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  behaviour: {fileID: -8493232515652860616}
+  isBlock: 1
+  isDead: 0
+  isEndOfTurn: 1
+  position: {x: 24, y: 4}
+--- !u!114 &-8493232515652860616
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -116,10 +134,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f820a927da1c6d340b34b03d43810f36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  block: 0
-  isDead: 0
-  damageType: physical
-  damage: 2
-  hp: 10
-  position: {x: -20, y: -20}
+  next: {fileID: 0}

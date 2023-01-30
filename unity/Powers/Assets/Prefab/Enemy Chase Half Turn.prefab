@@ -11,7 +11,10 @@ GameObject:
   - component: {fileID: 5824042782272387664}
   - component: {fileID: 5824042782272387671}
   - component: {fileID: 5824042782272387670}
-  - component: {fileID: 785047372288034568}
+  - component: {fileID: -1129939560859707661}
+  - component: {fileID: 1370324798863017965}
+  - component: {fileID: 2412150162802719939}
+  - component: {fileID: -5736621127212028760}
   m_Layer: 0
   m_Name: Enemy Chase Half Turn
   m_TagString: Untagged
@@ -27,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5824042782272387669}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -20, y: -20, z: 0}
+  m_LocalPosition: {x: 22, y: 4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -72,7 +75,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_Sprite: {fileID: 371996395501438148, guid: 05fc0b668f7912a4cbf8429e7daab1ea, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -104,7 +107,53 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
---- !u!114 &785047372288034568
+--- !u!114 &-1129939560859707661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5824042782272387669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf1a488a43d5e794daff7c06c55579f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  behaviour: {fileID: 1370324798863017965}
+  isBlock: 1
+  isDead: 0
+  isEndOfTurn: 0
+  position: {x: 22, y: 4}
+--- !u!114 &1370324798863017965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5824042782272387669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72f5eeb9d12388c4fad8a75895279ff0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  next: {fileID: 2412150162802719939}
+  moveSpeed: 5
+--- !u!114 &2412150162802719939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5824042782272387669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d199404249bf50478567e3ddc8314d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  next: {fileID: -5736621127212028760}
+  hp: 10
+  attack: 0
+--- !u!114 &-5736621127212028760
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -116,11 +165,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2941c101e8a9d14bb7a9b53d0fbfb6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  block: 0
-  isDead: 0
-  damageType: physical
-  damage: 2
-  hp: 10
-  position: {x: 0, y: 0}
+  next: {fileID: 0}
   radius: 5

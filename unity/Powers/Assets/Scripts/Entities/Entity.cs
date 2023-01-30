@@ -7,7 +7,9 @@ public class Entity : MonoBehaviour
     public StateBehaviour behaviour;
 
     public bool isBlock = false;
+    [HideInInspector]
     public bool isDead = false;
+    [HideInInspector]
     public bool isEndOfTurn = false;
 
     [HideInInspector]

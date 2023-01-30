@@ -46,16 +46,20 @@ public class GameManager : MonoBehaviour
     {
         Entity current = level.turn.First.Value;
         current.DoProcess();
-        if(current.isDead){
+        if (current.isDead)
+        {
             Vector2Int position = ToVector2Int(current.transform.position);
             level.positionToEntity[position].Remove(current);
             level.turn.RemoveFirst();
             Destroy(current);
             Debug.Log("Death of " + current);
-        } else if(current.isEndOfTurn){
+        }
+        else if (current.isEndOfTurn)
+        {
             current.isEndOfTurn = false;
             level.turn.RemoveFirst();
             level.turn.AddLast(current);
+            Debug.Log("Next Turn " + level.turn.First.Value);
         }
     }
 
@@ -95,7 +99,7 @@ public class GameManager : MonoBehaviour
         level.positionToEntity.Add(level.player, new List<Entity> { player.GetComponent<Entity>() });
         levels.Add(level);
         AddTraps(level);
-        //AddEnemies(level);
+        AddEnemies(level);
         return level;
     }
 
@@ -138,7 +142,7 @@ public class GameManager : MonoBehaviour
     }
 
     public bool TryMoveTo(Entity entity, Vector2Int current, Vector2Int destination)
-{
+    {
         if (IsFreePosition(destination))
         {
             level.positionToEntity[current].Remove(entity);
@@ -156,7 +160,7 @@ public class GameManager : MonoBehaviour
     protected void AddEnemies(Level level)
     {
         int numFloors = level.floor.Count;
-        int numEnemies = Mathf.Max((int)(numFloors * proc.enemyFrequency), 1);
+        int numEnemies = (int)(numFloors * proc.enemyFrequency);
         List<Vector2Int> list = new List<Vector2Int>(level.floor);
         for (int i = 0; i < numEnemies; i++)
         {
@@ -241,7 +245,8 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    public static List<Vector2Int> GetDirections(Vector2Int pos){
+    public static List<Vector2Int> GetDirections(Vector2Int pos)
+    {
         int[] incx = new int[8] { -1, -1, -1, +0, +0, +1, +1, +1 };
         int[] incy = new int[8] { -1, +0, +1, -1, +1, -1, +0, +1 };
         List<Vector2Int> neighborhood = new List<Vector2Int>();

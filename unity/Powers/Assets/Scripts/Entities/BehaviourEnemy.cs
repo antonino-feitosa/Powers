@@ -5,17 +5,12 @@ using UnityEngine;
 
 public class BehaviourEnemy : StateBehaviour
 {
-    private Entity entity;
-    void Awake()
-    {
-        entity = GetComponent<Entity>();
-        entity.isBlock = true;
-    }
-
     public bool AcceptPosition(Vector2Int pos)
     {
         var game = GameManager.instance;
-        if (game.HasEntityAt(pos))
+        var playerPosition = game.player.GetComponent<Entity>().position;
+        var entity = GetComponent<Entity>();
+        if (game.HasEntityAt(pos) || Vector2Int.Distance(pos, playerPosition) < 10)
         {
             return false;
         }
@@ -25,12 +20,11 @@ public class BehaviourEnemy : StateBehaviour
         for (int i = 0; i < incx.Length; i++)
         {
             var n = new Vector2Int(pos.x + incx[i], pos.y + incy[i]);
-            if (!floor.Contains(n) || game.HasEntityAt(pos) ||
-                game.level.positionToEntity.ContainsKey(entity.position))
+            if (!floor.Contains(n) || game.HasEntityAt(n) || game.level.positionToEntity.ContainsKey(n))
                 return false;
         }
         entity.position = pos;
-        entity.transform.position = new Vector3(pos.x, pos.y);
+        transform.position = new Vector3(pos.x, pos.y);
         return true;
     }
 
@@ -38,6 +32,7 @@ public class BehaviourEnemy : StateBehaviour
     {
         var game = GameManager.instance;
         entity.gameObject.SetActive(game.IsVisibleAt(entity.position));
+        entity.isEndOfTurn = true;
         return State.Idle;
     }
 }
