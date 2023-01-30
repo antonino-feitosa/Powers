@@ -17,15 +17,15 @@ public class Room_Empty : ProceduralMap
         }
 
         List<Vector2Int> points = new List<Vector2Int>{
-            new Vector2Int(center.x - radius, center.y - radius),
-            new Vector2Int(center.x - radius, center.y + 0),
-            new Vector2Int(center.x - radius, center.y + radius),
-            new Vector2Int(center.x, center.y - radius),
+            new Vector2Int(center.x - radius +1, center.y - radius +1),
+            new Vector2Int(center.x - radius +1, center.y + 0),
+            new Vector2Int(center.x - radius +1, center.y + radius -1),
+            new Vector2Int(center.x, center.y - radius +1),
             new Vector2Int(center.x, center.y + 0),
-            new Vector2Int(center.x, center.y + radius),
-            new Vector2Int(center.x + radius, center.y - radius),
-            new Vector2Int(center.x + radius, center.y + 0),
-            new Vector2Int(center.x + radius, center.y + radius)
+            new Vector2Int(center.x, center.y + radius -1),
+            new Vector2Int(center.x + radius -1, center.y - radius +1),
+            new Vector2Int(center.x + radius -1, center.y + 0),
+            new Vector2Int(center.x + radius -1, center.y + radius -1)
         };
         int index = Random.Range(0, points.Count);
         stairsUp = points[index];

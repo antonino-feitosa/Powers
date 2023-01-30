@@ -16,8 +16,8 @@ public class GameManager : MonoBehaviour
         public HashSet<Vector2Int> walls = new HashSet<Vector2Int>();
         public HashSet<Vector2Int> visible = new HashSet<Vector2Int>();
         public HashSet<Vector2Int> revealed = new HashSet<Vector2Int>();
-        public LinkedList<Moveable> turn = new LinkedList<Moveable>();
-        public Dictionary<Vector2Int, List<Moveable>> positionToEntity = new Dictionary<Vector2Int, List<Moveable>>();
+        public LinkedList<Entity> turn = new LinkedList<Entity>();
+        public Dictionary<Vector2Int, List<Entity>> positionToEntity = new Dictionary<Vector2Int, List<Entity>>();
     }
 
     public static GameManager instance;
@@ -28,80 +28,56 @@ public class GameManager : MonoBehaviour
     public Level level { get { return levels[currentLevel]; } }
 
     public ProceduralGeneratorParameters proc;
-    public PlayerControler player;
+    public BehaviourPlayerControler player;
     public ProceduralMap[] maps;
-    
+
     private object Monitor = new object();
     void Awake()
     {
         Random.InitState(proc.seed);
         instance = this;
         NewLevel(currentLevel);
-        proc.player.position = ToVector3(level.player);
-        proc.cameraPosition.position = new Vector3(proc.player.position.x, proc.player.position.y, proc.cameraPosition.position.z);
+        player.transform.position = ToVector3(level.player);
+        proc.cameraPosition.position = new Vector3(player.transform.position.x, player.transform.position.y, proc.cameraPosition.position.z);
         ChangeMap(currentLevel);
     }
 
-    public void NextTurn()
+    void Update()
     {
-        lock (Monitor)
-        {
-            Moveable current = level.turn.First.Value;
+        Entity current = level.turn.First.Value;
+        current.DoProcess();
+        if(current.isDead){
+            Vector2Int position = ToVector2Int(current.transform.position);
+            level.positionToEntity[position].Remove(current);
+            level.turn.RemoveFirst();
+            Destroy(current);
+            Debug.Log("Death of " + current);
+        } else if(current.isEndOfTurn){
+            current.isEndOfTurn = false;
             level.turn.RemoveFirst();
             level.turn.AddLast(current);
         }
     }
 
-    void Update()
-    {
-        lock (Monitor)
-        {
-            Moveable current = level.turn.First.Value;
-            while (!current.Turn())
-            {
-                if (current.isDead)
-                {
-                    Vector2Int position = new Vector2Int((int)current.transform.position.x, (int)current.transform.position.y);
-                    level.positionToEntity[position].Remove(current);
-                    level.turn.RemoveFirst();
-                    Destroy(current);
-                    current = level.turn.First.Value;
-                }
-                else
-                {
-                    level.turn.RemoveFirst();
-                    level.turn.AddLast(current);
-                    current = level.turn.First.Value;
-                }
-            }
-        }
-    }
-
     public void LevelForward()
     {
-        lock (Monitor)
+        int nextLevel = level.level + 1;
+        if (nextLevel >= levels.Count)
         {
-            int nextLevel = level.level + 1;
-            if (nextLevel >= levels.Count)
-            {
-                NewLevel(nextLevel);
-            }
-            ChangeMap(nextLevel);
+            NewLevel(nextLevel);
         }
+        ChangeMap(nextLevel);
     }
 
     public void LevelBackward()
     {
-        lock (Monitor)
+        int nextLevel = level.level - 1;
+        if (nextLevel < 0)
         {
-            int nextLevel = level.level - 1;
-            if (nextLevel < 0)
-            {
-                Debug.Log("You cannot ascend to a negative level!");
-                return;
-            }
-            ChangeMap(nextLevel);
+            Debug.Log("You cannot ascend to a negative level!");
+            return;
         }
+        ChangeMap(nextLevel);
     }
 
     public Level NewLevel(int nv)
@@ -115,31 +91,31 @@ public class GameManager : MonoBehaviour
         level.player = map.stairsUp;
         level.stairsUp = map.stairsUp;
         level.stairsDown = map.stairsDown;
-        level.turn.AddFirst(player);
-        Debug.Log("Player Position" + level.player.ToString());
-        level.positionToEntity.Add(level.player, new List<Moveable> { player });
+        level.turn.AddFirst(player.GetComponent<Entity>());
+        level.positionToEntity.Add(level.player, new List<Entity> { player.GetComponent<Entity>() });
         levels.Add(level);
         AddTraps(level);
+        //AddEnemies(level);
         return level;
     }
 
     public void ChangeMap(int nextLevel)
     {
-        level.player = ToVector2Int(proc.player.position);
-        foreach (Moveable ent in level.turn)
+        level.player = ToVector2Int(player.transform.position);
+        foreach (Entity ent in level.turn)
         {
             ent.gameObject.SetActive(false);
-            Debug.Log("Deactive " + ent.gameObject.name + " " + ent.gameObject.activeSelf);
+            //Debug.Log("Deactive " + ent.gameObject.name + " " + ent.gameObject.activeSelf);
         }
 
         currentLevel = nextLevel;
 
-        proc.player.position = ToVector3(level.player);
-        proc.cameraPosition.position = new Vector3(proc.player.position.x, proc.player.position.y, proc.cameraPosition.position.z);
-        foreach (Moveable ent in level.turn)
+        player.transform.position = ToVector3(level.player);
+        proc.cameraPosition.position = new Vector3(player.transform.position.x, player.transform.position.y, proc.cameraPosition.position.z);
+        foreach (Entity ent in level.turn)
         {
             ent.gameObject.SetActive(true);
-            Debug.Log("Active " + ent.gameObject.name + " " + ent.gameObject.activeSelf);
+            //Debug.Log("Active " + ent.gameObject.name + " " + ent.gameObject.activeSelf);
         }
         Clear();
         DetectWalls();
@@ -156,27 +132,50 @@ public class GameManager : MonoBehaviour
         bool isFree = level.floor.Contains(position);
         if (isFree && level.positionToEntity.ContainsKey(position))
         {
-            isFree = !level.positionToEntity[position].Find(ent => ent.block);
+            isFree = !level.positionToEntity[position].Find(ent => ent.isBlock);
         }
         return isFree;
     }
 
-    public bool TryMoveTo(Moveable entity, Vector2Int current, Vector2Int destination)
-    {
-        lock (Monitor)
+    public bool TryMoveTo(Entity entity, Vector2Int current, Vector2Int destination)
+{
+        if (IsFreePosition(destination))
         {
-            if (IsFreePosition(destination))
+            level.positionToEntity[current].Remove(entity);
+            entity.position = destination;
+            if (level.positionToEntity[current].Count == 0)
+                level.positionToEntity.Remove(current);
+            if (!level.positionToEntity.ContainsKey(destination))
+                level.positionToEntity.Add(destination, new List<Entity>());
+            level.positionToEntity[destination].Add(entity);
+            return true;
+        }
+        return false;
+    }
+
+    protected void AddEnemies(Level level)
+    {
+        int numFloors = level.floor.Count;
+        int numEnemies = Mathf.Max((int)(numFloors * proc.enemyFrequency), 1);
+        List<Vector2Int> list = new List<Vector2Int>(level.floor);
+        for (int i = 0; i < numEnemies; i++)
+        {
+            var model = proc.enemies[Random.Range(0, proc.enemies.Length)];
+            for (int j = 0; j < 10; j++)
             {
-                Debug.Log("Current Position" + current.ToString());
-                level.positionToEntity[current].Remove(entity);
-                if (level.positionToEntity[current].Count == 0)
-                    level.positionToEntity.Remove(current);
-                if (!level.positionToEntity.ContainsKey(destination))
-                    level.positionToEntity.Add(destination, new List<Moveable>());
-                level.positionToEntity[destination].Add(entity);
-                return true;
+                var pos = list[Random.Range(0, list.Count)];
+                if (model.AcceptPosition(pos))
+                {
+                    if (!level.positionToEntity.ContainsKey(pos))
+                        level.positionToEntity.Add(pos, new List<Entity>());
+                    var enemy = Instantiate(model.gameObject).GetComponent<Entity>();
+                    var enemyBehav = enemy.GetBehaviour<BehaviourEnemy>();
+                    enemy.gameObject.name += " Lv(" + level.level + ") #" + i;
+                    level.positionToEntity[pos].Add(enemy);
+                    level.turn.AddLast(enemy);
+                    break;
+                }
             }
-            return false;
         }
     }
 
@@ -194,9 +193,9 @@ public class GameManager : MonoBehaviour
                 if (model.AcceptPosition(pos))
                 {
                     if (!level.positionToEntity.ContainsKey(pos))
-                        level.positionToEntity.Add(pos, new List<Moveable>());
-                    var trap = Instantiate(model.gameObject).GetComponent<TriggerTrap>();
-                    trap.gameObject.name = "Trap " + level.level + " " + i;
+                        level.positionToEntity.Add(pos, new List<Entity>());
+                    var trap = Instantiate(model.gameObject).GetComponent<Entity>();
+                    trap.gameObject.name += " Lv(" + level.level + ") #" + i;
                     level.positionToEntity[pos].Add(trap);
                     level.turn.AddLast(trap);
                     break;
@@ -204,7 +203,6 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
 
     public bool IsVisibleAt(Vector2Int position)
     {
@@ -241,6 +239,18 @@ public class GameManager : MonoBehaviour
         if (level.player == position)
             return true;
         return false;
+    }
+
+    public static List<Vector2Int> GetDirections(Vector2Int pos){
+        int[] incx = new int[8] { -1, -1, -1, +0, +0, +1, +1, +1 };
+        int[] incy = new int[8] { -1, +0, +1, -1, +1, -1, +0, +1 };
+        List<Vector2Int> neighborhood = new List<Vector2Int>();
+        for (int i = 0; i < incx.Length; i++)
+        {
+            var n = new Vector2Int(pos.x + incx[i], pos.y + incy[i]);
+            neighborhood.Add(n);
+        }
+        return neighborhood;
     }
 
     public List<Vector2Int> Neighborhood(Vector2Int pos)
@@ -284,6 +294,11 @@ public class GameManager : MonoBehaviour
         return new DijkstraMap(grid, Neighborhood, MoveCost);
     }
 
+    public HashSet<Vector2Int> FieldOfView(Vector2Int center, int radius)
+    {
+        return FOV.Calculate(center, radius, isOpaque);
+    }
+
     public void ApplyFieldOfView(Vector2Int center, int radius)
     {
         if (!proc.hasFog)
@@ -311,11 +326,6 @@ public class GameManager : MonoBehaviour
         }
         level.revealed.UnionWith(view);
         level.visible = view;
-    }
-
-    public HashSet<Vector2Int> FieldOfView(Vector2Int center, int radius)
-    {
-        return FOV.Calculate(center, radius, isOpaque);
     }
 
     void DetectWalls()

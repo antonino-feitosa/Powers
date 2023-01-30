@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerControler : Moveable
+public class BehaviourPlayerControler : StateBehaviour
 {
     private static Dictionary<KeyCode, Vector2Int> mapKeys;
 
-    static PlayerControler()
+    static BehaviourPlayerControler()
     {
         mapKeys = new Dictionary<KeyCode, Vector2Int>();
         mapKeys.Add(KeyCode.D, new Vector2Int(+1, +0));
@@ -23,29 +23,28 @@ public class PlayerControler : Moveable
     protected enum StatePlayer { Idle, EndOfTurn, Forward, Backward };
     protected StatePlayer statePlayer = StatePlayer.Idle;
 
-    protected override void Start()
+    public override State Turn(Entity entity)
     {
-        base.Start();
-        block = true;
-    }
-
-    public override bool Turn()
-    {
-        if (base.Turn()) return true;
-
-        if (statePlayer == StatePlayer.Backward)
+        var game = GameManager.instance;
+        if (statePlayer == StatePlayer.EndOfTurn)
         {
-            var game = GameManager.instance;
+            entity.isEndOfTurn = true;
+            statePlayer = StatePlayer.Idle;
+            return State.Running;
+        }
+        else if (statePlayer == StatePlayer.Backward)
+        {
+            entity.isEndOfTurn = true;
             statePlayer = StatePlayer.Idle;
             game.LevelBackward();
-            return true;
+            return State.Running;
         }
         else if (statePlayer == StatePlayer.Forward)
         {
-            var game = GameManager.instance;
+            entity.isEndOfTurn = true;
             statePlayer = StatePlayer.Idle;
             game.LevelForward();
-            return true;
+            return State.Running;
         }
 
         foreach (KeyValuePair<KeyCode, Vector2Int> kvp in mapKeys)
@@ -53,9 +52,10 @@ public class PlayerControler : Moveable
             if (Input.GetKey(kvp.Key))
             {
                 Vector2Int dir = kvp.Value;
-                var game = GameManager.instance;
-                Vector2Int dest = GameManager.ToVector2Int(transform.position) + dir;
-                if (TryMoveTo(dir, () => game.NextTurn()))
+                var position = entity.transform.position;
+                Vector2Int dest = GameManager.ToVector2Int(position) + dir;
+                var moveable = entity.GetBehaviour<BehaviourMoveable>();
+                if (moveable.TryMoveTo(entity, dir))
                 {
                     game.ApplyFieldOfView(dest, radius);
                     if (game.IsUpStairs(dest))
@@ -66,10 +66,14 @@ public class PlayerControler : Moveable
                     {
                         statePlayer = StatePlayer.Forward;
                     }
+                    else
+                    {
+                        statePlayer = StatePlayer.EndOfTurn;
+                    }
                 }
                 break;
             }
         }
-        return true;
+        return State.Running;
     }
 }

@@ -14,4 +14,10 @@ public abstract class ProceduralMap : ScriptableObject
     public Vector2Int stairsDown = Vector2Int.zero;
 
     public abstract void Generate(int level = 1);
+
+    public void PutFloorAtNeighborhood(Vector2Int pos){
+        foreach(var p in GameManager.GetDirections(pos)){
+            floor.Add(p);
+        }
+    }
 }

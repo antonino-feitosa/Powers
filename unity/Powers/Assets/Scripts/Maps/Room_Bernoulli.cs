@@ -20,5 +20,7 @@ public class Room_Bernoulli : Room_Empty
         }
         floor.Add(stairsUp);
         floor.Add(stairsDown);
+        PutFloorAtNeighborhood(stairsUp);
+        PutFloorAtNeighborhood(stairsDown);
     }
 }

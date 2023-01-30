@@ -555,15 +555,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   seed: 0
   radius: 5
-  hasFog: 1
+  hasFog: 0
   center: {x: 0, y: 0}
   tilemap: {fileID: 1470512911}
   fieldOfView: {fileID: 1122615611}
-  player: {fileID: 2409131245762495430}
   cameraPosition: {fileID: 1818550964}
   traps:
-  - {fileID: 2300946626248862424, guid: 97cc367c2bb11254f81bfee8a08864ce, type: 3}
+  - {fileID: -4323743018913575090, guid: 97cc367c2bb11254f81bfee8a08864ce, type: 3}
   trapFrequency: 0.05
+  enemies: []
+  enemyFrequency: 0.1
   stairsUp: {fileID: 11400000, guid: f2f6988939a3f65409c4f8c691066a8d, type: 2}
   stairsDown: {fileID: 11400000, guid: 7b8bc0b17e6d5494abe21f8677c48029, type: 2}
   hiddenTile: {fileID: 11400000, guid: 042f9058c8e0e8b48a99df7961a00a8e, type: 2}
@@ -608,7 +609,7 @@ MonoBehaviour:
   currentLevel: 0
   maxLevel: 100
   proc: {fileID: 1967526702}
-  player: {fileID: 9113324638653074204}
+  player: {fileID: 9113324638653074206}
   maps:
   - {fileID: 11400000, guid: ad806efbc989612449cadf30994be1ec, type: 2}
 --- !u!4 &1967526704
@@ -633,7 +634,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9113324638653074203}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -1.276, y: -0.024, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -721,7 +722,10 @@ GameObject:
   - component: {fileID: 2409131245762495430}
   - component: {fileID: 5315964529830537735}
   - component: {fileID: 3352349584279254510}
+  - component: {fileID: 9113324638653074205}
   - component: {fileID: 9113324638653074204}
+  - component: {fileID: 9113324638653074207}
+  - component: {fileID: 9113324638653074206}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -738,10 +742,53 @@ MonoBehaviour:
   m_GameObject: {fileID: 9113324638653074203}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72f5eeb9d12388c4fad8a75895279ff0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  next: {fileID: 9113324638653074207}
+  moveSpeed: 5
+--- !u!114 &9113324638653074205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9113324638653074203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf1a488a43d5e794daff7c06c55579f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  behaviour: {fileID: 9113324638653074204}
+  isBlock: 1
+  position: {x: 0, y: 0}
+  state: 0
+--- !u!114 &9113324638653074206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9113324638653074203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e5f7a45768206043a05e2bad3b8c839, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  block: 0
-  isDead: 0
+  next: {fileID: 0}
   radius: 5
+--- !u!114 &9113324638653074207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9113324638653074203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d199404249bf50478567e3ddc8314d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  next: {fileID: 9113324638653074206}
+  hp: 10
+  attack: 0

@@ -11,6 +11,7 @@ public class Room_RandomWalk : ProceduralMap
     {
         floor = new HashSet<Vector2Int>();
         stairsUp = new Vector2Int(center.x, center.y);
+        PutFloorAtNeighborhood(center);
         
         Vector2Int pos = new Vector2Int(center.x, center.y);
         Vector2Int[] inc = new Vector2Int[4] { Vector2Int.left, Vector2Int.right, Vector2Int.up, Vector2Int.down };
@@ -27,5 +28,6 @@ public class Room_RandomWalk : ProceduralMap
                 pos = new Vector2Int(center.x, center.y);
             }
         }
+        PutFloorAtNeighborhood(stairsDown);
     }
 }
