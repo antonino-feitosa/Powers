@@ -560,13 +560,13 @@ MonoBehaviour:
   tilemap: {fileID: 1470512911}
   fieldOfView: {fileID: 1122615611}
   cameraPosition: {fileID: 1818550964}
+  frequencyTraps: 0.01
   traps:
-  - {fileID: -4323743018913575090, guid: 97cc367c2bb11254f81bfee8a08864ce, type: 3}
-  trapFrequency: 0.05
+  - {fileID: 421918363665818458, guid: 97cc367c2bb11254f81bfee8a08864ce, type: 3}
+  frequencyEnemies: 0.01
   enemies:
-  - {fileID: -5736621127212028760, guid: f68414d1c903fb74ba386cb0cb9cd15f, type: 3}
+  - {fileID: 6229937400314244921, guid: f68414d1c903fb74ba386cb0cb9cd15f, type: 3}
   - {fileID: -8493232515652860616, guid: eab1ad91c1849bf48b544e8b78b6a95b, type: 3}
-  enemyFrequency: 0.05
   stairsUp: {fileID: 11400000, guid: f2f6988939a3f65409c4f8c691066a8d, type: 2}
   stairsDown: {fileID: 11400000, guid: 7b8bc0b17e6d5494abe21f8677c48029, type: 2}
   hiddenTile: {fileID: 11400000, guid: 042f9058c8e0e8b48a99df7961a00a8e, type: 2}
@@ -766,6 +766,8 @@ MonoBehaviour:
   isDead: 0
   isEndOfTurn: 0
   position: {x: 0, y: 0}
+  direction: {x: 1, y: 0}
+  animator: {fileID: 0}
 --- !u!114 &9113324638653074206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -795,3 +797,4 @@ MonoBehaviour:
   next: {fileID: 9113324638653074206}
   hp: 10
   attack: 0
+  numTurnsDying: 10

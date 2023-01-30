@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 10
   center: {x: 0, y: 0}
-  stairsUp: {x: 0, y: 0}
-  stairsDown: {x: 40, y: -35}
-  iterations: 2
+  stairsUp: {x: 4, y: 0}
+  stairsDown: {x: 4, y: -4}
+  iterations: 0
   roomPercent: 1
   rooms:
   - {fileID: 11400000, guid: 4d8f6841360d37f4188d694248d88142, type: 2}

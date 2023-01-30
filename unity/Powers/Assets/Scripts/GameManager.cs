@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
     public Level level { get { return levels[currentLevel]; } }
 
     public ProceduralGeneratorParameters proc;
-    public BehaviourPlayerControler player;
+    public BH_PlayerControler player;
     public ProceduralMap[] maps;
 
     private object Monitor = new object();
@@ -52,14 +52,12 @@ public class GameManager : MonoBehaviour
             level.positionToEntity[position].Remove(current);
             level.turn.RemoveFirst();
             Destroy(current);
-            Debug.Log("Death of " + current);
         }
         else if (current.isEndOfTurn)
         {
             current.isEndOfTurn = false;
             level.turn.RemoveFirst();
             level.turn.AddLast(current);
-            Debug.Log("Next Turn " + level.turn.First.Value);
         }
     }
 
@@ -145,8 +143,8 @@ public class GameManager : MonoBehaviour
     {
         if (IsFreePosition(destination))
         {
-            level.positionToEntity[current].Remove(entity);
             entity.position = destination;
+            level.positionToEntity[current].Remove(entity);
             if (level.positionToEntity[current].Count == 0)
                 level.positionToEntity.Remove(current);
             if (!level.positionToEntity.ContainsKey(destination))
@@ -160,7 +158,7 @@ public class GameManager : MonoBehaviour
     protected void AddEnemies(Level level)
     {
         int numFloors = level.floor.Count;
-        int numEnemies = (int)(numFloors * proc.enemyFrequency);
+        int numEnemies = (int)(numFloors * proc.frequencyEnemies);
         List<Vector2Int> list = new List<Vector2Int>(level.floor);
         for (int i = 0; i < numEnemies; i++)
         {
@@ -172,8 +170,8 @@ public class GameManager : MonoBehaviour
                 {
                     if (!level.positionToEntity.ContainsKey(pos))
                         level.positionToEntity.Add(pos, new List<Entity>());
-                    var enemy = Instantiate(model.gameObject).GetComponent<Entity>();
-                    var enemyBehav = enemy.GetBehaviour<BehaviourEnemy>();
+                    var enemyObject = Instantiate(model.gameObject, ToVector3(pos), Quaternion.identity);
+                    var enemy = enemyObject.GetComponent<Entity>();
                     enemy.gameObject.name += " Lv(" + level.level + ") #" + i;
                     level.positionToEntity[pos].Add(enemy);
                     level.turn.AddLast(enemy);
@@ -186,7 +184,7 @@ public class GameManager : MonoBehaviour
     protected void AddTraps(Level level)
     {
         int numFloors = level.floor.Count;
-        int numTraps = Mathf.Max((int)(numFloors * proc.trapFrequency), 1);
+        int numTraps = (int)(numFloors * proc.frequencyTraps);
         List<Vector2Int> list = new List<Vector2Int>(level.floor);
         for (int i = 0; i < numTraps; i++)
         {
@@ -198,7 +196,8 @@ public class GameManager : MonoBehaviour
                 {
                     if (!level.positionToEntity.ContainsKey(pos))
                         level.positionToEntity.Add(pos, new List<Entity>());
-                    var trap = Instantiate(model.gameObject).GetComponent<Entity>();
+                    var trapObject = Instantiate(model.gameObject, ToVector3(pos), Quaternion.identity);
+                    var trap = trapObject.GetComponent<Entity>();
                     trap.gameObject.name += " Lv(" + level.level + ") #" + i;
                     level.positionToEntity[pos].Add(trap);
                     level.turn.AddLast(trap);
@@ -232,6 +231,11 @@ public class GameManager : MonoBehaviour
         return new Vector3(vec.x, vec.y);
     }
 
+    public Vector2Int GetPlayerPosition()
+    {
+        return player.GetComponent<Entity>().position;
+    }
+
     public bool HasEntityAt(Vector2Int position)
     {
         if (level.positionToEntity.ContainsKey(position))
@@ -245,27 +249,12 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    public static List<Vector2Int> GetDirections(Vector2Int pos)
-    {
-        int[] incx = new int[8] { -1, -1, -1, +0, +0, +1, +1, +1 };
-        int[] incy = new int[8] { -1, +0, +1, -1, +1, -1, +0, +1 };
-        List<Vector2Int> neighborhood = new List<Vector2Int>();
-        for (int i = 0; i < incx.Length; i++)
-        {
-            var n = new Vector2Int(pos.x + incx[i], pos.y + incy[i]);
-            neighborhood.Add(n);
-        }
-        return neighborhood;
-    }
-
     public List<Vector2Int> Neighborhood(Vector2Int pos)
     {
-        int[] incx = new int[8] { -1, -1, -1, +0, +0, +1, +1, +1 };
-        int[] incy = new int[8] { -1, +0, +1, -1, +1, -1, +0, +1 };
         List<Vector2Int> neighborhood = new List<Vector2Int>();
-        for (int i = 0; i < incx.Length; i++)
+        foreach (var p in Entity.Directions)
         {
-            var n = new Vector2Int(pos.x + incx[i], pos.y + incy[i]);
+            var n = pos + p;
             if (IsFreePosition(n))
             {
                 neighborhood.Add(n);
@@ -335,13 +324,11 @@ public class GameManager : MonoBehaviour
 
     void DetectWalls()
     {
-        int[] incx = new int[8] { -1, -1, -1, +0, +0, +1, +1, +1 };
-        int[] incy = new int[8] { -1, +0, +1, -1, +1, -1, +0, +1 };
         foreach (var pos in level.floor)
         {
-            for (int i = 0; i < incx.Length; i++)
+            foreach (var d in Entity.Directions)
             {
-                var wall = new Vector2Int(pos.x + incx[i], pos.y + incy[i]);
+                var wall = pos + d;
                 if (!level.floor.Contains(wall))
                 {
                     level.walls.Add(wall);

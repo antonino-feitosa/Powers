@@ -16,8 +16,8 @@ public abstract class ProceduralMap : ScriptableObject
     public abstract void Generate(int level = 1);
 
     public void PutFloorAtNeighborhood(Vector2Int pos){
-        foreach(var p in GameManager.GetDirections(pos)){
-            floor.Add(p);
+        foreach(var p in Entity.Directions){
+            floor.Add(pos + p);
         }
     }
 }

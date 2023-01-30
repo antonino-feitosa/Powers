@@ -12,7 +12,10 @@ GameObject:
   - component: {fileID: 2300946626248862425}
   - component: {fileID: 2300946626248862426}
   - component: {fileID: -7433974547557156340}
-  - component: {fileID: -4323743018913575090}
+  - component: {fileID: 2883851736860814514}
+  - component: {fileID: 509202374035372309}
+  - component: {fileID: 421918363665818458}
+  - component: {fileID: 2296534719148040382}
   m_Layer: 0
   m_Name: Trap Floor Spikes
   m_TagString: Untagged
@@ -28,7 +31,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2300946626248862427}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: -2, z: 0}
+  m_LocalPosition: {x: -4, y: -2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -117,12 +120,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf1a488a43d5e794daff7c06c55579f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  behaviour: {fileID: -4323743018913575090}
+  behaviour: {fileID: 2883851736860814514}
   isBlock: 0
   isDead: 0
   isEndOfTurn: 0
   position: {x: 2, y: -2}
---- !u!114 &-4323743018913575090
+  direction: {x: 1, y: 0}
+  animator: {fileID: 0}
+--- !u!114 &2883851736860814514
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -131,8 +136,48 @@ MonoBehaviour:
   m_GameObject: {fileID: 2300946626248862427}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dcca9e6859d0cbe4584c5f5f7cee3d9a, type: 3}
+  m_Script: {fileID: 11500000, guid: 1a3a2fe7f3eba5a48963b27a7e6125d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  next: {fileID: 509202374035372309}
+  runInBackground: 0
+--- !u!114 &509202374035372309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2300946626248862427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 806a33e0c943ff748a8d49b1fc6ce484, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  next: {fileID: 421918363665818458}
+--- !u!114 &421918363665818458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2300946626248862427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42dfa9536c5f9f5459778d19e3b3cd77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  next: {fileID: 2296534719148040382}
+  damage: 1
+--- !u!114 &2296534719148040382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2300946626248862427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1d6909d0e8db340b1548ce26066869, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   next: {fileID: 0}
-  damage: 1

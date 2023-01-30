@@ -23,6 +23,16 @@ public class CreateAnim : MonoBehaviour
         "Idle DownLeft",
         "Idle Up",
         "Idle UpLeft",
+
+        "Rest Right",
+        "Rest UpRight",
+        "Rest Down",
+        "Rest DownRight",
+        "Rest Left",
+        "Rest DownLeft",
+        "Rest Up",
+        "Rest UpLeft",
+
         "Walk Right",
         "Walk UpRight",
         "Walk Down",
@@ -31,6 +41,7 @@ public class CreateAnim : MonoBehaviour
         "Walk DownLeft",
         "Walk Up",
         "Walk UpLeft",
+
         "Run Right",
         "Run UpRight",
         "Run Down",
@@ -39,6 +50,7 @@ public class CreateAnim : MonoBehaviour
         "Run DownLeft",
         "Run Up",
         "Run UpLeft",
+
         "Hurt Right",
         "Hurt UpRight",
         "Hurt Down",
@@ -46,7 +58,25 @@ public class CreateAnim : MonoBehaviour
         "Hurt Left",
         "Hurt DownLeft",
         "Hurt Up",
-        "Hurt UpLeft"
+        "Hurt UpLeft",
+
+        "Dead Right",
+        "Dead UpRight",
+        "Dead Down",
+        "Dead DownRight",
+        "Dead Left",
+        "Dead DownLeft",
+        "Dead Up",
+        "Dead UpLeft",
+
+        "Fade Right",
+        "Fade UpRight",
+        "Fade Down",
+        "Fade DownRight",
+        "Fade Left",
+        "Fade DownLeft",
+        "Fade Up",
+        "Fade UpLeft"
     };
 
     public void Create()

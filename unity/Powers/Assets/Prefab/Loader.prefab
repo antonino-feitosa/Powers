@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7984261815641433102
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7984261815641433107}
+  - component: {fileID: 7984261815641433100}
+  - component: {fileID: 7984261815641433101}
+  m_Layer: 0
+  m_Name: Loader
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7984261815641433107
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7984261815641433102}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7984261815641433100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7984261815641433102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42dcfa448e2f0ec4c949a63d62fcc036, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentLevel: 0
+  maxLevel: 100
+  proc: {fileID: 7984261815641433101}
+  player: {fileID: 0}
+  maps:
+  - {fileID: 11400000, guid: ad806efbc989612449cadf30994be1ec, type: 2}
+--- !u!114 &7984261815641433101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7984261815641433102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e7ab658b9b2adf4aa279bf168436e65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  seed: 0
+  radius: 5
+  hasFog: 0
+  center: {x: 0, y: 0}
+  tilemap: {fileID: 0}
+  fieldOfView: {fileID: 0}
+  cameraPosition: {fileID: 0}
+  frequencyTraps: 0.1
+  traps:
+  - {fileID: 421918363665818458, guid: 97cc367c2bb11254f81bfee8a08864ce, type: 3}
+  frequencyEnemies: 0.1
+  enemies:
+  - {fileID: -8493232515652860616, guid: eab1ad91c1849bf48b544e8b78b6a95b, type: 3}
+  - {fileID: 6229937400314244921, guid: f68414d1c903fb74ba386cb0cb9cd15f, type: 3}
+  stairsUp: {fileID: 11400000, guid: f2f6988939a3f65409c4f8c691066a8d, type: 2}
+  stairsDown: {fileID: 11400000, guid: 7b8bc0b17e6d5494abe21f8677c48029, type: 2}
+  hiddenTile: {fileID: 11400000, guid: 042f9058c8e0e8b48a99df7961a00a8e, type: 2}
+  revealedTile: {fileID: 11400000, guid: 45752e6d6a37fbb44b32b8d71cbf358c, type: 2}
+  floorTile:
+  - {fileID: 11400000, guid: e6a01227b5f515d419176d5753743748, type: 2}
+  - {fileID: 11400000, guid: 37b3d6d49f368ad4e90b9e5689c97a00, type: 2}
+  - {fileID: 11400000, guid: 39f62d0e049340541bf491bc2f35c0fc, type: 2}
+  - {fileID: 11400000, guid: ad714ffc2a94ed54287bd35fa0a5d1ac, type: 2}
+  - {fileID: 11400000, guid: f4198609bb9423c42b2e9aa18a62cbfc, type: 2}
+  - {fileID: 11400000, guid: 53eab1c4bdee898469813bbec693f251, type: 2}
+  - {fileID: 11400000, guid: 6b587298e6fbee84eb286a06e3927383, type: 2}
+  - {fileID: 11400000, guid: 0c3f5707c72207a4d90ea40feed5eab6, type: 2}
+  wallPillar: {fileID: 11400000, guid: 80e6022f512b24a47858f71b4c41ffbd, type: 2}
+  wallNorth: {fileID: 11400000, guid: a6cd8f5fba631e34ca0a4e12634a10d9, type: 2}
+  wallSouth: {fileID: 11400000, guid: d574cdbb7e039734cba8df350d4b38b6, type: 2}
+  wallNorthSouth: {fileID: 11400000, guid: 90ca25d7bf92f9b468602be4751c3a2d, type: 2}
+  wallWest: {fileID: 11400000, guid: 622ed832300569c4abd3f8bac28def6f, type: 2}
+  wallNorthWest: {fileID: 11400000, guid: c66c9ff0bbc055943bde6bf8cb439acf, type: 2}
+  wallSouthWest: {fileID: 11400000, guid: 950d548ac489ea2418ffc633e777e9e3, type: 2}
+  wallNorthSouthWest: {fileID: 11400000, guid: 6fb14181955042241af865c9d9ecf175, type: 2}
+  wallEast: {fileID: 11400000, guid: 2478f21f01045f64fb0a53bc9c7a0647, type: 2}
+  wallNorthEast: {fileID: 11400000, guid: 94a67d58338c7f24fa4c8e0bbd07eae2, type: 2}
+  wallSouthEast: {fileID: 11400000, guid: 2f98be8cf30b724469f260e7059a9af0, type: 2}
+  wallNorthSouthEast: {fileID: 11400000, guid: da72f42e5478bee41b109717c8674362, type: 2}
+  wallEastWest: {fileID: 11400000, guid: 3a5b95a7afb36c846800eb68896afab6, type: 2}
+  wallEastWestSouth: {fileID: 11400000, guid: e764e6a8344268445a6ca406196e77fa, type: 2}
+  wallEastWestNorth: {fileID: 11400000, guid: 5bcd86b700fb226489f357104db837ee, type: 2}
+  wallAllSides: {fileID: 11400000, guid: 1f6878be27d079c48a6686b98b7fbafd, type: 2}

@@ -13,11 +13,12 @@ public class ProceduralGeneratorParameters : MonoBehaviour {
     public Tilemap tilemap;
 	public Tilemap fieldOfView;
 	public Transform cameraPosition;
-
-	public BehaviourTriggerTrap [] traps;
-	public float trapFrequency = 0.1f;
-	public BehaviourEnemy [] enemies;
-	public float enemyFrequency = 0.1f;
+	public float frequencyTraps = 0.1f;
+	public BH_Trap [] traps;
+	
+	public float frequencyEnemies = 0.1f;
+	public BH_Enemy [] enemies;
+	
 	
 	public TileBase stairsUp;
 	public TileBase stairsDown;
