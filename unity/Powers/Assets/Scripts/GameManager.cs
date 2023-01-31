@@ -69,12 +69,17 @@ public class GameManager : MonoBehaviour
     public ProceduralGeneratorParameters proc;
     public BH_PlayerControler player;
     public ProceduralMap[] maps;
+    private AudioSource audioSource;
 
     void OnGUI()
     {
         GUI.color = Color.green;
-        var unit = player.GetComponent<BH_Unit>();
-        GUI.Label(new Rect(10, 10, 200, 20), "Health Points: " + unit.hp + "/10");
+        if(player){
+            var unit = player.GetComponent<BH_Unit>();
+            GUI.Label(new Rect(10, 10, 200, 20), "Health Points: " + unit.hp + "/10");
+        } else {
+            GUI.Label(new Rect(10, 10, 200, 20), "You died!");
+        }
     }
 
     private object Monitor = new object();
@@ -82,6 +87,8 @@ public class GameManager : MonoBehaviour
     {
         Random.InitState(proc.seed);
         instance = this;
+        audioSource = GetComponent<AudioSource>();
+        audioSource.Play();
         NewLevel(currentLevel);
         player.transform.position = ToVector3(level.player);
         proc.cameraPosition.position = new Vector3(player.transform.position.x, player.transform.position.y, proc.cameraPosition.position.z);
@@ -97,6 +104,9 @@ public class GameManager : MonoBehaviour
             Vector2Int position = ToVector2Int(current.transform.position);
             level.positionToEntity[position].Remove(current);
             level.turn.RemoveFirst();
+            if(current.GetBehaviour<BH_PlayerControler>()){
+                player = null; // game over
+            }
             Destroy(current.gameObject);
         }
         else if (current.isEndOfTurn)
@@ -225,6 +235,10 @@ public class GameManager : MonoBehaviour
     public static Vector3 ToVector3(Vector2Int vec)
     {
         return new Vector3(vec.x, vec.y);
+    }
+
+    public bool HasPlayer(){
+        return player != null;
     }
 
     public Vector2Int GetPlayerPosition()

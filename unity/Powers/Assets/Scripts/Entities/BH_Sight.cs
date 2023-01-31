@@ -8,17 +8,21 @@ public class BH_Sight : StateBehaviourDecision
     public override State Turn(Entity entity)
     {
         var game = GameManager.instance;
+        if(!game.HasPlayer()){
+            SetAlternativeFlow();
+            return State.Idle;
+        }
+
         var playerPosition = game.GetPlayerPosition();
         var view = game.FieldOfView(entity.position, viewRadius);
         if (view.Contains(playerPosition))
         {
             SetNormalFlow();
-            return State.Idle;
         }
         else
         {
             SetAlternativeFlow();
-            return State.Running;
         }
+        return State.Idle;
     }
 }

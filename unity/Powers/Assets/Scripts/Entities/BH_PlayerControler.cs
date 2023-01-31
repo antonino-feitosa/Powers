@@ -68,6 +68,17 @@ public class BH_PlayerControler : StateBehaviour
                             {
                                 statePlayer = StatePlayer.Forward;
                             }
+                        } else {
+                            if(game.level.positionToEntity.ContainsKey(dest)){
+                                var other = game.level.positionToEntity[dest][0];
+                                var unit = other.GetBehaviour<BH_Unit>();
+                                if(unit){
+                                    entity.EffectAttack();
+                                    unit.ReceiveDamage(2);
+                                    entity.isEndOfTurn = true;
+                                    return State.Running;
+                                }
+                            }
                         }
                         break;
                     }

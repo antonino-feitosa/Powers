@@ -5,12 +5,17 @@
 - [x] Turns
 - [x] Hurt Animation
 - [x] Trap Spikes
-- [ ] Death Animation
-- [ ] Battle System
-- [ ] Enemy Follow
-- [ ] Enemy Stand
+- [x] Death Animation
+- [x] Battle System
+- [x] Enemy Follow
+- [x] Enemy Stand
+- [x] Enemy Delay
+- [x] Basic HUD
+- [ ] Blink with Damage
 - [ ] Enemy Random
-- [ ] Basic HUD
+- [ ] Sound Attack
+- [ ] Sound Spikes
+- [ ] Attack Animation
 
 # TODO
 

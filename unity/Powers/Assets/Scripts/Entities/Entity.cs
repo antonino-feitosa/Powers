@@ -40,8 +40,17 @@ public class Entity : MonoBehaviour
     public Vector2Int position;
     public Vector2Int direction = Right;
 
-    [HideInInspector]
-    public Animator animator;
+    public AudioSource audioSource;
+    public AudioClip attack;
+    public AudioClip step;
+    public AudioClip death;
+    public AudioClip trap;
+    public AudioClip scream;
+    public AudioClip hurt;
+    public AudioClip rest;
+
+    private Animator animator;
+
     void Awake()
     {
         animator = GetComponent<Animator>();
@@ -51,8 +60,12 @@ public class Entity : MonoBehaviour
     public void DoProcess()
     {
         StateBehaviour current = behaviour;
-        while (current != null && current.Turn(this) == StateBehaviour.State.Idle)
+        while (current != null)
         {
+            if(current.Turn(this) == StateBehaviour.State.Running){
+                //Debug.Log(name + " => " + current.GetType().Name);
+                break;
+            }
             current = current.next;
         }
     }
@@ -78,11 +91,13 @@ public class Entity : MonoBehaviour
 
     public void PlayRest()
     {
+        EffectRest();
         animator.Play("Rest " + dirToAnim[direction]);
     }
 
     public void PlayWalk()
     {
+        EffectStep();
         animator.Play("Walk " + dirToAnim[direction]);
     }
 
@@ -98,6 +113,7 @@ public class Entity : MonoBehaviour
     
     public void PlayDead()
     {
+        EffectDeath();
         animator.Play("Dead " + dirToAnim[direction]);
     }
     public void PlayFade()
@@ -107,12 +123,41 @@ public class Entity : MonoBehaviour
 
     public void PlayActive()
     {
+        EffectTrap();
         animator.Play("Active");
     }
 
     public void PlayDeactive()
     {
         animator.Play("Deactive");
+    }
+
+    public void EffectAttack(){
+        audioSource.PlayOneShot(attack);
+    }
+
+    public void EffectDeath(){
+        audioSource.PlayOneShot(death);
+    }
+
+    public void EffectStep(){
+        audioSource.PlayOneShot(step);
+    }
+
+    public void EffectHurt(){
+        audioSource.PlayOneShot(hurt);
+    }
+
+    public void EffectTrap(){
+        audioSource.PlayOneShot(trap);
+    }
+
+    public void EffectRest(){
+        audioSource.PlayOneShot(rest);
+    }
+
+    public void EffectScream(){
+        audioSource.PlayOneShot(scream);
     }
 
     public bool IsAnimationEnd()

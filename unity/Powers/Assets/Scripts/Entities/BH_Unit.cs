@@ -15,7 +15,10 @@ public class BH_Unit : StateBehaviour
 
     public virtual void ReceiveDamage(int damage)
     {
-        damageEvent.AddLast(damage);
+        if(hp > 0){
+            GetComponent<Entity>().PlayHurt();
+            damageEvent.AddLast(damage);
+        }
     }
 
     public override State Turn(Entity entity)
@@ -32,6 +35,7 @@ public class BH_Unit : StateBehaviour
                     damageEvent.Clear();
                     if (hp <= 0)
                     {
+                        hp = 0;
                         countTurns = 0;
                         entity.isBlock = false;
                         entity.PlayDead();
@@ -39,7 +43,6 @@ public class BH_Unit : StateBehaviour
                     }
                     else
                     {
-                        entity.PlayHurt();
                         stateUnit = StateUnit.Hurt;
                     }
                     return State.Running;

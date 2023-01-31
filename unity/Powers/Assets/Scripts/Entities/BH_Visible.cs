@@ -18,6 +18,7 @@ public class BH_Visible : StateBehaviourDecision
             SetNormalFlow();
             gameObject.SetActive(true);
         } else {
+            gameObject.SetActive(false);
             SetAlternativeFlow();
         }
         return State.Idle;

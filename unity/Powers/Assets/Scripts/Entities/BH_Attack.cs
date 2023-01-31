@@ -9,8 +9,12 @@ public class BH_Attack : StateBehaviour
     {
 
         var game = GameManager.instance;
-        var unit = game.player.GetComponent<Entity>().GetBehaviour<BH_Unit>();
-        unit.ReceiveDamage(damage);
+        if(game.HasPlayer()){
+            var unit = game.player.GetComponent<Entity>().GetBehaviour<BH_Unit>();
+            unit.ReceiveDamage(damage);
+            entity.EffectAttack();
+        }
+        
         //Debug.LogWarning("\t\t\t\t" + name + " Attacks " + unit);
         return State.Idle;
     }

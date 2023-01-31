@@ -8,12 +8,17 @@ public class BH_Melee : StateBehaviourDecision
     public override State Turn(Entity entity)
     {
         var game = GameManager.instance;
+        if(!game.HasPlayer()){
+            SetAlternativeFlow();
+            return State.Idle;
+        }
+
         var playerPosition = game.GetPlayerPosition();
-        var neighbor = game.Neighborhood(entity.position);
-        if (Array.Exists(Entity.Directions, pos => (pos + entity.position) == playerPosition))
+        if (Mathf.Max(Mathf.Abs(entity.position.x - playerPosition.x), Mathf.Abs(entity.position.y - playerPosition.y)) <= 1)
         {
             SetNormalFlow();
-            entity.direction = playerPosition - entity.position;
+            if(playerPosition != entity.position)
+                entity.direction = playerPosition - entity.position;
             entity.PlayIdle();
             return State.Idle;
         }
