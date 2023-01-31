@@ -28,6 +28,11 @@ public class Room_RandomWalk : ProceduralMap
                 pos = new Vector2Int(center.x, center.y);
             }
         }
+        if(stairsUp == stairsDown){
+            stairsDown.x += 2;
+        }
+        floor.Add(stairsDown);
         PutFloorAtNeighborhood(stairsDown);
+
     }
 }

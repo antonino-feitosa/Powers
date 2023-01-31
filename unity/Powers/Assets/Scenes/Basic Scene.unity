@@ -555,18 +555,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   seed: 0
   radius: 5
-  hasFog: 0
+  hasFog: 1
   center: {x: 0, y: 0}
   tilemap: {fileID: 1470512911}
   fieldOfView: {fileID: 1122615611}
   cameraPosition: {fileID: 1818550964}
-  frequencyTraps: 0.01
+  frequencyTraps: 0.05
   traps:
   - {fileID: 421918363665818458, guid: 97cc367c2bb11254f81bfee8a08864ce, type: 3}
-  frequencyEnemies: 0.01
+  frequencyEnemies: 0.05
   enemies:
   - {fileID: 6229937400314244921, guid: f68414d1c903fb74ba386cb0cb9cd15f, type: 3}
   - {fileID: -8493232515652860616, guid: eab1ad91c1849bf48b544e8b78b6a95b, type: 3}
+  - {fileID: 5689102913698328749, guid: f418fea67d5c220499c36111e26ed8c6, type: 3}
   stairsUp: {fileID: 11400000, guid: f2f6988939a3f65409c4f8c691066a8d, type: 2}
   stairsDown: {fileID: 11400000, guid: 7b8bc0b17e6d5494abe21f8677c48029, type: 2}
   hiddenTile: {fileID: 11400000, guid: 042f9058c8e0e8b48a99df7961a00a8e, type: 2}

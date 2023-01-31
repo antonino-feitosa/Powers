@@ -19,18 +19,15 @@ public class BH_PlayerControler : StateBehaviour
     }
 
     public int radius = 5;
-    protected enum StatePlayer { Idle, EndOfTurn, Forward, Backward };
+    protected enum StatePlayer { Idle, Forward, Backward };
     protected StatePlayer statePlayer = StatePlayer.Idle;
 
     public override State Turn(Entity entity)
     {
+        
         var game = GameManager.instance;
         switch (statePlayer)
         {
-            case StatePlayer.EndOfTurn:
-                entity.isEndOfTurn = true;
-                statePlayer = StatePlayer.Idle;
-                return State.Running;
             case StatePlayer.Forward:
                 entity.isEndOfTurn = true;
                 statePlayer = StatePlayer.Idle;
@@ -43,10 +40,12 @@ public class BH_PlayerControler : StateBehaviour
                 return State.Running;
 
             case StatePlayer.Idle:
-
+                entity.PlayIdle();
                 if (Input.GetKey(KeyCode.S))
                 {
-                    statePlayer = StatePlayer.EndOfTurn;
+                    entity.PlayRest();
+                    entity.isEndOfTurn = true;
+                    statePlayer = StatePlayer.Idle;
                     return State.Running;
                 }
 
@@ -68,10 +67,6 @@ public class BH_PlayerControler : StateBehaviour
                             else if (game.IsDownStairs(dest))
                             {
                                 statePlayer = StatePlayer.Forward;
-                            }
-                            else
-                            {
-                                statePlayer = StatePlayer.EndOfTurn;
                             }
                         }
                         break;

@@ -16,8 +16,8 @@ MonoBehaviour:
   center: {x: 0, y: 0}
   stairsUp: {x: 4, y: 0}
   stairsDown: {x: 4, y: -4}
-  iterations: 0
-  roomPercent: 1
+  iterations: 5
+  roomPercent: 0.9
   rooms:
   - {fileID: 11400000, guid: 4d8f6841360d37f4188d694248d88142, type: 2}
   - {fileID: 11400000, guid: 16c1d671a2f362d4195dc8d77c5c404f, type: 2}

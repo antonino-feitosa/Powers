@@ -17,7 +17,10 @@ GameObject:
   - component: {fileID: 1370324798863017965}
   - component: {fileID: 2412150162802719939}
   - component: {fileID: 6229937400314244921}
+  - component: {fileID: -8535155863383468466}
   - component: {fileID: -5736621127212028760}
+  - component: {fileID: 7401574691406767012}
+  - component: {fileID: 5561141527112674622}
   - component: {fileID: 7715915440596886141}
   m_Layer: 0
   m_Name: Enemy Chase
@@ -34,7 +37,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5824042782272387669}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1, y: 0, z: 0}
+  m_LocalPosition: {x: 4, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -143,6 +146,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   next: {fileID: -5955454092372789319}
+  alternative: {fileID: 7715915440596886141}
+  normal: {fileID: 0}
   runInBackground: 0
 --- !u!114 &-5955454092372789319
 MonoBehaviour:
@@ -157,6 +162,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   next: {fileID: 1370324798863017965}
+  alternative: {fileID: 7715915440596886141}
+  normal: {fileID: 0}
   viewRadius: 5
 --- !u!114 &1370324798863017965
 MonoBehaviour:
@@ -185,9 +192,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   next: {fileID: 6229937400314244921}
-  hp: 10
-  attack: 0
-  numTurnsDying: 10
+  hp: 2
+  numTurnsDying: 2
 --- !u!114 &6229937400314244921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,7 +206,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f820a927da1c6d340b34b03d43810f36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  next: {fileID: -8535155863383468466}
+--- !u!114 &-8535155863383468466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5824042782272387669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d28930a5e1a26f41aa7769980edb160, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   next: {fileID: -5736621127212028760}
+  alternative: {fileID: 7401574691406767012}
+  normal: {fileID: 0}
 --- !u!114 &-5736621127212028760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,7 +234,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2941c101e8a9d14bb7a9b53d0fbfb6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  next: {fileID: 7401574691406767012}
+--- !u!114 &7401574691406767012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5824042782272387669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e24bc81ff224bb545a87afa2d358f458, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  next: {fileID: 5561141527112674622}
+  alternative: {fileID: 7715915440596886141}
+  normal: {fileID: 0}
+--- !u!114 &5561141527112674622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5824042782272387669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d53bd24f0d9b96245b7afe3886d9acff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   next: {fileID: 7715915440596886141}
+  damage: 1
 --- !u!114 &7715915440596886141
 MonoBehaviour:
   m_ObjectHideFlags: 0

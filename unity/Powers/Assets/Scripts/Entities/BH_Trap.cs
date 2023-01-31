@@ -37,7 +37,7 @@ public class BH_Trap : StateBehaviourPositionCondition
             case StateTrap.Active:
                 if (entity.IsAnimationEnd())
                 {
-                    entity.PlayIdle();
+                    entity.PlayDeactive();
                     stateTrap = StateTrap.Idle;
                     return State.Idle;
                 }

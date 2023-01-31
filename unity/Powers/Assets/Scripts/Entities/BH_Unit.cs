@@ -5,7 +5,6 @@ using UnityEngine;
 public class BH_Unit : StateBehaviour
 {
     public int hp = 10;
-    public int attack;
     public int numTurnsDying = 10;
     public LinkedList<int> damageEvent = new LinkedList<int>();
 
@@ -34,7 +33,7 @@ public class BH_Unit : StateBehaviour
                     if (hp <= 0)
                     {
                         countTurns = 0;
-                        entity.SetAnimatorFreeze(true);
+                        entity.isBlock = false;
                         entity.PlayDead();
                         stateUnit = StateUnit.Dying;
                     }
@@ -47,6 +46,7 @@ public class BH_Unit : StateBehaviour
                 }
                 else
                 {
+                    entity.PlayIdle();
                     return State.Idle;
                 }
             case StateUnit.Hurt:
@@ -63,9 +63,11 @@ public class BH_Unit : StateBehaviour
             case StateUnit.Dying:
                 if (countTurns >= numTurnsDying)
                 {
-                    entity.SetAnimatorFreeze(false);
                     entity.PlayFade();
                     stateUnit = StateUnit.Fading;
+                } else {
+                    countTurns++;
+                    entity.isEndOfTurn = true;
                 }
                 return State.Running;
             case StateUnit.Fading:

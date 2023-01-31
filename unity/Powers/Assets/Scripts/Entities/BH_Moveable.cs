@@ -26,7 +26,8 @@ public class BH_Moveable : StateBehaviour
                 transform.position = _movingDestination;
                 stateMoveable = StateMoveable.Idle;
                 entity.PlayIdle();
-                return State.Idle;
+                entity.isEndOfTurn = true;
+                return State.Running;
             }
         }
         return State.Idle;

@@ -47,9 +47,28 @@ public class Entity : MonoBehaviour
         animator = GetComponent<Animator>();
         position = GameManager.ToVector2Int(transform.position);
     }
+    
+    public void DoProcess()
+    {
+        StateBehaviour current = behaviour;
+        while (current != null && current.Turn(this) == StateBehaviour.State.Idle)
+        {
+            current = current.next;
+        }
+    }
 
-    public void SetAnimatorFreeze(bool enable){
-        animator.speed = enable ? 0 : 1;
+    public Type GetBehaviour<Type>()
+    {
+        StateBehaviour current = behaviour;
+        while (current != null)
+        {
+            if (current is Type behaviour)
+            {
+                return behaviour;
+            }
+            current = current.next;
+        }
+        return default(Type);
     }
 
     public void PlayIdle()
@@ -88,34 +107,16 @@ public class Entity : MonoBehaviour
 
     public void PlayActive()
     {
-        animator.Play("Active " + dirToAnim[direction]);
+        animator.Play("Active");
+    }
+
+    public void PlayDeactive()
+    {
+        animator.Play("Deactive");
     }
 
     public bool IsAnimationEnd()
     {
         return animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1;
-    }
-
-    public void DoProcess()
-    {
-        StateBehaviour current = behaviour;
-        while (current != null && current.Turn(this) == StateBehaviour.State.Idle)
-        {
-            current = current.next;
-        }
-    }
-
-    public Type GetBehaviour<Type>()
-    {
-        StateBehaviour current = behaviour;
-        while (current != null)
-        {
-            if (current is Type behaviour)
-            {
-                return behaviour;
-            }
-            current = current.next;
-        }
-        return default(Type);
     }
 }

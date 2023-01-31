@@ -91,7 +91,7 @@ public class CreateAnim : MonoBehaviour
             {
                 var dest = new Sprite[4];
                 Array.Copy(sprites, i * 4, dest, 0, 4);
-                var anim = CreateAnimation(prefix, NAMES[i], 12, !NAMES[i].StartsWith("Hurt"), dest);
+                var anim = CreateAnimation(prefix, NAMES[i], 12, !(NAMES[i].StartsWith("Hurt") || NAMES[i].StartsWith("Fade")), dest);
                 anim.name = NAMES[i];
                 controller.AddMotion(anim);
             }

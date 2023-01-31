@@ -6,7 +6,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Trap Floor Spikes
+  m_Name: Spikes Floor
   serializedVersion: 5
   m_AnimatorParameters: []
   m_AnimatorLayers:
@@ -80,7 +80,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Idle
+  m_Name: Deactive
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []

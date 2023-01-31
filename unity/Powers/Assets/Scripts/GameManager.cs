@@ -18,6 +18,45 @@ public class GameManager : MonoBehaviour
         public HashSet<Vector2Int> revealed = new HashSet<Vector2Int>();
         public LinkedList<Entity> turn = new LinkedList<Entity>();
         public Dictionary<Vector2Int, List<Entity>> positionToEntity = new Dictionary<Vector2Int, List<Entity>>();
+
+        public bool HasEntityAt(Vector2Int position)
+        {
+            if (positionToEntity.ContainsKey(position))
+                return true;
+            if (stairsUp == position)
+                return true;
+            if (stairsDown == position)
+                return true;
+            if (player == position)
+                return true;
+            return false;
+        }
+
+        public void AddEntities(float frequency, StateBehaviourPositionCondition[] entities)
+        {
+            int numFloors = floor.Count;
+            int length = (int)(numFloors * frequency);
+            List<Vector2Int> list = new List<Vector2Int>(floor);
+            for (int i = 0; i < length; i++)
+            {
+                var model = entities[Random.Range(0, entities.Length)];
+                for (int j = 0; j < 10; j++)
+                {
+                    var pos = list[Random.Range(0, list.Count)];
+                    if (!HasEntityAt(pos) && model.AcceptPosition(pos, this))
+                    {
+                        if (!positionToEntity.ContainsKey(pos))
+                            positionToEntity.Add(pos, new List<Entity>());
+                        var entityObject = Instantiate(model.gameObject, ToVector3(pos), Quaternion.identity);
+                        var entity = entityObject.GetComponent<Entity>();
+                        entity.gameObject.name += " Lv(" + level + ") #" + i;
+                        positionToEntity[pos].Add(entity);
+                        turn.AddLast(entity);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     public static GameManager instance;
@@ -30,6 +69,13 @@ public class GameManager : MonoBehaviour
     public ProceduralGeneratorParameters proc;
     public BH_PlayerControler player;
     public ProceduralMap[] maps;
+
+    void OnGUI()
+    {
+        GUI.color = Color.green;
+        var unit = player.GetComponent<BH_Unit>();
+        GUI.Label(new Rect(10, 10, 200, 20), "Health Points: " + unit.hp + "/10");
+    }
 
     private object Monitor = new object();
     void Awake()
@@ -51,13 +97,15 @@ public class GameManager : MonoBehaviour
             Vector2Int position = ToVector2Int(current.transform.position);
             level.positionToEntity[position].Remove(current);
             level.turn.RemoveFirst();
-            Destroy(current);
+            Destroy(current.gameObject);
         }
         else if (current.isEndOfTurn)
         {
+            //Debug.Log("End Of Turn: " + current);
             current.isEndOfTurn = false;
             level.turn.RemoveFirst();
             level.turn.AddLast(current);
+            //Debug.Log("\t\t\t\t\t\tNext Turn: " + level.turn.First.Value);
         }
     }
 
@@ -76,7 +124,7 @@ public class GameManager : MonoBehaviour
         int nextLevel = level.level - 1;
         if (nextLevel < 0)
         {
-            Debug.Log("You cannot ascend to a negative level!");
+            Debug.LogError("You cannot ascend to a negative level!");
             return;
         }
         ChangeMap(nextLevel);
@@ -95,9 +143,9 @@ public class GameManager : MonoBehaviour
         level.stairsDown = map.stairsDown;
         level.turn.AddFirst(player.GetComponent<Entity>());
         level.positionToEntity.Add(level.player, new List<Entity> { player.GetComponent<Entity>() });
+        level.AddEntities(proc.frequencyTraps, proc.traps);
+        level.AddEntities(proc.frequencyEnemies, proc.enemies);
         levels.Add(level);
-        AddTraps(level);
-        AddEnemies(level);
         return level;
     }
 
@@ -155,58 +203,6 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    protected void AddEnemies(Level level)
-    {
-        int numFloors = level.floor.Count;
-        int numEnemies = (int)(numFloors * proc.frequencyEnemies);
-        List<Vector2Int> list = new List<Vector2Int>(level.floor);
-        for (int i = 0; i < numEnemies; i++)
-        {
-            var model = proc.enemies[Random.Range(0, proc.enemies.Length)];
-            for (int j = 0; j < 10; j++)
-            {
-                var pos = list[Random.Range(0, list.Count)];
-                if (model.AcceptPosition(pos))
-                {
-                    if (!level.positionToEntity.ContainsKey(pos))
-                        level.positionToEntity.Add(pos, new List<Entity>());
-                    var enemyObject = Instantiate(model.gameObject, ToVector3(pos), Quaternion.identity);
-                    var enemy = enemyObject.GetComponent<Entity>();
-                    enemy.gameObject.name += " Lv(" + level.level + ") #" + i;
-                    level.positionToEntity[pos].Add(enemy);
-                    level.turn.AddLast(enemy);
-                    break;
-                }
-            }
-        }
-    }
-
-    protected void AddTraps(Level level)
-    {
-        int numFloors = level.floor.Count;
-        int numTraps = (int)(numFloors * proc.frequencyTraps);
-        List<Vector2Int> list = new List<Vector2Int>(level.floor);
-        for (int i = 0; i < numTraps; i++)
-        {
-            var model = proc.traps[Random.Range(0, proc.traps.Length)];
-            for (int j = 0; j < 10; j++)
-            {
-                var pos = list[Random.Range(0, list.Count)];
-                if (model.AcceptPosition(pos))
-                {
-                    if (!level.positionToEntity.ContainsKey(pos))
-                        level.positionToEntity.Add(pos, new List<Entity>());
-                    var trapObject = Instantiate(model.gameObject, ToVector3(pos), Quaternion.identity);
-                    var trap = trapObject.GetComponent<Entity>();
-                    trap.gameObject.name += " Lv(" + level.level + ") #" + i;
-                    level.positionToEntity[pos].Add(trap);
-                    level.turn.AddLast(trap);
-                    break;
-                }
-            }
-        }
-    }
-
     public bool IsVisibleAt(Vector2Int position)
     {
         return !proc.hasFog || level.visible.Contains(position);
@@ -234,19 +230,6 @@ public class GameManager : MonoBehaviour
     public Vector2Int GetPlayerPosition()
     {
         return player.GetComponent<Entity>().position;
-    }
-
-    public bool HasEntityAt(Vector2Int position)
-    {
-        if (level.positionToEntity.ContainsKey(position))
-            return true;
-        if (level.stairsUp == position)
-            return true;
-        if (level.stairsDown == position)
-            return true;
-        if (level.player == position)
-            return true;
-        return false;
     }
 
     public List<Vector2Int> Neighborhood(Vector2Int pos)

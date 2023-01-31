@@ -9,25 +9,21 @@ public class BH_ChasePlayer : StateBehaviour
 
     public override State Turn(Entity entity)
     {
-        switch(state){
-            case StateChase.Moving:
-                var game = GameManager.instance;
-                var playerPosition = game.GetPlayerPosition();
+        var game = GameManager.instance;
+        var playerPosition = game.GetPlayerPosition();
 
-                var map = game.MakeDijkstraMap(game.level.floor);
-                map.AddAttractionPoint(playerPosition);
-                map.Calculate();
+        var map = game.MakeDijkstraMap(game.level.floor);
+        map.AddAttractionPoint(playerPosition);
+        map.Calculate();
 
-                Vector2Int pos = map.Chase(entity.position);
-                var moveable = entity.GetBehaviour<BH_Moveable>();
-                moveable.TryMoveTo(entity, pos - entity.position);
-                state = StateChase.Idle;
-                return State.Running;
-            case StateChase.Idle:
-                state = StateChase.Moving;
-                return State.Idle;
-            default:
-                return State.Idle;
+        Vector2Int pos = map.Chase(entity.position);
+        var moveable = entity.GetBehaviour<BH_Moveable>();
+        if(moveable.TryMoveTo(entity, pos - entity.position)){
+            state = StateChase.Moving;
+            return State.Running;
+        } else {
+            state = StateChase.Idle;
+            return State.Idle;
         }
     }
 }

@@ -37,13 +37,18 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Maps\Room_RandomWalk.cs" />
+     <Compile Include="Assets\Scripts\Entities\BH_Trap.cs" />
+     <Compile Include="Assets\Scripts\Entities\BH_Visible.cs" />
      <Compile Include="Assets\Scripts\Maps\Room_Bernoulli.cs" />
+     <Compile Include="Assets\Scripts\Entities\BH_Sight.cs" />
      <Compile Include="Assets\Scripts\Entities\BH_Unit.cs" />
+     <Compile Include="Assets\Scripts\Entities\BH_EndOfTurn.cs" />
      <Compile Include="Assets\Scripts\Entities\BH_PlayerControler.cs" />
      <Compile Include="Assets\Scripts\CameraFollow.cs" />
      <Compile Include="Assets\Scripts\Tools\CreateAnim.cs" />
      <Compile Include="Assets\Scripts\Loader.cs" />
      <Compile Include="Assets\Scripts\World\PriorityQueue.cs" />
+     <Compile Include="Assets\Scripts\Entities\StateBehaviourPositionCondition.cs" />
      <Compile Include="Assets\Scripts\ProceduralGeneratorParameters.cs" />
      <Compile Include="Assets\Scripts\Entities\StateBehaviour.cs" />
      <Compile Include="Assets\Scripts\Entities\BH_ChasePlayer.cs" />
@@ -53,17 +58,16 @@
      <Compile Include="Assets\Scripts\ProceduralMap.cs" />
      <Compile Include="Assets\Scripts\Maps\Room_Empty.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
+     <Compile Include="Assets\Scripts\Entities\BH_TurnDelay.cs" />
      <Compile Include="Assets\Scripts\Entities\Entity.cs" />
+     <Compile Include="Assets\Scripts\Entities\BH_TriggerPosition.cs" />
      <Compile Include="Assets\Scripts\Tools\CreateAnimEditor.cs" />
      <Compile Include="Assets\Scripts\Entities\BH_Enemy.cs" />
      <Compile Include="Assets\Scripts\World\FOV.cs" />
-     <Compile Include="Assets\Scripts\Entities\StateBehaviourPositionCondition.cs" />
-     <Compile Include="Assets\Scripts\Entities\BH_Sight.cs" />
-     <Compile Include="Assets\Scripts\Entities\BH_TurnDelay.cs" />
-     <Compile Include="Assets\Scripts\Entities\BH_Visible.cs" />
-     <Compile Include="Assets\Scripts\Entities\BH_EndOfTurn.cs" />
-     <Compile Include="Assets\Scripts\Entities\BH_TriggerPosition.cs" />
-     <Compile Include="Assets\Scripts\Entities\BH_Trap.cs" />
+     <Compile Include="Assets\Scripts\Entities\BH_Melee.cs" />
+     <Compile Include="Assets\Scripts\Entities\BH_Attack.cs" />
+     <Compile Include="Assets\Scripts\Entities\StateBehaviourDecision.cs" />
+     <Compile Include="Assets\Scripts\Entities\BH_Alternating.cs" />
     <Reference Include="UnityEngine">
         <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.44f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>
