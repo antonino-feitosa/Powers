@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BH_EndOfTurn : StateBehaviour
 {
-    public override State Turn(Entity entity)
+    public override State Turn(Entity entity, int turn)
     {
         entity.isEndOfTurn = true;
         return State.Running;

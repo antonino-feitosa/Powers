@@ -13,8 +13,6 @@ GameObject:
   - component: {fileID: 5212292004352075202}
   - component: {fileID: -3077187489321116193}
   - component: {fileID: 7554588328797768039}
-  - component: {fileID: 4384070315502088872}
-  - component: {fileID: 3881845548126267437}
   - component: {fileID: 829419753417595001}
   - component: {fileID: 4179131757943579479}
   - component: {fileID: 5689102913698328749}
@@ -223,7 +221,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf1a488a43d5e794daff7c06c55579f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  behaviour: {fileID: 4384070315502088872}
+  behaviour: {fileID: 829419753417595001}
   isBlock: 1
   isDead: 0
   isEndOfTurn: 0
@@ -237,38 +235,6 @@ MonoBehaviour:
   scream: {fileID: 8300000, guid: 0ac48dfcfe59b8a49a25f181cd185a7f, type: 3}
   hurt: {fileID: 8300000, guid: bba07681c5e018243a22aa7e4adcbd90, type: 3}
   rest: {fileID: 8300000, guid: 8afab074f16fac943a38e860a3070f8a, type: 3}
---- !u!114 &4384070315502088872
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5212292004352075201}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a3a2fe7f3eba5a48963b27a7e6125d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  next: {fileID: 3881845548126267437}
-  alternative: {fileID: 8327894366106222057}
-  normal: {fileID: 0}
-  runInBackground: 0
---- !u!114 &3881845548126267437
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5212292004352075201}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8268b22a7eb814748849c82f5cf26207, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  next: {fileID: 829419753417595001}
-  alternative: {fileID: 8327894366106222057}
-  normal: {fileID: 0}
-  viewRadius: 5
 --- !u!114 &829419753417595001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -353,6 +319,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   next: {fileID: 8327894366106222057}
+  alternative: {fileID: 8327894366106222057}
+  normal: {fileID: 0}
   damage: 1
 --- !u!114 &2946905023600194364
 MonoBehaviour:

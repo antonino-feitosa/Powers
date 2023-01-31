@@ -57,13 +57,13 @@ public class Entity : MonoBehaviour
         position = GameManager.ToVector2Int(transform.position);
     }
     
-    public void DoProcess()
+    public void DoProcess(int turn)
     {
         StateBehaviour current = behaviour;
         while (current != null)
         {
-            if(current.Turn(this) == StateBehaviour.State.Running){
-                //Debug.Log(name + " => " + current.GetType().Name);
+            if(current.Turn(this, turn) == StateBehaviour.State.Running){
+                //if(name != "Player") Debug.Log(name + " => " + current.GetType().Name);
                 break;
             }
             current = current.next;
@@ -84,6 +84,11 @@ public class Entity : MonoBehaviour
         return default(Type);
     }
 
+    public bool IsAnimationEnd()
+    {
+        return animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1;
+    }
+
     public void PlayIdle()
     {
         animator.Play("Idle " + dirToAnim[direction]);
@@ -101,9 +106,10 @@ public class Entity : MonoBehaviour
         animator.Play("Walk " + dirToAnim[direction]);
     }
 
-    public void PlayRun()
+    public void PlayAttack()
     {
-        animator.Play("Run " + dirToAnim[direction]);
+        EffectAttack();
+        animator.Play("Attack " + dirToAnim[direction]);
     }
 
     public void PlayHurt()
@@ -158,10 +164,5 @@ public class Entity : MonoBehaviour
 
     public void EffectScream(){
         audioSource.PlayOneShot(scream);
-    }
-
-    public bool IsAnimationEnd()
-    {
-        return animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 1;
     }
 }

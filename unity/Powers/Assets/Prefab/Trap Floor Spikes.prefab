@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 2300946626248862426}
   - component: {fileID: 6243362017326383410}
   - component: {fileID: -7433974547557156340}
-  - component: {fileID: 2883851736860814514}
   - component: {fileID: 509202374035372309}
   - component: {fileID: 421918363665818458}
   - component: {fileID: 2296534719148040382}
@@ -32,7 +31,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2300946626248862427}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4, y: -16, z: 0}
+  m_LocalPosition: {x: 10, y: 20, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -217,7 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf1a488a43d5e794daff7c06c55579f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  behaviour: {fileID: 2883851736860814514}
+  behaviour: {fileID: 509202374035372309}
   isBlock: 0
   isDead: 0
   isEndOfTurn: 0
@@ -231,22 +230,6 @@ MonoBehaviour:
   scream: {fileID: 8300000, guid: 0ac48dfcfe59b8a49a25f181cd185a7f, type: 3}
   hurt: {fileID: 8300000, guid: bba07681c5e018243a22aa7e4adcbd90, type: 3}
   rest: {fileID: 8300000, guid: 8afab074f16fac943a38e860a3070f8a, type: 3}
---- !u!114 &2883851736860814514
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2300946626248862427}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a3a2fe7f3eba5a48963b27a7e6125d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  next: {fileID: 509202374035372309}
-  alternative: {fileID: 2296534719148040382}
-  normal: {fileID: 0}
-  runInBackground: 0
 --- !u!114 &509202374035372309
 MonoBehaviour:
   m_ObjectHideFlags: 0

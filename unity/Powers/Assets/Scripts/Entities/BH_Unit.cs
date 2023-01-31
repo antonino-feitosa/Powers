@@ -11,7 +11,7 @@ public class BH_Unit : StateBehaviour
     protected enum StateUnit { Idle, Hurt, Dying, Fading, Dead };
     protected StateUnit stateUnit = StateUnit.Idle;
 
-    private int countTurns = 0;
+    private int waitTurn = 0;
 
     public virtual void ReceiveDamage(int damage)
     {
@@ -21,7 +21,7 @@ public class BH_Unit : StateBehaviour
         }
     }
 
-    public override State Turn(Entity entity)
+    public override State Turn(Entity entity, int turn)
     {
         switch (stateUnit)
         {
@@ -36,7 +36,7 @@ public class BH_Unit : StateBehaviour
                     if (hp <= 0)
                     {
                         hp = 0;
-                        countTurns = 0;
+                        waitTurn = turn;
                         entity.isBlock = false;
                         entity.PlayDead();
                         stateUnit = StateUnit.Dying;
@@ -49,7 +49,6 @@ public class BH_Unit : StateBehaviour
                 }
                 else
                 {
-                    entity.PlayIdle();
                     return State.Idle;
                 }
             case StateUnit.Hurt:
@@ -64,12 +63,11 @@ public class BH_Unit : StateBehaviour
                     return State.Running;
                 }
             case StateUnit.Dying:
-                if (countTurns >= numTurnsDying)
+                if (turn - waitTurn >= numTurnsDying)
                 {
                     entity.PlayFade();
                     stateUnit = StateUnit.Fading;
                 } else {
-                    countTurns++;
                     entity.isEndOfTurn = true;
                 }
                 return State.Running;

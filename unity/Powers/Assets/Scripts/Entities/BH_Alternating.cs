@@ -4,18 +4,15 @@ using UnityEngine;
 
 public class BH_Alternating : StateBehaviourDecision
 {
-    private bool isNormal = true;
-    public override State Turn(Entity entity)
+    public override State Turn(Entity entity, int turn)
     {
-        if (isNormal)
+        if (turn % 2 == 0)
         {
             SetNormalFlow();
-            isNormal = false;
         }
         else
         {
             SetAlternativeFlow();
-            isNormal = true;
         }
         return State.Idle;
     }

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afc1d4a1ac8a1694d92372f3aae600f8, type: 3}
+  m_Name: Map - Random Walk - M1
+  m_EditorClassIdentifier: 
+  radius: 15
+  center: {x: 0, y: 0}
+  stairsUp: {x: 0, y: 0}
+  stairsDown: {x: 12, y: 18}
+  iterations: 0
+  roomPercent: 0.8
+  rooms:
+  - {fileID: 11400000, guid: f78ebbad6058e474c8d6b92c00751fa7, type: 2}
+  - {fileID: 11400000, guid: 4d8f6841360d37f4188d694248d88142, type: 2}
+  - {fileID: 11400000, guid: f7de481f5c036b54cb30179af77095cf, type: 2}
+  - {fileID: 11400000, guid: f3067ee0033cae541a02b0594ce100fc, type: 2}
+  - {fileID: 11400000, guid: 050e4f93f215fdb4d96ab8d38d0900f4, type: 2}
+  - {fileID: 11400000, guid: 07b32b912306d424aaf9943bc8547a33, type: 2}
+  - {fileID: 11400000, guid: 131ac51abc534fb42912c36e81bb37c1, type: 2}
+  - {fileID: 11400000, guid: 16c1d671a2f362d4195dc8d77c5c404f, type: 2}

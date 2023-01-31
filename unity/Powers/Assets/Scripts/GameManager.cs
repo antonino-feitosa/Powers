@@ -50,8 +50,8 @@ public class GameManager : MonoBehaviour
                         var entityObject = Instantiate(model.gameObject, ToVector3(pos), Quaternion.identity);
                         var entity = entityObject.GetComponent<Entity>();
                         entity.gameObject.name += " Lv(" + level + ") #" + i;
+                        entity.gameObject.SetActive(false);
                         positionToEntity[pos].Add(entity);
-                        turn.AddLast(entity);
                         break;
                     }
                 }
@@ -62,6 +62,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     public int currentLevel = 0;
     public int maxLevel = 100;
+    public int countTurn = 0;
     public List<Level> levels = new List<Level>();
 
     public Level level { get { return levels[currentLevel]; } }
@@ -74,10 +75,13 @@ public class GameManager : MonoBehaviour
     void OnGUI()
     {
         GUI.color = Color.green;
-        if(player){
+        if (player)
+        {
             var unit = player.GetComponent<BH_Unit>();
-            GUI.Label(new Rect(10, 10, 200, 20), "Health Points: " + unit.hp + "/10");
-        } else {
+            GUI.Label(new Rect(10, 10, 300, 20), "Health Points: " + unit.hp + "/10    Turn: " + countTurn);
+        }
+        else
+        {
             GUI.Label(new Rect(10, 10, 200, 20), "You died!");
         }
     }
@@ -98,24 +102,26 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         Entity current = level.turn.First.Value;
-        current.DoProcess();
+        current.DoProcess(countTurn);
         if (current.isDead)
         {
             Vector2Int position = ToVector2Int(current.transform.position);
             level.positionToEntity[position].Remove(current);
             level.turn.RemoveFirst();
-            if(current.GetBehaviour<BH_PlayerControler>()){
+            if (current.GetBehaviour<BH_PlayerControler>())
+            {
                 player = null; // game over
             }
             Destroy(current.gameObject);
         }
         else if (current.isEndOfTurn)
         {
-            //Debug.Log("End Of Turn: " + current);
+            if (current.GetBehaviour<BH_PlayerControler>()) countTurn++;
+            Debug.Log("End Of Turn: " + current);
             current.isEndOfTurn = false;
             level.turn.RemoveFirst();
             level.turn.AddLast(current);
-            //Debug.Log("\t\t\t\t\t\tNext Turn: " + level.turn.First.Value);
+            Debug.Log("\t\t\t\t\t\tNext Turn: " + level.turn.First.Value);
         }
     }
 
@@ -167,24 +173,76 @@ public class GameManager : MonoBehaviour
             ent.gameObject.SetActive(false);
             //Debug.Log("Deactive " + ent.gameObject.name + " " + ent.gameObject.activeSelf);
         }
+        level.turn.Clear();
 
         currentLevel = nextLevel;
 
         player.transform.position = ToVector3(level.player);
+        player.GetComponent<Entity>().position = level.player;
+        player.gameObject.SetActive(true);
         proc.cameraPosition.position = new Vector3(player.transform.position.x, player.transform.position.y, proc.cameraPosition.position.z);
-        foreach (Entity ent in level.turn)
-        {
-            ent.gameObject.SetActive(true);
-            //Debug.Log("Active " + ent.gameObject.name + " " + ent.gameObject.activeSelf);
-        }
+        
         Clear();
         DetectWalls();
         PaintFloor();
         PaintWalls();
+        ApplyFieldOfView(level.player, player.radius);
+    }
+
+    public void ApplyFieldOfView(Vector2Int center, int radius)
+    {
+        HashSet<Vector2Int> view = FieldOfView(center, radius);
+        player.map = MakeDijkstraMap(view);
+        player.map.AddAttractionPoint(center);
+        player.map.Calculate();
+
+        var current = level.turn.First;
+        while(current != null){
+            var ent = current.Value;
+            if(!view.Contains(ent.position)){
+                ent.gameObject.SetActive(false);
+                level.turn.Remove(current);
+            }
+            current = current.Next;
+        }
+
+        foreach (var pos in view)
+        {
+            if (level.positionToEntity.ContainsKey(pos))
+            {
+                foreach (var ent in level.positionToEntity[pos])
+                {
+                    if (!level.turn.Contains(ent))
+                    {
+                        Debug.LogWarning("Active " + ent);
+                        ent.gameObject.SetActive(true);
+                        level.turn.AddLast(ent);
+                    }
+                }
+            }
+        }
+
+        HashSet<Vector2Int> newRevealed = new HashSet<Vector2Int>(level.visible);
+        newRevealed.ExceptWith(view);
+
         if (proc.hasFog)
         {
-            ApplyFieldOfView(level.player, player.radius);
+            foreach (var pos in newRevealed)
+            {
+                var v = new Vector3Int(pos.x, pos.y, 0);
+                var tilePosition = proc.fieldOfView.WorldToCell(v);
+                proc.fieldOfView.SetTile(tilePosition, proc.revealedTile);
+            }
+
+            foreach (var pos in view)
+            {
+                var v = new Vector3Int(pos.x, pos.y, 0);
+                var tilePosition = proc.fieldOfView.WorldToCell(v);
+                proc.fieldOfView.SetTile(tilePosition, null);
+            }
+            level.revealed.UnionWith(view);
         }
+        level.visible = view;
     }
 
     public bool IsFreePosition(Vector2Int position)
@@ -237,7 +295,8 @@ public class GameManager : MonoBehaviour
         return new Vector3(vec.x, vec.y);
     }
 
-    public bool HasPlayer(){
+    public bool HasPlayer()
+    {
         return player != null;
     }
 
@@ -252,7 +311,7 @@ public class GameManager : MonoBehaviour
         foreach (var p in Entity.Directions)
         {
             var n = pos + p;
-            if (IsFreePosition(n))
+            if (IsFreePosition(n) && IsVisibleAt(n))
             {
                 neighborhood.Add(n);
             }
@@ -288,35 +347,6 @@ public class GameManager : MonoBehaviour
     public HashSet<Vector2Int> FieldOfView(Vector2Int center, int radius)
     {
         return FOV.Calculate(center, radius, isOpaque);
-    }
-
-    public void ApplyFieldOfView(Vector2Int center, int radius)
-    {
-        if (!proc.hasFog)
-        {
-            return;
-        }
-
-        HashSet<Vector2Int> view = FieldOfView(center, radius);
-
-        HashSet<Vector2Int> newRevealed = new HashSet<Vector2Int>(level.visible);
-        newRevealed.ExceptWith(view);
-
-        foreach (var pos in newRevealed)
-        {
-            var v = new Vector3Int(pos.x, pos.y, 0);
-            var tilePosition = proc.fieldOfView.WorldToCell(v);
-            proc.fieldOfView.SetTile(tilePosition, proc.revealedTile);
-        }
-
-        foreach (var pos in view)
-        {
-            var v = new Vector3Int(pos.x, pos.y, 0);
-            var tilePosition = proc.fieldOfView.WorldToCell(v);
-            proc.fieldOfView.SetTile(tilePosition, null);
-        }
-        level.revealed.UnionWith(view);
-        level.visible = view;
     }
 
     void DetectWalls()

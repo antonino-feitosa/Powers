@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 1263969626958887711}
   - component: {fileID: -7191833267328631232}
   - component: {fileID: -5117686018401078664}
-  - component: {fileID: 8517533737160354612}
   - component: {fileID: 4966935459576209274}
   - component: {fileID: -8493232515652860616}
   - component: {fileID: 606125640250635873}
@@ -34,7 +33,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1263969626958887708}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 24, y: 1, z: 0}
+  m_LocalPosition: {x: 8, y: 14, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -219,7 +218,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf1a488a43d5e794daff7c06c55579f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  behaviour: {fileID: 8517533737160354612}
+  behaviour: {fileID: 4966935459576209274}
   isBlock: 1
   isDead: 0
   isEndOfTurn: 1
@@ -233,22 +232,6 @@ MonoBehaviour:
   scream: {fileID: 8300000, guid: 0ac48dfcfe59b8a49a25f181cd185a7f, type: 3}
   hurt: {fileID: 8300000, guid: bba07681c5e018243a22aa7e4adcbd90, type: 3}
   rest: {fileID: 8300000, guid: 8afab074f16fac943a38e860a3070f8a, type: 3}
---- !u!114 &8517533737160354612
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1263969626958887708}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a3a2fe7f3eba5a48963b27a7e6125d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  next: {fileID: 4966935459576209274}
-  alternative: {fileID: 6437985670617343120}
-  normal: {fileID: 0}
-  runInBackground: 0
 --- !u!114 &4966935459576209274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -305,6 +288,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   next: {fileID: 6437985670617343120}
+  alternative: {fileID: 6437985670617343120}
+  normal: {fileID: 0}
   damage: 1
 --- !u!114 &6437985670617343120
 MonoBehaviour:

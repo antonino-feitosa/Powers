@@ -6,5 +6,5 @@ public abstract class StateBehaviour : MonoBehaviour
 {
     public enum State {Idle, Running};
     public StateBehaviour next;
-    public abstract State Turn(Entity entity);
+    public abstract State Turn(Entity entity, int turn);
 }

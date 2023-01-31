@@ -3,7 +3,10 @@ using UnityEngine;
 
 public class BH_PlayerControler : StateBehaviour
 {
+    public int attack = 3;
     private static Dictionary<KeyCode, Vector2Int> mapKeys;
+
+    public DijkstraMap map;
 
     static BH_PlayerControler()
     {
@@ -19,18 +22,28 @@ public class BH_PlayerControler : StateBehaviour
     }
 
     public int radius = 5;
-    protected enum StatePlayer { Idle, Forward, Backward };
+    protected enum StatePlayer { Idle, Forward, Backward, Attacking };
     protected StatePlayer statePlayer = StatePlayer.Idle;
 
-    public override State Turn(Entity entity)
+    private float timer = 0.0f;
+    public override State Turn(Entity entity, int turn)
     {
-        
+
         var game = GameManager.instance;
         switch (statePlayer)
         {
+            case StatePlayer.Attacking:
+                if (entity.IsAnimationEnd())
+                {
+                    statePlayer = StatePlayer.Idle;
+                    entity.PlayIdle();
+                    entity.isEndOfTurn = true;
+                }
+                return State.Running;
             case StatePlayer.Forward:
                 entity.isEndOfTurn = true;
                 statePlayer = StatePlayer.Idle;
+                Debug.LogError("Next Map");
                 game.LevelForward();
                 return State.Running;
             case StatePlayer.Backward:
@@ -41,11 +54,12 @@ public class BH_PlayerControler : StateBehaviour
 
             case StatePlayer.Idle:
                 entity.PlayIdle();
-                if (Input.GetKey(KeyCode.S))
+                timer += Time.deltaTime;
+                if (Input.GetKey(KeyCode.S) && timer > 1)
                 {
+                    timer = 0;
                     entity.PlayRest();
                     entity.isEndOfTurn = true;
-                    statePlayer = StatePlayer.Idle;
                     return State.Running;
                 }
 
@@ -68,14 +82,20 @@ public class BH_PlayerControler : StateBehaviour
                             {
                                 statePlayer = StatePlayer.Forward;
                             }
-                        } else {
-                            if(game.level.positionToEntity.ContainsKey(dest)){
+                            return State.Running;
+                        }
+                        else
+                        {
+                            if (game.level.positionToEntity.ContainsKey(dest))
+                            {
                                 var other = game.level.positionToEntity[dest][0];
                                 var unit = other.GetBehaviour<BH_Unit>();
-                                if(unit){
-                                    entity.EffectAttack();
-                                    unit.ReceiveDamage(2);
-                                    entity.isEndOfTurn = true;
+                                if (unit)
+                                {
+                                    entity.direction = kvp.Value;
+                                    entity.PlayAttack();
+                                    unit.ReceiveDamage(attack);
+                                    statePlayer = StatePlayer.Attacking;
                                     return State.Running;
                                 }
                             }

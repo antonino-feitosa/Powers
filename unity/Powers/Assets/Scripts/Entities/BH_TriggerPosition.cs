@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BH_TriggerPosition : StateBehaviour
 {
-    public override State Turn(Entity entity)
+    public override State Turn(Entity entity, int turn)
     {
         var game = GameManager.instance;
         List<Entity> list = game.level.positionToEntity[entity.position];

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BH_Melee : StateBehaviourDecision
 {
-    public override State Turn(Entity entity)
+    public override State Turn(Entity entity, int turn)
     {
         var game = GameManager.instance;
         if(!game.HasPlayer()){
@@ -19,7 +19,6 @@ public class BH_Melee : StateBehaviourDecision
             SetNormalFlow();
             if(playerPosition != entity.position)
                 entity.direction = playerPosition - entity.position;
-            entity.PlayIdle();
             return State.Idle;
         }
         else

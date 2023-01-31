@@ -13,8 +13,6 @@ GameObject:
   - component: {fileID: 5824042782272387670}
   - component: {fileID: -4501432366248377126}
   - component: {fileID: -1129939560859707661}
-  - component: {fileID: 2617074354769390908}
-  - component: {fileID: -5955454092372789319}
   - component: {fileID: 1370324798863017965}
   - component: {fileID: 2412150162802719939}
   - component: {fileID: 6229937400314244921}
@@ -38,7 +36,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5824042782272387669}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4, y: -4, z: 0}
+  m_LocalPosition: {x: 0, y: -2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -223,7 +221,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf1a488a43d5e794daff7c06c55579f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  behaviour: {fileID: 2617074354769390908}
+  behaviour: {fileID: 1370324798863017965}
   isBlock: 1
   isDead: 0
   isEndOfTurn: 0
@@ -237,38 +235,6 @@ MonoBehaviour:
   scream: {fileID: 8300000, guid: 0ac48dfcfe59b8a49a25f181cd185a7f, type: 3}
   hurt: {fileID: 8300000, guid: bba07681c5e018243a22aa7e4adcbd90, type: 3}
   rest: {fileID: 8300000, guid: 8afab074f16fac943a38e860a3070f8a, type: 3}
---- !u!114 &2617074354769390908
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5824042782272387669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a3a2fe7f3eba5a48963b27a7e6125d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  next: {fileID: -5955454092372789319}
-  alternative: {fileID: 7715915440596886141}
-  normal: {fileID: 0}
-  runInBackground: 0
---- !u!114 &-5955454092372789319
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5824042782272387669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8268b22a7eb814748849c82f5cf26207, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  next: {fileID: 1370324798863017965}
-  alternative: {fileID: 7715915440596886141}
-  normal: {fileID: 0}
-  viewRadius: 5
 --- !u!114 &1370324798863017965
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -338,7 +304,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2941c101e8a9d14bb7a9b53d0fbfb6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  next: {fileID: 7401574691406767012}
+  next: {fileID: 7715915440596886141}
 --- !u!114 &7401574691406767012
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -352,7 +318,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   next: {fileID: 5561141527112674622}
-  alternative: {fileID: 7715915440596886141}
+  alternative: {fileID: -5736621127212028760}
   normal: {fileID: 0}
 --- !u!114 &5561141527112674622
 MonoBehaviour:
@@ -367,6 +333,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   next: {fileID: 7715915440596886141}
+  alternative: {fileID: 7715915440596886141}
+  normal: {fileID: 0}
   damage: 1
 --- !u!114 &7715915440596886141
 MonoBehaviour:

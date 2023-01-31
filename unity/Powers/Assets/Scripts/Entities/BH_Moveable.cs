@@ -12,7 +12,7 @@ public class BH_Moveable : StateBehaviour
 
     private Vector3 _movingDestination;
 
-    public override State Turn(Entity entity)
+    public override State Turn(Entity entity, int turn)
     {
         if (stateMoveable == StateMoveable.Moving)
         {

@@ -9,7 +9,7 @@ public class BH_Trap : StateBehaviourPositionCondition
     private enum StateTrap { Idle, Active };
     private StateTrap stateTrap = StateTrap.Idle;
 
-    public override State Turn(Entity entity)
+    public override State Turn(Entity entity, int turn)
     {
         var game = GameManager.instance;
         switch (stateTrap)

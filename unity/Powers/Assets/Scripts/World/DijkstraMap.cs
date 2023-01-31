@@ -104,11 +104,14 @@ public class DijkstraMap : IComparer<Vector2Int>
             Vector2Int current = queue.Pop();
             foreach (var neighbor in neighborhood(current))
             {
-                float alt = distance[current] + Cost(current, neighbor);
-                if (alt < distance[neighbor])
+                if (distance.ContainsKey(neighbor))
                 {
-                    distance[neighbor] = alt;
-                    queue.Update(neighbor);
+                    float alt = distance[current] + Cost(current, neighbor);
+                    if (alt < distance[neighbor])
+                    {
+                        distance[neighbor] = alt;
+                        queue.Update(neighbor);
+                    }
                 }
             }
         }
