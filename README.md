@@ -24,9 +24,7 @@ Initially, the user can choose a race, class, weapons, and powers among the init
 
 ## Implementation
 
-The prototype is textual[^17] (Typescript) based on the software architecture described in [^18].
-
-The first version should be implemented using Solarus[^11] engine (lua).
+The [prototype](https://github.com/antonino-feitosa/Powers---Proto) is textual[^17] (javascript) based on the software architecture described in [^18].
 
 The final version should be implemenete using Unity.
 
