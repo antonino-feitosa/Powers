@@ -117,11 +117,11 @@ public class GameManager : MonoBehaviour
         else if (current.isEndOfTurn)
         {
             if (current.GetBehaviour<BH_PlayerControler>()) countTurn++;
-            Debug.Log("End Of Turn: " + current);
+            //Debug.Log("End Of Turn: " + current);
             current.isEndOfTurn = false;
             level.turn.RemoveFirst();
             level.turn.AddLast(current);
-            Debug.Log("\t\t\t\t\t\tNext Turn: " + level.turn.First.Value);
+            //Debug.Log("\t\t\t\t\t\tNext Turn: " + level.turn.First.Value);
         }
     }
 
@@ -214,7 +214,6 @@ public class GameManager : MonoBehaviour
                 {
                     if (!level.turn.Contains(ent))
                     {
-                        Debug.LogWarning("Active " + ent);
                         ent.gameObject.SetActive(true);
                         level.turn.AddLast(ent);
                     }

@@ -43,7 +43,6 @@ public class BH_PlayerControler : StateBehaviour
             case StatePlayer.Forward:
                 entity.isEndOfTurn = true;
                 statePlayer = StatePlayer.Idle;
-                Debug.LogError("Next Map");
                 game.LevelForward();
                 return State.Running;
             case StatePlayer.Backward:
